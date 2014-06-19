@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">CalQ</string>
+    <string name="action_settings">Settings</string>
+    
+    <!-- Button Strings -->
+    <!-- delete should be &#9747; -->
+    <string name="delete">X</string>
+    <string name="equal">=</string>
+    <string name="number">123</string>
+    <string name="example">Example MathML</string>
+    <string name="numkeyboard_hint">0.0</string>
+    
+    <string name="sum">+</string>
+    <string name="difference">-</string>
+    <string name="product">×</string>
+    <string name="quotient">÷</string>
+    <string name="power">^</string>
+    <string name="square">x²</string>
+    <string name="squareroot">√</string>
+    
+
+</resources>
