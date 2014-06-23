@@ -1,7 +1,8 @@
 package awqatty.b.OpTree;
 
 import awqatty.b.FunctionDictionary.*;
-import awqatty.b.JSInterface.IdFormat;
+import awqatty.b.JSInterface.HtmlIdFormat;
+import awqatty.b.ListTree.ListTree;
 import awqatty.b.MathmlPresentation.*;
 
 public final class OpNodeBuilder {
@@ -31,7 +32,6 @@ public final class OpNodeBuilder {
 		case DIVIDE:
 			return new FunctionDivide();
 		case POWER:
-			return new FunctionPower();
 		case SQUARE:
 			return new FunctionPower();
 		case SQRT:
@@ -43,25 +43,39 @@ public final class OpNodeBuilder {
 	}
 	
 	//*
-	private TextPresObject buildTextPres(FunctionType ftype) {
-		//TODO Add more tags
+	private TextPresObject buildTextPres(FunctionType ftype) {		
 		String[] strList = new String[3];
-		TagBox[] tagList = new TagBox[3];
+		//TODO Add more tags
+		TagFillBase[] tagList = new TagFillBase[5];
 
-		tagList[0] = new IdTagBox(Tags.ID.getTag());
-		tagList[1] = new TagBox(
-				TagFlags.HIGHLIGHT,
-				true,false,
-				Tags.SELECT_L.getTag(),
-				"" );
-		tagList[2] = new TagBox(
-				TagFlags.HIGHLIGHT,
-				true,false,
-				Tags.SELECT_R.getTag(),
-				"" );
+		tagList[0] = new BiTagFill(
+				TagFlags.NONE, TagFlags.DISABLE_ID, Tags.ID.getTag(),
+				"", "" );
+		//TODO use this in selection tags
+		/*
+		"<mstyle background='#99ddff' style='border: 1pt solid #000; padding: 2pt;'>",
+		"</mstyle>",
+		//*/
+		tagList[1] = new BiTagFill(
+				TagFlags.HIGHLIGHT, TagFlags.HIGHLIGHT,	Tags.SELECT_L.getTag(),
+				//TODO fill with actual values (add space to front of value)
+				"","");
+		tagList[2] = new BiTagFill(
+				TagFlags.HIGHLIGHT, TagFlags.HIGHLIGHT,	Tags.SELECT_R.getTag(),
+				//TODO fill with actual values
+				"","");
+		tagList[3] = new BiTagFill(
+				TagFlags.PARENTHESES, TagFlags.PARENTHESES,	Tags.PARENTHESIS_L.getTag(),
+				"<mo>(</mo>","");
+		tagList[4] = new BiTagFill(
+				TagFlags.PARENTHESES, TagFlags.PARENTHESES,	Tags.PARENTHESIS_R.getTag(),
+				"<mo>)</mo>","");
 		
-		String href = "href=" + IdFormat.encloseIdInTags(Tags.ID.getTag());
-
+		String href = " href=" + HtmlIdFormat.encloseIdInTags(Tags.ID.getTag()),
+				out_l = "<mstyle" + href + Tags.SELECT_L.getTag() + ">"
+						+ Tags.PARENTHESIS_L.getTag(),
+				out_r = Tags.PARENTHESIS_R.getTag() + "</mstyle>";
+		
 		switch (ftype) {
 		case BLANK:
 			/* How it should be (TODO figure this out)
@@ -69,47 +83,46 @@ public final class OpNodeBuilder {
 				+ href + ">" + "<mn>0</mn></mphantom>";
 			*/
 			// Temp job
-			strList[0] = Tags.SELECT_L.getTag() + "<mi " + href + ">&#x025EF;</mi>";
+			strList[0] = out_l + "<mi>&#x025EF;</mi>" + out_r;
 			strList[1] = "";
-			strList[2] = Tags.SELECT_R.getTag();
+			strList[2] = "";
 			break;
 		case NUMBER:
-			strList[0] = Tags.SELECT_L.getTag() + "<mn " + href + ">";
+			strList[0] = out_l + "<mn>" + NumberStringConverter.toString(number)
+					+"</mn>" + out_r;
 			strList[1] = "";
-			strList[2] = (number != (long)number
-					? Double.toString(number) : Long.toString((long)number) )
-					+"</mn>" + Tags.SELECT_R.getTag();
+			strList[2] = "";
 			break;
 		case ADD:
-			strList[0] = Tags.SELECT_L.getTag();
-			strList[1] = "<mo " + href + ">+</mo>";
-			strList[2] = Tags.SELECT_R.getTag();
+			strList[0] = out_l;
+			strList[1] = "<mo>+</mo>";
+			strList[2] = out_r;
 			break;
 		case SUBTRACT:
-			strList[0] = Tags.SELECT_L.getTag();
-			strList[1] = "<mo " + href + ">-</mo>";
-			strList[2] = Tags.SELECT_R.getTag();
+			strList[0] = out_l;
+			strList[1] = "<mo>-</mo>";
+			strList[2] = out_r;
 			break;
 		case MULTIPLY:
-			strList[0] = Tags.SELECT_L.getTag();
-			strList[1] = "<mo " + href + ">&times;</mo>";
-			strList[2] = Tags.SELECT_R.getTag();
+			strList[0] = out_l;
+			strList[1] = "<mo>&times;</mo>";
+			strList[2] = out_r;
 			break;
 		case DIVIDE:
-			strList[0] = Tags.SELECT_L.getTag() + "<mfrac " + href + "><mrow>";
+			strList[0] = out_l + "<mfrac><mrow>";
 			strList[1] = "</mrow><mrow>";
-			strList[2] = "</mrow></mfrac>" + Tags.SELECT_R.getTag();
+			strList[2] = "</mrow></mfrac>" + out_r;
 			break;
 		case POWER:
 		case SQUARE:
-			strList[0] = Tags.SELECT_L.getTag() + "<msup " + href + "><mrow>";
+			strList[0] = out_l + "<msup><mrow>";
 			strList[1] = "</mrow><mrow>";
-			strList[2] = "</mrow></msup>" + Tags.SELECT_R.getTag();
+			strList[2] = "</mrow></msup>" + out_r;
 			break;
 		case SQRT:
-			strList[0] = Tags.SELECT_L.getTag() + "<msqrt " + href + ">";
+			strList[0] = out_l + "<msqrt>";
 			strList[1] = "";
-			strList[2] = "</msqrt>" + Tags.SELECT_R.getTag();
+			strList[2] = "</msqrt>" + out_r;
 			break;
 			//TODO - throw exception?
 		default:
@@ -161,9 +174,10 @@ public final class OpNodeBuilder {
 
 	public OpNode build(FunctionType ftype) {
 		if (ftype != FunctionType.SOURCE) {
-			FunctionForm func = buildFunction(ftype);
-			TextPresObject pres = buildTextPres(ftype);
-			return new OpNode(ftype, func, pres,
+			return new OpNode(
+					(ftype == FunctionType.SQUARE ? FunctionType.POWER : ftype),
+					buildFunction(ftype),
+					buildTextPres(ftype),
 					getMinBranchCount(ftype),
 					getMaxBranchCount(ftype) );
 		}
@@ -173,7 +187,8 @@ public final class OpNodeBuilder {
 	}
 	
 	// The null entries are placeholders for the selected node
-	public OpNode[] buildExp(FunctionType ftype) {
+	public ListTree<OpNode> buildExp(FunctionType ftype) {
+		ListTree<OpNode> tmp = new ListTree<OpNode>();
 		switch(ftype){
 		// 2+ args
 		case ADD:
@@ -181,33 +196,27 @@ public final class OpNodeBuilder {
 		case MULTIPLY:
 		case DIVIDE:
 		case POWER:
-			return new OpNode[] {
-					build(ftype),
-					null,
-					build(FunctionType.BLANK)
-				};
+			tmp.addChild(tmp.addChild(-1, 0, build(ftype)),
+					0, build(FunctionType.BLANK) );
+			break;
 		// Others (1-arg, 2-arg w/ default)
 		case SQUARE:
-			return new OpNode[] {
-					build(ftype),
-					null,
-					Number(2).build(FunctionType.NUMBER)
-				};
+			tmp.addChild(tmp.addChild(-1, 0, build(ftype)),
+					0, Number(2).build(FunctionType.NUMBER) );
+			break;
 		case SQRT:
-			return new OpNode[] {
-					build(ftype),
-					null
-				};
 		case NUMBER:
 		case BLANK:
-			return new OpNode[] {
-					build(ftype)
-				};
-		case SOURCE:
-			throw new RuntimeException("Cannot create node instance of this type");
+			tmp.addChild(-1, 0, build(ftype));
+			break;
 		default:
 			throw new RuntimeException("Invalid function-type code");
 		}
+		return tmp;
+	}
+	
+	public int buildExpLoc(FunctionType ftype) {
+		return 0;
 	}
 
 	

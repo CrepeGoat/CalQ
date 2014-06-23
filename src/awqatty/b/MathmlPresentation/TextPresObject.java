@@ -5,31 +5,23 @@ import java.util.List;
 
 public class TextPresObject {
 	private static final int pre=0, mid=1, suf=2;
-	private final String[] strList;
-	private final TagBox[] tagList;
+	private final String[] strlist;
+	private final TagFillBase[] taglist;
 	private final TagFlags flags;
 
-	public TextPresObject(String[] sl, TagBox[] tl) {
-		strList = sl;
-		tagList = tl;
+	public TextPresObject(String[] sl, TagFillBase[] tl) {
+		strlist = sl;
+		taglist = tl;
 		flags = new TagFlags(TagFlags.NONE);
 	}
 	
 	public void setIdValue(int id) {
-		// Method 1: Assumes IdTagBox is ALWAYS the first entry
-		//*
-		if (tagList[0].isIdTag()) {
-			((IdTagBox)tagList[0]).setIdTag(id);
-		}	
-		/*/
-		// Method 2: Makes no assumption
-		for (int i=0; i<tagList.length; ++i) {
-			if (tagList[i].isIdTag()) {
-				((IdTagBox)tagList[i]).setIdTag(id);
-				break;
-			}
-		}
-		//*/
+		// Method 1: Assumes ID TagFill is ALWAYS the first entry
+		if (taglist.length > 0)
+			if (taglist[0].tag == Tags.ID.getTag())
+				// TODO put string replacement operation in another function
+				((BiTagFill)taglist[0]).inserts[0]
+						= Integer.toString(id);
 	}
 	public void enableTagFlag(int f) {
 		flags.enableFlag(f);
@@ -39,28 +31,25 @@ public class TextPresObject {
 	}
 	
 	public String getTextPres(List<String> inList) {
-		// Makes immutable copy of strings
-		String[] tmpList = new String[strList.length];
-		System.arraycopy(strList,0, tmpList,0, strList.length);
-		// Replaces tags with correct strings (based on flag state)
 		int i;
-		// TODO make tb cycle in reverse order (parentheses have id's too)
-		for (TagBox tb:tagList)
-			if (tb.isActive(flags))
-				for (i=0; i<tmpList.length; ++i)
-					tmpList[i] = tb.replaceTags(tmpList[i]);
 		// Concatenates strings into single output string
-		String rStr;
-		rStr = tmpList[pre];
+		String str_out;
+		str_out = strlist[pre];
 		if (inList.size() > 0) {
-			rStr += inList.get(0);
+			str_out += inList.get(0);
 			for (i=1; i<inList.size(); ++i) {
-				rStr += tmpList[mid] + inList.get(i);
+				str_out += strlist[mid] + inList.get(i);
 			}
 		}
-		rStr += tmpList[suf];
+		str_out += strlist[suf];
 		
-		return rStr;
+		// Replaces tags with correct strings (based on flag state)
+		for (i=taglist.length-1; i >= 0; --i) {
+			taglist[i].setActivity(flags);
+			str_out = taglist[i].replaceTagsIn(str_out);
+		}
+		
+		return str_out;
 	}
 
 

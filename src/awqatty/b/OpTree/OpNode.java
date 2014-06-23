@@ -2,10 +2,10 @@ package awqatty.b.OpTree;
 
 import java.util.List;
 
-import awqatty.b.ArrayTree.NodeBase;
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionForm;
 import awqatty.b.FunctionDictionary.FunctionType;
+import awqatty.b.ListTree.NodeBase;
 import awqatty.b.MathmlPresentation.TextPresObject;
 
 

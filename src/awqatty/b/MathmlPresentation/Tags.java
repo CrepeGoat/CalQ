@@ -16,15 +16,8 @@ public enum Tags {
 	// Tag Value Storage
 	private static String[] tag_strings = {
 		"#id#",
-		/*
-		// TODO avoid using, nullifies links inside
-		"<menclose notation=\"roundedbox\">",
-		"</menclose>",
-		/*
-		"<mstyle background='#99ddff' style='border: 1pt solid #000; padding: 2pt;'>",
-		"</mstyle>",
-		//*/
-		"","",
+		"#s1#",
+		"#s2#",
 		"#pl#",
 		"#pr#"
 	};
@@ -32,7 +25,7 @@ public enum Tags {
 		return tag_strings[value];
 	}
 	public static String getTag(Tags t) {
-		return tag_strings[t.value];
+		return t.getTag();
 	}
 
 }

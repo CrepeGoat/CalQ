@@ -29,10 +29,10 @@
 			
 			<Button
 			    android:id="@+id/buttonDel"
+			    android:minWidth="60dp"
 			    android:layout_width="wrap_content"
 			    android:layout_height="match_parent"
 			    android:text="@string/delete"
-			    android:textColor="@color/red"
 			    android:onClick="onClickDelete" />		
 			<ViewSwitcher
 			    android:id="@+id/switchEqRes"
@@ -52,7 +52,7 @@
 				    android:layout_height="match_parent"
 				    android:textSize="30sp"
 				    android:textStyle="bold"
-				    android:textColor="@color/orange"
+				    android:textColor="@color/mid_blue"
 				    android:maxLines="1"
 				    android:gravity="right"
 				    android:clickable="true"

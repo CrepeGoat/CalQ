@@ -4,10 +4,11 @@ public class TagFlags {
 	// Flag Constants
 	public static final int 
 				NONE 			= 0,
-				LOWLIGHT 		= 1,
-				SUBHIGHLIGHT 	= 2,
-				HIGHLIGHT 		= 4,
-				PARENTHESES 	= 8;
+				DISABLE_ID		= 1,
+				LOWLIGHT 		= 2,
+				SUBHIGHLIGHT 	= 4,
+				HIGHLIGHT 		= 8,
+				PARENTHESES 	= 16;
 	
 	// Internal Memory & Constructor
 	private int flags;
@@ -32,10 +33,10 @@ public class TagFlags {
 		flags = (flags & ~f);
 		return this;
 	}
-	/*
 	public int get() {
 		return flags;
 	}
+	/*
 	public static boolean coincide(TagFlags f1, TagFlags f2) {
 		return (f1.flags | f2.flags) != 0;
 	}

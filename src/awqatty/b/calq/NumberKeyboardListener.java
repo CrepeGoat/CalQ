@@ -40,24 +40,19 @@ public class NumberKeyboardListener implements OnKeyboardActionListener {
 			if (text.length() > 0)
 				setDisplayText(text.subSequence(0, text.length()-1));
 		}
-		// Back Key Logic
+		// Cancel Key Logic
 		else if (arg0 == -3) {
-			// TODO implement
 			setDisplayText("");
+			activity.onNumKeyboardCancel();
 		}
 		// Enter Key Logic
 		else if (arg0 == -2) {
 			try {
-			activity.onNumKeyboardResult(Double.valueOf(text.toString()));
-			setDisplayText("");
+				activity.onNumKeyboardResult(Double.valueOf(text.toString()));
+				setDisplayText("");
 			} catch (NumberFormatException e) {
 				// Raise toast to alert user that expression is incomplete
-				Toast t = Toast.makeText(
-						activity.getApplicationContext(),
-						"Error: Invalid Number Format",
-						Toast.LENGTH_LONG );
-				t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0,0);
-				t.show();
+				activity.raiseToast("Error: Invalid Number Format");
 			}
 		}
 		// Negative Key Logic

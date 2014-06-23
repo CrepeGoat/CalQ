@@ -17,6 +17,7 @@ import android.widget.Toast;
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.JSInterface.*;
+import awqatty.b.MathmlPresentation.NumberStringConverter;
 import awqatty.b.OpTree.OpTree;
 
 /*
@@ -24,22 +25,26 @@ import awqatty.b.OpTree.OpTree;
  * Add to app store
  * set up donation system
  * 
- * Parenthesis Logic
  * Fix highlighting, or eliminate highlight tags
- * Trim MathJax package
- * Commutative Function Support
- * Add functionality to delete button (i.e. add "deleteParent" method in ArrayTree)
  * 
- * Cancel key in NumKeys
  * Use drawables for NumKey keys
  * 
- * Make keyboard stretch over full screen width
+ * Add ftype values to buttons (to avoid switch table for OnPressOperator & addFunction)
+ * Make MultiOnClickListener class, with ability to disable listeners w/o removal
+ * 		(make listenerSwitch class, which can switch on/off listener w/o explicitly
+ * 			granting access to listener, which should remain private)
+ * 
  * GUI Scheme (colors, custom buttons, TextView borders)
  * Move Num button into main button block (i.e. equals, delete, etc.)
  * 
+ * Add double-click actions to operator/delete buttons
+ * 
+ * Add more operators (tabbed view?)
+ * 
+ * Add code to allow for a "blank-click" on-screen, & allow for SVG output
+ * 		(i.e. )
+ * 
  * Bugs
- * no auto-render on application startup
- *		(create bound Javascript function to trigger render on completion of setup?)
  * x/0, sqrt(negatives) errors
  * 
  * 
@@ -65,7 +70,7 @@ public class MainActivity extends Activity {
 		// Enable Javascript in Webview (warning suppressed)
 		w.getSettings().setJavaScriptEnabled(true);
 		// Reroute "links" to MainActivity
-		w.setWebViewClient(new MathmlViewClient(this));
+		w.setWebViewClient(new MathmlLinksViewClient(this));
 		// vvv Used for Javascript onclick methods vvv
 		//		w.addJavascriptInterface(new JSObject(this), "onClick");
 		
@@ -109,8 +114,6 @@ public class MainActivity extends Activity {
 		k.setOnKeyboardActionListener(new NumberKeyboardListener(
 				this, (TextView) findViewById(R.id.textNum) ));
 		//*/
-		// Loads initial blank element to screen
-		refreshScreen(w);
 	}
 
 	@Override
@@ -142,7 +145,7 @@ public class MainActivity extends Activity {
 				+"\njavascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);"
 				);
 	}
-	private void refreshScreen(WebView w) {
+	public void refreshScreen(WebView w) {
 		loadMathmlToScreen(w, expression.getTextPres());
 	}
 	private void refreshScreen() {
@@ -150,7 +153,23 @@ public class MainActivity extends Activity {
 		WebView w = (WebView) findViewById(R.id.webview);
 		refreshScreen(w);
 	}
-		
+
+	private void resetEqualButton() {
+		ViewSwitcher panel = (ViewSwitcher) findViewById(R.id.switchEqRes);
+		if (panel.getDisplayedChild() != 0) {
+			panel.showPrevious();
+		}
+	}
+	
+	public void raiseToast(String str) {
+		Toast t = Toast.makeText(
+				getApplicationContext(), str, Toast.LENGTH_SHORT );
+		// Sets toast position to bottom of WebView
+		t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0,
+				findViewById(R.id.webview).getBottom() - 10 );
+		t.show();
+	}
+	
 	private FunctionType getFtypeFromViewId(int id) {
 		switch (id) {
 		case R.id.buttonSum:
@@ -173,39 +192,31 @@ public class MainActivity extends Activity {
 		}
 	}
 	
-	private void resetEqualButton() {
-		ViewSwitcher panel = (ViewSwitcher) findViewById(R.id.switchEqRes);
-		if (panel.getDisplayedChild() != 0) {
-			panel.showPrevious();
-		}
-	}
 
 	//////////////////////////////////////////////////////////////////////
 	// ON-CLICK/BUTTON METHODS
 	//////////////////////////////////////////////////////////////////////
-	// Javascript Function
+	// Called when a MathML element is clicked in the WebView
 	public void onMathmlClick(int index) {
 		// TODO if clicked element is a child element of the current selection,
 		//		set selector to the index of its parent
-		expression.unsetHighlight();
-		expression.selection = index;
-		expression.setHighlight();
+		expression.setSelection(index);
 		refreshScreen();
 	}
-
+	
+	// Called when the equals button is clicked
 	public void onClickEquals(View v) {
 		try {
-			expression.unsetHighlight();
+			expression.setSelection(0);
 			
 			// Calculate result (throws CalcEx)
 			result = expression.getCalculation();
 
-			expression.selection = 0;
 			refreshScreen();
 
 			// Set text representation of result to view
 			((TextView) findViewById(R.id.textRes))
-					.setText(Double.toString(result));
+					.setText(NumberStringConverter.toString(result));
 			
 			// Set ViewSwitcher from equal button to result text display
 			((ViewSwitcher) findViewById(R.id.switchEqRes))
@@ -213,51 +224,43 @@ public class MainActivity extends Activity {
 			}
 		catch (CalculationException ce) {
 			// Raise toast to alert user that expression is incomplete
-			Toast t = Toast.makeText(
-					getApplicationContext(),
-					"Error: Expression is incomplete",
-					Toast.LENGTH_LONG );
-			t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0,0);
-			t.show();
+			raiseToast("Error: Expression is incomplete");
 			
 			// set selector to failed index
-			expression.selection = (Integer)ce.getCauseObject();
-			expression.setHighlight();
+			expression.setSelection((Integer)ce.getCauseObject());
 			refreshScreen();
 		}
 	}
+	// Called when the result text box is clicked
 	public void onClickResult(View v) {
 		// Replaces current expression with calculated result value
 		//	(Does not need to unset highlight on mortal objects)
-		expression.selection = 0;
+		expression.setSelection(0);
 		expression.addNumber(result);
-		//	(Does not need to set highlight on root)
 		refreshScreen();
 	}
 	
+	// Called when the user clicks the delete button
 	public void onClickDelete(View v) {
 		expression.delete();
-		expression.setHighlight();
 		refreshScreen();
 		// Changes are made -> switch from ans display to equal button
 		resetEqualButton();
 	}
 	
+	// Called when the user clicks an operator button
+	// TODO add multiListener to operator buttons,
+	//		for reactivating "=" button w/o performing a view lookup
 	public void onClickOperator(View v) {
-		expression.unsetHighlight();
 		expression.addFunction(getFtypeFromViewId(
 				v.getId() ));	// sets selector in function
-		expression.setHighlight();
 		refreshScreen();
 		// Changes are made -> switch from ans display to equal button
 		resetEqualButton();
 	}
 	
+	// Called when the user clicks the number insertion button
 	public void onClickNumber(View v) {
-		/* TODO
-		 * bring up keyboard for numeric input
-		 * put result in new number object
-		 */
 		((KeyboardView) findViewById(R.id.keyboardNum)).setVisibility(View.VISIBLE);
 		((TextView) findViewById(R.id.textNum)).setVisibility(View.VISIBLE);
 	}
@@ -268,10 +271,14 @@ public class MainActivity extends Activity {
 
 		//	(Does not need to unset highlight on mortal objects)
 		expression.addNumber(d);
-		expression.setHighlight();
 		refreshScreen();
 		// Changes are made -> switch from ans display to equal button
 		resetEqualButton();
+	}
+	public void onNumKeyboardCancel() {
+		// Hides Keyboard
+		((KeyboardView) findViewById(R.id.keyboardNum)).setVisibility(View.GONE);
+		((TextView) findViewById(R.id.textNum)).setVisibility(View.GONE);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -285,8 +292,8 @@ public class MainActivity extends Activity {
 	public void setMathmlExample(View v) {
 		// Augment test expression
 		++temp_count;
-		temp_out += "<mo href=" + IdFormat.encloseIdInTags(0) + ">+</mo>"
-				+ "<mn href=" + IdFormat.encloseIdInTags(temp_count) + ">"
+		temp_out += "<mo href=" + HtmlIdFormat.encloseIdInTags(0) + ">+</mo>"
+				+ "<mn href=" + HtmlIdFormat.encloseIdInTags(temp_count) + ">"
 				+ temp_count.toString() + "</mn>";
 		
 		// Set local webview object

@@ -1,7 +1,7 @@
 package awqatty.b.FunctionDictionary;
 
 public enum FunctionType {
-	SOURCE,
+	SOURCE,		// denotes ListTree container (remove?)
 	BLANK,
 	NUMBER,
 	ADD,
@@ -12,8 +12,9 @@ public enum FunctionType {
 	SQUARE,
 	SQRT;
 	
-	public static boolean isFunction(FunctionType ftype) {
-		switch (ftype) {
+	// Property-Check Methods
+	public boolean isFunction() {
+		switch (this) {
 		case SOURCE:
 		case BLANK:
 		case NUMBER:
@@ -22,8 +23,8 @@ public enum FunctionType {
 			return true;
 		}
 	}
-	public static boolean isCommutative(FunctionType ftype) {
-		switch (ftype) {
+	public boolean isCommutative() {
+		switch (this) {
 		case ADD:
 		case MULTIPLY:
 			return true;
@@ -32,46 +33,26 @@ public enum FunctionType {
 		}
 	}
 	
-	public static int defaultArgCount(FunctionType ftype) {
-		switch (ftype) {
-		case BLANK:
-		case NUMBER:
-			return 0;
+	public boolean doesEncapsulateBranches() {
+		switch (this) {
+		case DIVIDE:
 		case SQRT:
-			return 1;
-		default:
-			return 2;
-		}
-	}
-	
-	public static boolean hasDefaultArg(FunctionType ftype) {
-		switch (ftype) {
-		case SQUARE:
 			return true;
 		default:
 			return false;
 		}
 	}
 	
-	public byte getOperatorPrecedence(FunctionType ftype) {
-		switch (ftype) {
+	public boolean isEncapsulated() {
+		switch(this) {
 		case BLANK:
 		case NUMBER:
-			return 0;
-		case POWER:
-		case SQUARE:
-		case SQRT:
-			return 2;
-		case MULTIPLY:
 		case DIVIDE:
-			return 3;
-		case ADD:
-		case SUBTRACT:
-			return 4;
-		case SOURCE:
-			return Byte.MAX_VALUE;
+		case SQRT:
+		case POWER:
+			return true;
 		default:
-			return 1;
+			return false;
 		}
 	}
 }
