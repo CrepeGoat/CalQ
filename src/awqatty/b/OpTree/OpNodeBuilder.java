@@ -42,32 +42,22 @@ public final class OpNodeBuilder {
 		}
 	}
 	
-	//*
 	private TextPresObject buildTextPres(FunctionType ftype) {		
-		String[] strList = new String[3];
-		//TODO Add more tags
-		TagFillBase[] tagList = new TagFillBase[5];
-
-		tagList[0] = new BiTagFill(
+		String[] strlist;
+		TagFillBase[] taglist = new TagFillBase[4];
+		
+		// Note - ID TagFill MUST be first (see TextPresObject)
+		taglist[0] = new BiTagFill(
 				TagFlags.NONE, TagFlags.DISABLE_ID, Tags.ID.getTag(),
+				// ID value is set dynamically
 				"", "" );
-		//TODO use this in selection tags
-		/*
-		"<mstyle background='#99ddff' style='border: 1pt solid #000; padding: 2pt;'>",
-		"</mstyle>",
-		//*/
-		tagList[1] = new BiTagFill(
+		taglist[1] = new BiTagFill(
 				TagFlags.HIGHLIGHT, TagFlags.HIGHLIGHT,	Tags.SELECT_L.getTag(),
-				//TODO fill with actual values (add space to front of value)
-				"","");
-		tagList[2] = new BiTagFill(
-				TagFlags.HIGHLIGHT, TagFlags.HIGHLIGHT,	Tags.SELECT_R.getTag(),
-				//TODO fill with actual values
-				"","");
-		tagList[3] = new BiTagFill(
+				" background='#99ddff' style='border: 1pt solid #000; padding: 2pt;'","");
+		taglist[2] = new BiTagFill(
 				TagFlags.PARENTHESES, TagFlags.PARENTHESES,	Tags.PARENTHESIS_L.getTag(),
 				"<mo>(</mo>","");
-		tagList[4] = new BiTagFill(
+		taglist[3] = new BiTagFill(
 				TagFlags.PARENTHESES, TagFlags.PARENTHESES,	Tags.PARENTHESIS_R.getTag(),
 				"<mo>)</mo>","");
 		
@@ -78,59 +68,58 @@ public final class OpNodeBuilder {
 		
 		switch (ftype) {
 		case BLANK:
-			/* How it should be (TODO figure this out)
-			strList[0] = "<mphantom style='border: 5px solid #000; padding: 5px;' "
-				+ href + ">" + "<mn>0</mn></mphantom>";
-			*/
-			// Temp job
-			strList[0] = out_l + "<mi>&#x025EF;</mi>" + out_r;
-			strList[1] = "";
-			strList[2] = "";
+			strlist = new String[1];
+			// TODO use mphantom instead? 
+			strlist[0] = out_l + "<mi>&#x025EF;</mi>" + out_r;
 			break;
 		case NUMBER:
-			strList[0] = out_l + "<mn>" + NumberStringConverter.toString(number)
+			strlist = new String[1];
+			strlist[0] = out_l + "<mn>" + NumberStringConverter.toString(number)
 					+"</mn>" + out_r;
-			strList[1] = "";
-			strList[2] = "";
 			break;
 		case ADD:
-			strList[0] = out_l;
-			strList[1] = "<mo>+</mo>";
-			strList[2] = out_r;
+			strlist = new String[3];
+			strlist[0] = out_l;
+			strlist[1] = "<mo>+</mo>";
+			strlist[2] = out_r;
 			break;
 		case SUBTRACT:
-			strList[0] = out_l;
-			strList[1] = "<mo>-</mo>";
-			strList[2] = out_r;
+			strlist = new String[3];
+			strlist[0] = out_l;
+			strlist[1] = "<mo>-</mo>";
+			strlist[2] = out_r;
 			break;
 		case MULTIPLY:
-			strList[0] = out_l;
-			strList[1] = "<mo>&times;</mo>";
-			strList[2] = out_r;
+			strlist = new String[3];
+			strlist[0] = out_l;
+			strlist[1] = "<mo>&times;</mo>";
+			strlist[2] = out_r;
 			break;
 		case DIVIDE:
-			strList[0] = out_l + "<mfrac><mrow>";
-			strList[1] = "</mrow><mrow>";
-			strList[2] = "</mrow></mfrac>" + out_r;
+			strlist = new String[3];
+			strlist[0] = out_l + "<mfrac><mrow>";
+			strlist[1] = "</mrow><mrow>";
+			strlist[2] = "</mrow></mfrac>" + out_r;
 			break;
 		case POWER:
 		case SQUARE:
-			strList[0] = out_l + "<msup><mrow>";
-			strList[1] = "</mrow><mrow>";
-			strList[2] = "</mrow></msup>" + out_r;
+			strlist = new String[3];
+			strlist[0] = out_l + "<msup><mrow>";
+			strlist[1] = "</mrow><mrow>";
+			strlist[2] = "</mrow></msup>" + out_r;
 			break;
 		case SQRT:
-			strList[0] = out_l + "<msqrt>";
-			strList[1] = "";
-			strList[2] = "</msqrt>" + out_r;
+			strlist = new String[2];
+			strlist[0] = out_l + "<msqrt>";
+			strlist[1] = "</msqrt>" + out_r;
 			break;
 			//TODO - throw exception?
 		default:
+			strlist = null;
 			break;
 		}
-		return new TextPresObject(strList, tagList);
+		return new TextPresObject(strlist, taglist);
 	}
-	//*/
 	
 	private int getMinBranchCount(FunctionType ftype) {
 		switch (ftype) {

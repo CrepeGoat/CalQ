@@ -19,7 +19,7 @@ public enum Tags {
 		"#s1#",
 		"#s2#",
 		"#pl#",
-		"#pr#"
+		"#pr#",
 	};
 	public String getTag() {
 		return tag_strings[value];

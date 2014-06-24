@@ -198,7 +198,7 @@ public class MainActivity extends Activity {
 	//////////////////////////////////////////////////////////////////////
 	// Called when a MathML element is clicked in the WebView
 	public void onMathmlClick(int index) {
-		// TODO if clicked element is a child element of the current selection,
+		// TODO (?) if clicked element is a child element of the current selection,
 		//		set selector to the index of its parent
 		expression.setSelection(index);
 		refreshScreen();
@@ -206,12 +206,11 @@ public class MainActivity extends Activity {
 	
 	// Called when the equals button is clicked
 	public void onClickEquals(View v) {
-		try {
-			expression.setSelection(0);
-			
+		try {			
 			// Calculate result (throws CalcEx)
 			result = expression.getCalculation();
-
+			
+			expression.setSelection(0);
 			refreshScreen();
 
 			// Set text representation of result to view
@@ -234,9 +233,9 @@ public class MainActivity extends Activity {
 	// Called when the result text box is clicked
 	public void onClickResult(View v) {
 		// Replaces current expression with calculated result value
-		//	(Does not need to unset highlight on mortal objects)
 		expression.setSelection(0);
 		expression.addNumber(result);
+		resetEqualButton();
 		refreshScreen();
 	}
 	
@@ -285,23 +284,25 @@ public class MainActivity extends Activity {
 	// TEST FUNCTIONS
 	//////////////////////////////////////////////////////////////////////
 
-	/*
+	//*
 	// Testing elements
 	Integer temp_count = 0;
-	String temp_out = "<mi>a</mi>";
+	String temp_out;
 	public void setMathmlExample(View v) {
 		// Augment test expression
 		++temp_count;
-		temp_out += "<mo href=" + HtmlIdFormat.encloseIdInTags(0) + ">+</mo>"
-				+ "<mn href=" + HtmlIdFormat.encloseIdInTags(temp_count) + ">"
-				+ temp_count.toString() + "</mn>";
+		temp_out = "<mstyle  background='#9df' style='border: 1pt solid #000; padding: 2pt;'>"
+				+ "<mn>1</mn><mo>+</mo><mn>" + temp_count.toString() + "</mn></mstyle>";
+		//temp_out += "<mo href=" + HtmlIdFormat.encloseIdInTags(0) + ">+</mo>"
+				//+ "<mn href=" + HtmlIdFormat.encloseIdInTags(temp_count) + ">"
+				//+ temp_count.toString() + "</mn>";
 		
 		// Set local webview object
 		WebView w = (WebView) findViewById(R.id.webview);
 		// Load a MathML example on-screen
 		loadMathmlToScreen(w, temp_out);
 	}
-	
+	//*/
 	/*
 	private int build_state = 0;
 	public void setMathmlExample(View v) {

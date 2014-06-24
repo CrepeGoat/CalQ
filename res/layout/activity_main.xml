@@ -126,7 +126,8 @@
 	            android:text="@string/example"
 	            android:layout_width="match_parent"
 	            android:textColor="@color/orange"
-	            android:visibility="invisible" />	        
+	            android:onClick="setMathmlExample"
+	            android:visibility="visible" />	        
 	    </TableLayout>
 	</LinearLayout>
 	

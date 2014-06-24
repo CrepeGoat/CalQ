@@ -22,11 +22,15 @@ public class OpTree {
 	//---------------------------------------------------------------
 	// Private Methods
 	private void unsetHighlight() {
+		/* TODO uncomment method
 		tree.get(selection).disableTagFlag(TagFlags.HIGHLIGHT);
+		*/
 	}
 	private void setHighlight() {
-		if (selection != 0)
-			tree.get(selection).enableTagFlag(TagFlags.HIGHLIGHT);
+		/* TODO uncomment method
+		if (selection != 0)		// highlighting everything == highlighting nothing
+			tree.get(selection).enableTagFlag(TagFlags.HIGHLIGHT); 
+		//*/
 	}
 	
 	private void setParentheses(int index, FunctionType parent_type) {
@@ -38,7 +42,7 @@ public class OpTree {
 	private void setParentheses(int index) {
 		int tmp = tree.getParentIndex(index);
 		if (tmp != -1)
-			setParentheses(index, tree.get(tree.getParentIndex(index)).ftype);
+			setParentheses(index, tree.get(tmp).ftype);
 		else
 			tree.get(index).disableTagFlag(TagFlags.PARENTHESES);
 	}

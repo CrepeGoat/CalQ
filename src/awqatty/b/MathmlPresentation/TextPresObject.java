@@ -4,7 +4,6 @@ import java.util.List;
 
 
 public class TextPresObject {
-	private static final int pre=0, mid=1, suf=2;
 	private final String[] strlist;
 	private final TagFillBase[] taglist;
 	private final TagFlags flags;
@@ -16,12 +15,14 @@ public class TextPresObject {
 	}
 	
 	public void setIdValue(int id) {
-		// Method 1: Assumes ID TagFill is ALWAYS the first entry
+		// Assumes taglist is not empty, and ID TagFill is ALWAYS the first entry
+		/*
 		if (taglist.length > 0)
 			if (taglist[0].tag == Tags.ID.getTag())
-				// TODO put string replacement operation in another function
-				((BiTagFill)taglist[0]).inserts[0]
-						= Integer.toString(id);
+		 */
+		// TODO put string replacement operation in another function
+		((BiTagFill)taglist[0]).inserts[0]
+				= Integer.toString(id);
 	}
 	public void enableTagFlag(int f) {
 		flags.enableFlag(f);
@@ -33,15 +34,22 @@ public class TextPresObject {
 	public String getTextPres(List<String> inList) {
 		int i;
 		// Concatenates strings into single output string
-		String str_out;
-		str_out = strlist[pre];
+		// Case 0+ branches
+		String str_out = strlist[0];
+		
+		// Case 1+ branches
 		if (inList.size() > 0) {
-			str_out += inList.get(0);
-			for (i=1; i<inList.size(); ++i) {
-				str_out += strlist[mid] + inList.get(i);
+			str_out += inList.get(0) + strlist[1];
+			
+			// Case 2+ branches
+			if (inList.size() > 1) {
+				str_out += inList.get(1);
+				for (i=2; i<inList.size(); ++i) {
+					str_out += strlist[1] + inList.get(i);
+				}
+				str_out += strlist[2];
 			}
 		}
-		str_out += strlist[suf];
 		
 		// Replaces tags with correct strings (based on flag state)
 		for (i=taglist.length-1; i >= 0; --i) {
