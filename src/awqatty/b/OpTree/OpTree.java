@@ -183,10 +183,10 @@ public class OpTree {
 	//-----------------------------------------------------------------
 	// Calculation Methods
 	public double getCalculation() throws CalculationException {
-		return tree.calculate(new BranchCompute()).get(0);
+		return new BranchCalculator().runLoop(tree).get(0);
 	}
 	public String getTextPres() {
-		return tree.calculate(new BranchDisplay()).get(0);
+		return new BranchXmlDisplay().runLoop(tree).get(0);
 	}
 
 }

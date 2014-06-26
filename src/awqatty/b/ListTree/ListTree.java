@@ -189,30 +189,17 @@ public class ListTree<N extends NodeBase> {
 	}
 
 	//--------------------------------------------------------------------
-	//Calculation Methods
-	
-	public <U> ArrayList<U> calculate(BranchFunction<N,U> func) throws CalculationException {
-		// TODO rewrite to push/pop from back -> more efficient
-		ArrayList<U> stack = new ArrayList<U>();
-		for (int i = list.size()-1; i >= 0; --i) {
-			try {
-				if (list.get(i).getBranchCount() == 0)
-					stack.add(0, func.calculate(list.get(i),
-							stack.subList(0, list.get(i).getBranchCount()) ));
-				else {
-					stack.set(0, func.calculate(list.get(i), 
-							stack.subList(0, list.get(i).getBranchCount()) ));
-					stack.subList(1, list.get(i).getBranchCount()).clear();
-				}	
-			}
-			catch (CalculationException ce) {
-				ce.setCauseObject(Integer.valueOf(i));
-				throw ce;
-			}
+	//Calculation Methods	
+	public <U> List<U> forAllInReverse(BranchFunctorForm<N,U> func) {
+		int i = list.size()-1;
+		try {
+			for (; i >= 0; --i)
+				func.excecuteInLoop(list.get(i));
+		} catch (CalculationException ce) {
+			ce.setCauseObject(Integer.valueOf(i));
+			throw ce;
 		}
-		
-		return stack;
-
+		return func.returnValues();
 	}
 
 }
