@@ -47,8 +47,8 @@ public class ListTree<N extends NodeBase> {
 	public int getParentIndex(int index) {
 		int tmp=0; --index;
 		for (; index >= 0; --index) {
-			tmp += 1-list.get(index).getBranchCount();
-			if (tmp <= 0)
+			tmp += list.get(index).getBranchCount()-1;
+			if (tmp >= 0)
 				break;
 		}
 		return index;
@@ -62,9 +62,11 @@ public class ListTree<N extends NodeBase> {
 	 * 
 	 */
 	public int getEndOfBranchIndex(int index) {
-		int tmp=list.get(index++).getBranchCount();
-		while (tmp > 0) {
-			tmp += list.get(index++).getBranchCount() - 1;
+		if (index < list.size()) {
+			int tmp=list.get(index++).getBranchCount();
+			while (tmp > 0) {
+				tmp += list.get(index++).getBranchCount() - 1;
+			}
 		}
 		return index;
 	}
@@ -80,6 +82,15 @@ public class ListTree<N extends NodeBase> {
 		}
 		
 		return branch_loc;
+	}
+	public int getBranchNumber(int index) {
+		int tmp=0; --index;
+		for (; index >= 0; --index) {
+			tmp += list.get(index).getBranchCount()-1;
+			if (tmp >= 0)
+				break;
+		}
+		return list.get(index).getBranchCount()-1 - tmp;
 	}
 	
 	public int[] getBranchIndices(int parent_loc) {

@@ -1,6 +1,6 @@
 package awqatty.b.MathmlPresentation;
 
-public class BiTagFill extends TagFillBase {
+public class BiTagFill extends SwitchTagFillBase {
 	/****************************************************
 	 * inserts[0] - the replacement string used when active
 	 * inserts[1] - the replacement string used when inactive

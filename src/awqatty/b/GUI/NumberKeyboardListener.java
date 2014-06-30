@@ -1,9 +1,8 @@
-package awqatty.b.calq;
+package awqatty.b.GUI;
 
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
-import android.view.Gravity;
 import android.widget.TextView;
-import android.widget.Toast;
+import awqatty.b.calq.MainActivity;
 
 public class NumberKeyboardListener implements OnKeyboardActionListener {
 

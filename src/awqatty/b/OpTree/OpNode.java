@@ -11,41 +11,41 @@ import awqatty.b.MathmlPresentation.TextPresObject;
 
 public class OpNode extends NodeBase {
 	
-	protected final FunctionForm function;
-	protected final TextPresObject presentation;
+	private final FunctionForm function;
+	private final TextPresObject presenter;
 	
 	public final FunctionType ftype;
 	
 	public OpNode(FunctionType ft, FunctionForm f, TextPresObject p) {
 		ftype = ft;
 		function = f;
-		presentation = p;
+		presenter = p;
 	}
 	public OpNode(FunctionType ft, FunctionForm f, TextPresObject p,
 			int llimit, int ulimit) {
 		super(llimit, ulimit);
 		ftype = ft;
 		function = f;
-		presentation = p;
+		presenter = p;
 	}
 	
 	// Set display parameters
 	public void setIdNumber(int index) {
-		presentation.setIdValue(index);
+		presenter.setIdValue(index);
 	}
 	public void enableTagFlag(int f) {
-		presentation.enableTagFlag(f);
+		presenter.enableTagFlag(f);
 	}
 	public void disableTagFlag(int f) {
-		presentation.disableTagFlag(f);
+		presenter.disableTagFlag(f);
 	}
 	
 	// Main Calculation Methods
 	public Double calculate(List<Double> dlist) throws CalculationException {
 		return function.calculate(dlist);
 	}
-	public String getTextPres(List<String> slist) {
-		return presentation.getTextPres(slist);
+	public String getTextPres(List<String> slist, byte index) {
+		return presenter.getTextPres(slist);
 	}
 
 }

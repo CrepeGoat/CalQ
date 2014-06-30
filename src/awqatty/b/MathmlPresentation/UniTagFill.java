@@ -1,6 +1,6 @@
 package awqatty.b.MathmlPresentation;
 
-public class UniTagFill extends TagFillBase {
+public class UniTagFill extends SwitchTagFillBase {
 
 	public final String insert;
 	

@@ -6,11 +6,13 @@ import java.util.List;
 public class TextPresObject {
 	private final String[] strlist;
 	private final TagFillBase[] taglist;
+	private final TagFillBase[] childtaglist;
 	private final TagFlags flags;
 
-	public TextPresObject(String[] sl, TagFillBase[] tl) {
+	public TextPresObject(String[] sl, TagFillBase[] tl, TagFillBase[] ctl) {
 		strlist = sl;
 		taglist = tl;
+		childtaglist = ctl;
 		flags = new TagFlags(TagFlags.NONE);
 	}
 	
@@ -33,6 +35,9 @@ public class TextPresObject {
 	
 	public String getTextPres(List<String> inList) {
 		int i;
+		for (i=0; i<inList.size(); ++i)
+			for (TagFillBase t:childtaglist)
+				inList.set(i, t.replaceTagsIn(inList.get(i)));
 		// Concatenates strings into single output string
 		// Case 0+ branches
 		String str_out = strlist[0];

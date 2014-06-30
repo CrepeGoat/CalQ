@@ -1,10 +1,10 @@
-package awqatty.b.OpTree;
+ package awqatty.b.OpTree;
 
 import awqatty.b.CustomExceptions.BranchCountException;
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.ListTree.ListTree;
-import awqatty.b.MathmlPresentation.TagFlags;
+import awqatty.b.MathmlPresentation.Tags;
 
 public class OpTree {
 
@@ -32,21 +32,7 @@ public class OpTree {
 			tree.get(selection).enableTagFlag(TagFlags.HIGHLIGHT); 
 		//*/
 	}
-	
-	private void setParentheses(int index, FunctionType parent_type) {
-		if (parent_type.doesEncapsulateBranches() || tree.get(index).ftype.isEncapsulated())
-			tree.get(index).disableTagFlag(TagFlags.PARENTHESES);
-		else
-			tree.get(index).enableTagFlag(TagFlags.PARENTHESES);			
-	}
-	private void setParentheses(int index) {
-		int tmp = tree.getParentIndex(index);
-		if (tmp != -1)
-			setParentheses(index, tree.get(tmp).ftype);
-		else
-			tree.get(index).disableTagFlag(TagFlags.PARENTHESES);
-	}
-	
+		
 	//---------------------------------------------------------------
 	// Manipulation Methods
 	public void setSelection(int index) {
@@ -75,7 +61,7 @@ public class OpTree {
 				if (ftype == tree.get(tree.getParentIndex(selection)).ftype) {
 					unsetHighlight();
 					i = selection = tree.addChild(tree.getParentIndex(selection),
-							tree.get(selection).getBranchCount(),
+							tree.getBranchNumber(selection)+1,
 							node_builder.build(FunctionType.BLANK) );
 					setHighlight();
 					// Set ID numbers for all elements in new locations
@@ -94,14 +80,13 @@ public class OpTree {
 		for (i=selection; i<tree.size(); ++i)
 			tree.get(i).setIdNumber(i);
 		
-		setParentheses(selection);
 		// Set index to new location, & set parentheses
 		int[] indices = tree.getBranchIndices(selection);
 		for (i=0; i < tree.get(selection).getBranchCount(); ++i) {
 			if (tree.get(indices[i]).ftype == FunctionType.BLANK) {
 				selection = indices[i];
+				break;
 			}
-			setParentheses(indices[i], ftype);
 		}
 		setHighlight();
 	}
@@ -116,7 +101,6 @@ public class OpTree {
 							.build(FunctionType.NUMBER) );
 		
 		setHighlight();
-		setParentheses(selection);
 		// Set ID numbers for all elements in new locations
 		if (has_branch)
 			for (int i=selection; i<tree.size(); ++i)
@@ -135,7 +119,6 @@ public class OpTree {
 			tree.setBranch(selection, 
 					node_builder.build(FunctionType.BLANK) );
 			
-			setParentheses(selection);
 			setHighlight();
 			// Set ID numbers for all elements in new locations
 			if (has_branch)
@@ -172,7 +155,6 @@ public class OpTree {
 						new ListTree<OpNode>(tree.subTree(indices[i])) );
 				
 				setHighlight();
-				setParentheses(selection);
 				// Set ID numbers for all elements in new locations
 				for (i=selection; i<tree.size(); ++i)
 					tree.get(i).setIdNumber(i);
@@ -186,7 +168,9 @@ public class OpTree {
 		return new BranchCalculator().runLoop(tree).get(0);
 	}
 	public String getTextPres() {
-		return new BranchXmlDisplay().runLoop(tree).get(0);
+		return new BranchXmlDisplay((byte)0).runLoop(tree).get(0)
+				.replaceAll(Tags.PARENTHESIS_L.getTag(), "")
+				.replaceAll(Tags.PARENTHESIS_R.getTag(), "");
 	}
 
 }

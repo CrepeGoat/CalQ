@@ -5,7 +5,6 @@ import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-//import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
@@ -16,6 +15,8 @@ import android.widget.Toast;
 
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
+import awqatty.b.GUI.CompositeOnClickListener;
+import awqatty.b.GUI.NumberKeyboardListener;
 import awqatty.b.JSInterface.*;
 import awqatty.b.MathmlPresentation.NumberStringConverter;
 import awqatty.b.OpTree.OpTree;
@@ -30,14 +31,12 @@ import awqatty.b.OpTree.OpTree;
  * Use drawables for NumKey keys
  * 
  * Add ftype values to buttons (to avoid switch table for OnPressOperator & addFunction)
- * Make MultiOnClickListener class, with ability to disable listeners w/o removal
- * 		(make listenerSwitch class, which can switch on/off listener w/o explicitly
- * 			granting access to listener, which should remain private)
  * 
  * GUI Scheme (colors, custom buttons, TextView borders)
  * Move Num button into main button block (i.e. equals, delete, etc.)
  * 
- * Add double-click actions to operator/delete buttons
+ * Add double-click actions to operator buttons
+ * 		(i.e. replace op-button w/ place-switch button, switch back on other button click)
  * 
  * Add more operators (tabbed view?)
  * 
@@ -53,9 +52,12 @@ import awqatty.b.OpTree.OpTree;
 
 public class MainActivity extends Activity {
 	
-	private OpTree expression = new OpTree();
-	// TODO necessary? vvv
+	/*********************************************************
+	 * Private Fields
+	 *********************************************************/
+	private final OpTree expression = new OpTree();
 	private double result;
+	private CompositeOnClickListener.ListenerSwitch buttonEq_switch;
 	
 	//---------------------------------------------------
 	// Init Functions
@@ -65,11 +67,13 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		// Set local webview object
+		/*********************************************************
+		 * Set local WebView object
+		 *********************************************************/
 		WebView w = (WebView) findViewById(R.id.webview);
 		// Enable Javascript in Webview (warning suppressed)
 		w.getSettings().setJavaScriptEnabled(true);
-		// Reroute "links" to MainActivity
+		// Reroute "html-links" to MainActivity
 		w.setWebViewClient(new MathmlLinksViewClient(this));
 		// vvv Used for Javascript onclick methods vvv
 		//		w.addJavascriptInterface(new JSObject(this), "onClick");
@@ -83,7 +87,7 @@ public class MainActivity extends Activity {
 						+"jax: ['input/MathML','output/'], "
 						+"extensions: ['mml2jax.js'], "
 						+"TeX: { extensions: ['noErrors.js','noUndefined.js'] }, "
-						+"OUTPUT: { scale: 150 }, "
+						+"OUTPUT: { scale: 175 }, "
 						+"});</script>"
 					+"<script type='text/javascript' "
 						+"src='file:///android_asset/MathJax_2_3_custom/MathJax.js'"
@@ -92,10 +96,12 @@ public class MainActivity extends Activity {
 		//		(disabled SVG, causes links to nest improperly)
 		/*
 		if (android.os.Build.VERSION.SDK_INT
-				< android.os.Build.VERSION_CODES.HONEYCOMB )
+				>= android.os.Build.VERSION_CODES.HONEYCOMB ) {
 			base_url = base_url
 					.replaceFirst("output/", "output/SVG")
 					.replaceFirst("OUTPUT", "SVG");
+			Log.d(this.toString(), "SVG USED!!!!!!!!!!");
+		}
 		else //*/
 			base_url = base_url
 					.replaceFirst("output/", "output/HTML-CSS")
@@ -107,13 +113,69 @@ public class MainActivity extends Activity {
 		// (?) Disables animation for equals/result panel
 		//((ViewSwitcher) findViewById(R.id.switchEqRes)).setAnimateFirstView(false);
 
-		// Set up Number Keyboard
+		/*********************************************************
+		 * Set Number Keyboard
+		 *********************************************************/
 		//*
 		KeyboardView k = (KeyboardView) findViewById(R.id.keyboardNum);
 		k.setKeyboard(new Keyboard(this, R.xml.num_keys));
 		k.setOnKeyboardActionListener(new NumberKeyboardListener(
 				this, (TextView) findViewById(R.id.textNum) ));
 		//*/
+		
+		/*********************************************************
+		 * Set Button Listeners
+		 *********************************************************/
+		CompositeOnClickListener
+				op_listener = new CompositeOnClickListener(2),
+				num_listener = new CompositeOnClickListener(2),
+				del_listener = new CompositeOnClickListener(2);
+		
+		op_listener.addListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((MainActivity)v.getContext()).onClickOperator(v);
+			}
+		});
+		num_listener.addListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((MainActivity)v.getContext()).onClickNumber(v);
+			}
+		});
+		del_listener.addListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((MainActivity)v.getContext()).onClickDelete(v);
+			}
+		});
+		
+		buttonEq_switch = 
+				op_listener.addSwitchListener(
+				num_listener.addSwitchListener(
+				del_listener.addSwitchListener(
+				new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						((MainActivity)v.getContext()).setEqualButton();
+					}
+				} )));
+		
+		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
+		findViewById(R.id.buttonNum).setOnClickListener(num_listener);
+		
+		View[] op_buttons = {
+		findViewById(R.id.buttonSum),
+		findViewById(R.id.buttonDiff),
+		findViewById(R.id.buttonProd),
+		findViewById(R.id.buttonQuot),
+		findViewById(R.id.buttonSqr),
+		findViewById(R.id.buttonPow),
+		findViewById(R.id.buttonSqrt),
+		};
+		for (View v : op_buttons) {
+			v.setOnClickListener(op_listener);
+		}
 	}
 
 	@Override
@@ -137,6 +199,7 @@ public class MainActivity extends Activity {
 				+"<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\">"
 				+"<mstyle displaystyle=\"true\""
 				//+" mathcolor='#000000'"
+				//+ " mathsize=1.2em"
 				+">"
 				// Insert MathML code here
 				+ mathml_exp
@@ -152,13 +215,6 @@ public class MainActivity extends Activity {
 		// Set local webview object
 		WebView w = (WebView) findViewById(R.id.webview);
 		refreshScreen(w);
-	}
-
-	private void resetEqualButton() {
-		ViewSwitcher panel = (ViewSwitcher) findViewById(R.id.switchEqRes);
-		if (panel.getDisplayedChild() != 0) {
-			panel.showPrevious();
-		}
 	}
 	
 	public void raiseToast(String str) {
@@ -220,6 +276,8 @@ public class MainActivity extends Activity {
 			// Set ViewSwitcher from equal button to result text display
 			((ViewSwitcher) findViewById(R.id.switchEqRes))
 					.showNext();
+			// Set onclick response to reset eq button
+			buttonEq_switch.setActivity(true);
 			}
 		catch (CalculationException ce) {
 			// Raise toast to alert user that expression is incomplete
@@ -235,27 +293,27 @@ public class MainActivity extends Activity {
 		// Replaces current expression with calculated result value
 		expression.setSelection(0);
 		expression.addNumber(result);
-		resetEqualButton();
+		setEqualButton();
 		refreshScreen();
+	}
+	// Called on button click after Equals has been clicked
+	public void setEqualButton() {
+		ViewSwitcher panel = (ViewSwitcher) findViewById(R.id.switchEqRes);
+		panel.showPrevious();
+		buttonEq_switch.setActivity(false);
 	}
 	
 	// Called when the user clicks the delete button
 	public void onClickDelete(View v) {
 		expression.delete();
 		refreshScreen();
-		// Changes are made -> switch from ans display to equal button
-		resetEqualButton();
 	}
 	
 	// Called when the user clicks an operator button
-	// TODO add multiListener to operator buttons,
-	//		for reactivating "=" button w/o performing a view lookup
 	public void onClickOperator(View v) {
 		expression.addFunction(getFtypeFromViewId(
 				v.getId() ));	// sets selector in function
 		refreshScreen();
-		// Changes are made -> switch from ans display to equal button
-		resetEqualButton();
 	}
 	
 	// Called when the user clicks the number insertion button
@@ -271,8 +329,6 @@ public class MainActivity extends Activity {
 		//	(Does not need to unset highlight on mortal objects)
 		expression.addNumber(d);
 		refreshScreen();
-		// Changes are made -> switch from ans display to equal button
-		resetEqualButton();
 	}
 	public void onNumKeyboardCancel() {
 		// Hides Keyboard
