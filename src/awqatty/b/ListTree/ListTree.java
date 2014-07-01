@@ -8,7 +8,7 @@ import awqatty.b.CustomExceptions.CalculationException;
 
 public class ListTree<N extends NodeBase> {
 
-	protected List<N> list;
+	protected final List<N> list;
 	
 	public ListTree() {
 		list = new ArrayList<N>();

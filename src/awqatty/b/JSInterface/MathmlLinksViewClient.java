@@ -11,9 +11,7 @@ import awqatty.b.calq.MainActivity;
  */
 public class MathmlLinksViewClient extends MathmlViewClient {
 
-	//protected MainActivity activity;
 	public MathmlLinksViewClient(MainActivity context) {
-		//activity = context;
 		super(context);
 	}
 	

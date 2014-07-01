@@ -9,8 +9,8 @@ import awqatty.b.MathmlPresentation.Tags;
 public class OpTree {
 
 	// Private Members
-	private ListTree<OpNode> tree = new ListTree<OpNode>();
-	private OpNodeBuilder node_builder = new OpNodeBuilder();
+	private final ListTree<OpNode> tree = new ListTree<OpNode>();
+	private final OpNodeBuilder node_builder = new OpNodeBuilder();
 	public int selection = 0;
 	
 	// Constructor

@@ -12,7 +12,7 @@ import awqatty.b.calq.MainActivity;
 
 public class MathmlViewClient extends WebViewClient {
 
-	protected MainActivity activity;
+	protected final MainActivity activity;
 	public MathmlViewClient(MainActivity context) {
 		super();
 		activity = context;
@@ -23,7 +23,7 @@ public class MathmlViewClient extends WebViewClient {
         super.onPageFinished(view, url);
         if (!url.startsWith("http://bar"))
         	throw new RuntimeException();
-        activity.refreshScreen(view);
+        activity.refreshScreen();
         // Debug Log
         //Log.d(this.toString(), "onPageFinished overloaded method called.");
 	}

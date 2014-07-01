@@ -2,8 +2,8 @@ package awqatty.b.JSInterface;
 
 public abstract class HtmlIdFormat {
 
-	public static String id_prefix = "id_";
-	public static String id_suffix = "_";
+	public static final String id_prefix = "id_";
+	public static final String id_suffix = "_";
 
 	// Convert ID to tagged string
 	public static String encloseIdInTags(int id) {

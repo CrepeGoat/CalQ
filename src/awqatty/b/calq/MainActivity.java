@@ -9,6 +9,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.webkit.WebView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 import android.widget.Toast;
@@ -21,10 +22,17 @@ import awqatty.b.JSInterface.*;
 import awqatty.b.MathmlPresentation.NumberStringConverter;
 import awqatty.b.OpTree.OpTree;
 
-/*
+
+
+/***************************************************************************************
+ * Author - Becker Awqatty
+ * 
+ * References:
+ * StackOverflow Community
+ * MathJax in Android Sample Code (https://github.com/leathrum/android-apps/blob/master
+ * 		/MathJaxApp/mml-full/MainActivity.java)
+ * 
  * TODO
- * Add to app store
- * set up donation system
  * 
  * Fix highlighting, or eliminate highlight tags
  * 
@@ -33,6 +41,7 @@ import awqatty.b.OpTree.OpTree;
  * Add ftype values to buttons (to avoid switch table for OnPressOperator & addFunction)
  * 
  * GUI Scheme (colors, custom buttons, TextView borders)
+ * 
  * Move Num button into main button block (i.e. equals, delete, etc.)
  * 
  * Add double-click actions to operator buttons
@@ -43,14 +52,11 @@ import awqatty.b.OpTree.OpTree;
  * Add code to allow for a "blank-click" on-screen, & allow for SVG output
  * 		(i.e. )
  * 
- * Bugs
- * x/0, sqrt(negatives) errors
  * 
- * 
- */
+ *****************************************************************************************/
 
 
-public class MainActivity extends Activity {
+public final class MainActivity extends Activity {
 	
 	/*********************************************************
 	 * Private Fields
@@ -58,6 +64,8 @@ public class MainActivity extends Activity {
 	private final OpTree expression = new OpTree();
 	private double result;
 	private CompositeOnClickListener.ListenerSwitch buttonEq_switch;
+	
+	private WebView webview;
 	
 	//---------------------------------------------------
 	// Init Functions
@@ -70,11 +78,11 @@ public class MainActivity extends Activity {
 		/*********************************************************
 		 * Set local WebView object
 		 *********************************************************/
-		WebView w = (WebView) findViewById(R.id.webview);
+		webview = (WebView) findViewById(R.id.webview);
 		// Enable Javascript in Webview (warning suppressed)
-		w.getSettings().setJavaScriptEnabled(true);
+		webview.getSettings().setJavaScriptEnabled(true);
 		// Reroute "html-links" to MainActivity
-		w.setWebViewClient(new MathmlLinksViewClient(this));
+		webview.setWebViewClient(new MathmlLinksViewClient(this));
 		// vvv Used for Javascript onclick methods vvv
 		//		w.addJavascriptInterface(new JSObject(this), "onClick");
 		
@@ -107,7 +115,7 @@ public class MainActivity extends Activity {
 					.replaceFirst("output/", "output/HTML-CSS")
 					.replaceFirst("OUTPUT", "\"HTML-CSS\"");
 		
-		w.loadDataWithBaseURL(
+		webview.loadDataWithBaseURL(
 				"http://bar", base_url, "text/html","utf-8","" );
 		
 		// (?) Disables animation for equals/result panel
@@ -117,10 +125,11 @@ public class MainActivity extends Activity {
 		 * Set Number Keyboard
 		 *********************************************************/
 		//*
-		KeyboardView k = (KeyboardView) findViewById(R.id.keyboardNum);
+		KeyboardView k = (KeyboardView)findViewById(R.id.keyboardNum);
 		k.setKeyboard(new Keyboard(this, R.xml.num_keys));
 		k.setOnKeyboardActionListener(new NumberKeyboardListener(
-				this, (TextView) findViewById(R.id.textNum) ));
+				this, (TextView)findViewById(R.id.textNum) ));
+		k.setEnabled(false);
 		//*/
 		
 		/*********************************************************
@@ -160,9 +169,10 @@ public class MainActivity extends Activity {
 						((MainActivity)v.getContext()).setEqualButton();
 					}
 				} )));
+		buttonEq_switch.deactivateListener();
 		
-		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
 		findViewById(R.id.buttonNum).setOnClickListener(num_listener);
+		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
 		
 		View[] op_buttons = {
 		findViewById(R.id.buttonSum),
@@ -189,13 +199,15 @@ public class MainActivity extends Activity {
 	//////////////////////////////////////////////////////////////////////
 	// INTERNAL FUNCTIONS
 	//////////////////////////////////////////////////////////////////////
-	private void loadMathmlToScreen(WebView w, String mathml_exp) {
+	private void loadMathmlToScreen(String mathml_exp) {
 		// Load a MathML example on-screen
+		//	(https://github.com/leathrum/android-apps/blob/master
+		//		/MathJaxApp/mml-full/MainActivity.java)
 		/* 								  vv green
 		 * TODO add color ( mathcolor='#000000')
 		 * 							red	^^	^^ blue
 		 */
-		w.loadUrl("javascript:document.getElementById('math').innerHTML='"
+		webview.loadUrl("javascript:document.getElementById('math').innerHTML='"
 				+"<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\">"
 				+"<mstyle displaystyle=\"true\""
 				//+" mathcolor='#000000'"
@@ -208,13 +220,33 @@ public class MainActivity extends Activity {
 				+"\njavascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);"
 				);
 	}
-	public void refreshScreen(WebView w) {
-		loadMathmlToScreen(w, expression.getTextPres());
+	public void refreshScreen() {
+		loadMathmlToScreen(expression.getTextPres());
 	}
-	private void refreshScreen() {
-		// Set local webview object
-		WebView w = (WebView) findViewById(R.id.webview);
-		refreshScreen(w);
+	
+	private void hideKeyboard() {
+		// Shows button panel
+		findViewById(R.id.buttonPanel).setVisibility(View.VISIBLE);
+		// Aligns bottom of WebView back to button panel
+		((RelativeLayout.LayoutParams)webview.getLayoutParams())
+				.addRule(RelativeLayout.ABOVE, R.id.buttonPanel);
+		// Hides Keyboard
+		findViewById(R.id.textNum).setVisibility(View.GONE);
+		KeyboardView keyboard = (KeyboardView)findViewById(R.id.keyboardNum);
+		keyboard.setVisibility(View.GONE);
+		keyboard.setEnabled(false);
+	}
+	private void showKeyboard() {
+		// Shows keyboard
+		KeyboardView keyboard = (KeyboardView)findViewById(R.id.keyboardNum);
+		keyboard.setVisibility(View.VISIBLE);
+		keyboard.setEnabled(true);
+		findViewById(R.id.textNum).setVisibility(View.VISIBLE);
+		// Aligns bottom of WebView to top of keyboard
+		((RelativeLayout.LayoutParams)webview.getLayoutParams())
+				.addRule(RelativeLayout.ABOVE, R.id.textNum);
+		// Hides button panel
+		findViewById(R.id.buttonPanel).setVisibility(View.GONE);
 	}
 	
 	public void raiseToast(String str) {
@@ -222,7 +254,7 @@ public class MainActivity extends Activity {
 				getApplicationContext(), str, Toast.LENGTH_SHORT );
 		// Sets toast position to bottom of WebView
 		t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0,
-				findViewById(R.id.webview).getBottom() - 10 );
+				webview.getBottom() - 10 );
 		t.show();
 	}
 	
@@ -277,8 +309,8 @@ public class MainActivity extends Activity {
 			((ViewSwitcher) findViewById(R.id.switchEqRes))
 					.showNext();
 			// Set onclick response to reset eq button
-			buttonEq_switch.setActivity(true);
-			}
+			buttonEq_switch.activateListener();
+		}
 		catch (CalculationException ce) {
 			// Raise toast to alert user that expression is incomplete
 			raiseToast("Error: Expression is incomplete");
@@ -300,7 +332,7 @@ public class MainActivity extends Activity {
 	public void setEqualButton() {
 		ViewSwitcher panel = (ViewSwitcher) findViewById(R.id.switchEqRes);
 		panel.showPrevious();
-		buttonEq_switch.setActivity(false);
+		buttonEq_switch.deactivateListener();
 	}
 	
 	// Called when the user clicks the delete button
@@ -318,22 +350,15 @@ public class MainActivity extends Activity {
 	
 	// Called when the user clicks the number insertion button
 	public void onClickNumber(View v) {
-		((KeyboardView) findViewById(R.id.keyboardNum)).setVisibility(View.VISIBLE);
-		((TextView) findViewById(R.id.textNum)).setVisibility(View.VISIBLE);
+		showKeyboard();
 	}
 	public void onNumKeyboardResult(double d) {
-		// Hides Keyboard
-		((KeyboardView) findViewById(R.id.keyboardNum)).setVisibility(View.GONE);
-		((TextView) findViewById(R.id.textNum)).setVisibility(View.GONE);
-
-		//	(Does not need to unset highlight on mortal objects)
+		hideKeyboard();
 		expression.addNumber(d);
 		refreshScreen();
 	}
 	public void onNumKeyboardCancel() {
-		// Hides Keyboard
-		((KeyboardView) findViewById(R.id.keyboardNum)).setVisibility(View.GONE);
-		((TextView) findViewById(R.id.textNum)).setVisibility(View.GONE);
+		hideKeyboard();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -353,10 +378,8 @@ public class MainActivity extends Activity {
 				//+ "<mn href=" + HtmlIdFormat.encloseIdInTags(temp_count) + ">"
 				//+ temp_count.toString() + "</mn>";
 		
-		// Set local webview object
-		WebView w = (WebView) findViewById(R.id.webview);
 		// Load a MathML example on-screen
-		loadMathmlToScreen(w, temp_out);
+		loadMathmlToScreen(temp_out);
 	}
 	//*/
 	/*

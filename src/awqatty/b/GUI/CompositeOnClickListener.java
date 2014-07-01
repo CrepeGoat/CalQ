@@ -14,17 +14,20 @@ public class CompositeOnClickListener implements OnClickListener {
 	public static final boolean ON = true;
 	public static final boolean OFF = false;
 	// Object stored elsewhere to activate/deactivate listeners w/o using publicly
-	public class ListenerSwitch {
+	public final class ListenerSwitch {
 		private final SwitchListenerBox box;
 		public ListenerSwitch(SwitchListenerBox b) {
 			box = b;
 		}
-		public void setActivity(boolean b) {
-			box.state = b;
+		public void activateListener() {
+			box.state = true;
+		}
+		public void deactivateListener() {
+			box.state = false;
 		}
 	}
 	
-	private class SwitchListenerBox implements OnClickListener {
+	private final class SwitchListenerBox implements OnClickListener {
 		protected final OnClickListener listener;
 		public boolean state;
 

@@ -9,7 +9,7 @@ import awqatty.b.calq.MainActivity;
  */
 public class JSObject {
 
-	MainActivity main;
+	private final MainActivity main;
 	
 	public JSObject(MainActivity m) {
 		// TODO Auto-generated constructor stub
