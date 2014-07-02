@@ -53,6 +53,7 @@ public class CompositeOnClickListener implements OnClickListener {
 	/*******************************************************************
 	 * Methods
 	 */
+	// Constructors
 	public CompositeOnClickListener() {
 		listener_list = new ArrayList<OnClickListener>();
 	}
@@ -60,6 +61,8 @@ public class CompositeOnClickListener implements OnClickListener {
 		listener_list = new ArrayList<OnClickListener>(capacity);
 	}
 	
+	// Add Listener Methods
+	// (Note - onClick methods are called in the order they are added, i.e. FIFO)
 	public void addListener(OnClickListener l) {
 		listener_list.add(l);
 	}

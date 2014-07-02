@@ -10,6 +10,27 @@ public class ListTree<N extends NodeBase> {
 
 	protected final List<N> list;
 	
+	public class FindParentAlgorithm {
+		private int index, count;
+		
+		public void runAlgorithm(int child_loc) {
+			count = 0;
+			index = child_loc-1;
+			for (; index >= 0; --index) {
+				count += list.get(index).getBranchCount()-1;
+				if (count >= 0)
+					break;
+			}
+		}
+		public int getParentIndex() {
+			return index;
+		}
+		public int getBranchNumber() {
+			return list.get(index).getBranchCount()-1 - count;
+		}
+	}
+	
+	
 	public ListTree() {
 		list = new ArrayList<N>();
 	}
@@ -173,6 +194,24 @@ public class ListTree<N extends NodeBase> {
 		temp2.addAll(temp3);
 	}
 	
+	public int shiftBranchOrder(int branch_loc, int new_order) {
+		FindParentAlgorithm alg = new FindParentAlgorithm();
+		alg.runAlgorithm(branch_loc);
+		
+		int parent_loc = alg.getParentIndex();
+		if (parent_loc != -1)
+			new_order = Math.min(new_order,
+					list.get(parent_loc).getBranchCount()-1 );
+		
+		if (new_order != alg.getBranchNumber()) {
+			List<N> sublist = list.subList(branch_loc, getEndOfBranchIndex(branch_loc)),
+					tmplist = new ArrayList<N>(sublist);
+			sublist.clear();
+			branch_loc = getNthBranchIndex(parent_loc, new_order);
+			list.addAll(branch_loc, tmplist);
+		}
+		return branch_loc;
+	}
 	/*********************************************************************
 	 * FUNCTION - deleteBranch
 	 * 
@@ -188,13 +227,11 @@ public class ListTree<N extends NodeBase> {
 	 * 
 	 */
 	public void setBranch(int branch_loc, N branch) {
-		// TODO (?) make method for adding entire branch, instead of single node
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
 		list.add(branch_loc, branch);
 	}
 
 	public void setBranch(int branch_loc, ListTree<N> branch) {
-		// TODO (?) make method for adding entire branch, instead of single node
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
 		list.addAll(branch_loc, branch.list);
 	}

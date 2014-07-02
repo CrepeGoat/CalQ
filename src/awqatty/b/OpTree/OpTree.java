@@ -71,18 +71,19 @@ public class OpTree {
 				}
 		}
 		unsetHighlight();
+		i = selection;
 		// Set new function elements into place
-		tree.addParent(selection,
-				node_builder.buildExpLoc(ftype),
-				node_builder.buildExp(ftype) );
+		node_builder.buildInSubtree(tree.subTree(selection), ftype);
 		
+		int last_index = tree.size();
 		// Set ID numbers for all elements in new locations
-		for (i=selection; i<tree.size(); ++i)
+		for (; i<last_index; ++i)
 			tree.get(i).setIdNumber(i);
 		
-		// Set index to new location, & set parentheses
+		// Set index to new location
 		int[] indices = tree.getBranchIndices(selection);
-		for (i=0; i < tree.get(selection).getBranchCount(); ++i) {
+		last_index = tree.get(selection).getBranchCount();
+		for (i=0; i<last_index; ++i) {
 			if (tree.get(indices[i]).ftype == FunctionType.BLANK) {
 				selection = indices[i];
 				break;
@@ -96,17 +97,32 @@ public class OpTree {
 	 */
 	public void addNumber(double num) {
 		boolean has_branch = tree.get(selection).getBranchCount() > 0;
-		tree.setBranch(selection, 
-				node_builder.Number(num)
-							.build(FunctionType.NUMBER) );
+		node_builder.Number(num)
+					.buildInSubtree(tree.subTree(selection), FunctionType.NUMBER);
 		
-		setHighlight();
 		// Set ID numbers for all elements in new locations
 		if (has_branch)
 			for (int i=selection; i<tree.size(); ++i)
 				tree.get(i).setIdNumber(i);
 		else
 			tree.get(selection).setIdNumber(selection);
+		setHighlight();
+	}
+	
+	public void shuffleOrder() {
+		ListTree<OpNode>.FindParentAlgorithm alg = tree.new FindParentAlgorithm();
+		alg.runAlgorithm(selection);
+		
+		int parent_loc = alg.getParentIndex();
+		int i = selection;
+		selection = tree.shiftBranchOrder(selection,
+				(alg.getBranchNumber()+1) % tree.get(parent_loc).getBranchCount() );
+		
+		int last_loc = tree.getEndOfBranchIndex(Math.max(i,selection));
+		// Set ID numbers for all elements in new locations
+		for (i = Math.min(i,selection); i < last_loc; ++i)
+			tree.get(i).setIdNumber(i);
+		// No need to reset highlight, selection shifts w/ object movement
 	}
 	
 	/*****************************************************************

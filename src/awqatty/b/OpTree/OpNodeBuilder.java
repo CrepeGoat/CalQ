@@ -170,11 +170,23 @@ public final class OpNodeBuilder {
 			return 0;
 		}
 	}
+	
+	// Used to ensure functions have appropriate ftypes
+	//	i.e. SQUARE differs from POWER only by default values,
+	//		should be treated as POWER function (esp. when args change from defaults)
+	private FunctionType getImplementingType(FunctionType ftype) {
+		switch(ftype){
+		case SQUARE:
+			return FunctionType.POWER;
+		default:
+			return ftype;
+		}
+	}
 
 	public OpNode build(FunctionType ftype) {
 		if (ftype != FunctionType.SOURCE) {
 			return new OpNode(
-					(ftype == FunctionType.SQUARE ? FunctionType.POWER : ftype),
+					getImplementingType(ftype),
 					buildFunction(ftype),
 					buildTextPres(ftype),
 					getMinBranchCount(ftype),
@@ -184,38 +196,38 @@ public final class OpNodeBuilder {
 		else
 			throw new RuntimeException("Cannot create source node instance");
 	}
-	
-	// The null entries are placeholders for the selected node
-	public ListTree<OpNode> buildExp(FunctionType ftype) {
-		ListTree<OpNode> tmp = new ListTree<OpNode>();
+		
+	public void buildInSubtree(ListTree<OpNode> subtree, FunctionType ftype) {
 		switch(ftype){
+		// 0-arg
+		case NUMBER:
+		case BLANK:
+			subtree.setBranch(0, build(ftype));
+			break;
 		// 2+ args
 		case ADD:
 		case SUBTRACT:
 		case MULTIPLY:
 		case DIVIDE:
 		case POWER:
-			tmp.addChild(tmp.addChild(-1, 0, build(ftype)),
-					0, build(FunctionType.BLANK) );
+			subtree.addParent(0, build(ftype));
+			subtree.addChild(0, 1, build(FunctionType.BLANK));
 			break;
-		// Others (1-arg, 2-arg w/ default)
-		case SQUARE:
-			tmp.addChild(tmp.addChild(-1, 0, build(ftype)),
-					0, Number(2).build(FunctionType.NUMBER) );
-			break;
+		// 1-arg
 		case SQRT:
-		case NUMBER:
-		case BLANK:
-			tmp.addChild(-1, 0, build(ftype));
+			subtree.addParent(0, build(ftype));
+			break;
+		// 2-arg w/ default value
+		case SQUARE:
+			double tmp = number;
+			number = 2;
+			subtree.addParent(0, build(ftype));
+			subtree.addChild(0, 1, build(FunctionType.NUMBER));
+			number = tmp;
 			break;
 		default:
 			throw new RuntimeException("Invalid function-type code");
-		}
-		return tmp;
-	}
-	
-	public int buildExpLoc(FunctionType ftype) {
-		return 0;
+		}	
 	}
 
 	

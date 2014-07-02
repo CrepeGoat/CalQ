@@ -18,7 +18,7 @@ public class JSObject {
 	
 	@JavascriptInterface
 	public void onClick(String id) {
-		main.onMathmlClick(
+		main.onClickMathml(
 				Integer.valueOf(HtmlIdFormat.getIdFromString(id)) );
 	}
 

@@ -22,7 +22,7 @@ public class MathmlLinksViewClient extends MathmlViewClient {
 		// Log.d(this.toString(), url+", index = "+HtmlIdFormat.getIdFromString(url));
 		
 		// Reroutes id int value to MainActivity method
-		activity.onMathmlClick(
+		activity.onClickMathml(
 				Integer.valueOf(HtmlIdFormat.getIdFromString(url)) );
 		return true;
 	}

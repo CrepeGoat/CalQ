@@ -32,6 +32,25 @@ public enum FunctionType {
 			return false;	
 		}
 	}
+	public int defaultArgCount() {
+		switch(this) {
+			case BLANK:
+			case NUMBER:
+				return 0;
+			case SQRT:
+			case SOURCE:
+				return 1;
+			case ADD:
+			case SUBTRACT:
+			case MULTIPLY:
+			case DIVIDE:
+			case POWER:
+			case SQUARE:
+				return 2;
+			default:
+				return 0;
+		}
+	}
 	
 	public boolean doesEncapsulateBranches() {
 		switch (this) {

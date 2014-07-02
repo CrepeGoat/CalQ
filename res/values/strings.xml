@@ -9,6 +9,7 @@
     <string name="delete">X</string>
     <string name="equal">=</string>
     <string name="number">123</string>
+    <string name="cycle">-></string>
     <string name="example">Example MathML</string>
     <string name="numkeyboard_hint">0.0</string>
     

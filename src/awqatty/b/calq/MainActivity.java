@@ -5,10 +5,13 @@ import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -44,9 +47,6 @@ import awqatty.b.OpTree.OpTree;
  * 
  * Move Num button into main button block (i.e. equals, delete, etc.)
  * 
- * Add double-click actions to operator buttons
- * 		(i.e. replace op-button w/ place-switch button, switch back on other button click)
- * 
  * Add more operators (tabbed view?)
  * 
  * Add code to allow for a "blank-click" on-screen, & allow for SVG output
@@ -63,9 +63,14 @@ public final class MainActivity extends Activity {
 	 *********************************************************/
 	private final OpTree expression = new OpTree();
 	private double result;
-	private CompositeOnClickListener.ListenerSwitch buttonEq_switch;
+	private CompositeOnClickListener.ListenerSwitch
+			trigger_resetEqualButton,
+			trigger_resetOpButton;
+
+	private View button_shuffle;
+	private View button_temp;
 	
-	private WebView webview;
+	private WebView webview;		// local reference
 	
 	//---------------------------------------------------
 	// Init Functions
@@ -136,9 +141,35 @@ public final class MainActivity extends Activity {
 		 * Set Button Listeners
 		 *********************************************************/
 		CompositeOnClickListener
-				op_listener = new CompositeOnClickListener(2),
-				num_listener = new CompositeOnClickListener(2),
-				del_listener = new CompositeOnClickListener(2);
+				op_listener = new CompositeOnClickListener(3),
+				num_listener = new CompositeOnClickListener(3),
+				del_listener = new CompositeOnClickListener(3);
+				// WebView does not support onClickListener's
+				//web_listener = new CompositeOnClickListener(1);
+		
+		trigger_resetOpButton = 
+				op_listener.addSwitchListener(
+				num_listener.addSwitchListener(
+				del_listener.addSwitchListener(
+						new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								((MainActivity)v.getContext()).resetOpButton();
+							}
+						} )));
+		trigger_resetOpButton.deactivateListener();
+		
+		trigger_resetEqualButton = 
+				op_listener.addSwitchListener(
+				num_listener.addSwitchListener(
+				del_listener.addSwitchListener(
+						new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								((MainActivity)v.getContext()).resetEqualButton();
+							}
+						} )));
+		trigger_resetEqualButton.deactivateListener();
 		
 		op_listener.addListener(new View.OnClickListener() {
 			@Override
@@ -158,19 +189,8 @@ public final class MainActivity extends Activity {
 				((MainActivity)v.getContext()).onClickDelete(v);
 			}
 		});
-		
-		buttonEq_switch = 
-				op_listener.addSwitchListener(
-				num_listener.addSwitchListener(
-				del_listener.addSwitchListener(
-				new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						((MainActivity)v.getContext()).setEqualButton();
-					}
-				} )));
-		buttonEq_switch.deactivateListener();
-		
+				
+		// Sets listeners to respective views
 		findViewById(R.id.buttonNum).setOnClickListener(num_listener);
 		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
 		
@@ -186,6 +206,8 @@ public final class MainActivity extends Activity {
 		for (View v : op_buttons) {
 			v.setOnClickListener(op_listener);
 		}
+		
+		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
 	}
 
 	@Override
@@ -285,7 +307,7 @@ public final class MainActivity extends Activity {
 	// ON-CLICK/BUTTON METHODS
 	//////////////////////////////////////////////////////////////////////
 	// Called when a MathML element is clicked in the WebView
-	public void onMathmlClick(int index) {
+	public void onClickMathml(int index) {
 		// TODO (?) if clicked element is a child element of the current selection,
 		//		set selector to the index of its parent
 		expression.setSelection(index);
@@ -308,8 +330,8 @@ public final class MainActivity extends Activity {
 			// Set ViewSwitcher from equal button to result text display
 			((ViewSwitcher) findViewById(R.id.switchEqRes))
 					.showNext();
-			// Set onclick response to reset eq button
-			buttonEq_switch.activateListener();
+			// Set onClick response to reset eq button
+			trigger_resetEqualButton.activateListener();
 		}
 		catch (CalculationException ce) {
 			// Raise toast to alert user that expression is incomplete
@@ -325,14 +347,14 @@ public final class MainActivity extends Activity {
 		// Replaces current expression with calculated result value
 		expression.setSelection(0);
 		expression.addNumber(result);
-		setEqualButton();
+		resetEqualButton();
 		refreshScreen();
 	}
 	// Called on button click after Equals has been clicked
-	public void setEqualButton() {
+	public void resetEqualButton() {
 		ViewSwitcher panel = (ViewSwitcher) findViewById(R.id.switchEqRes);
 		panel.showPrevious();
-		buttonEq_switch.deactivateListener();
+		trigger_resetEqualButton.deactivateListener();
 	}
 	
 	// Called when the user clicks the delete button
@@ -343,9 +365,33 @@ public final class MainActivity extends Activity {
 	
 	// Called when the user clicks an operator button
 	public void onClickOperator(View v) {
-		expression.addFunction(getFtypeFromViewId(
-				v.getId() ));	// sets selector in function
+		// Adds function to expression
+		FunctionType ftype = getFtypeFromViewId(v.getId());
+		expression.addFunction(ftype);	// sets selector in function
 		refreshScreen();
+		
+		// Replaces op-button with shuffle button
+		// TODO replace assertion with something with better style
+		if (ftype.defaultArgCount() > 1) {
+			ViewGroup parent = (ViewGroup) v.getParent();
+			parent.addView(button_shuffle, parent.indexOfChild(v), v.getLayoutParams());
+			parent.removeView(v);
+			button_temp = v;
+			trigger_resetOpButton.activateListener();
+		}
+	}
+	public void onClickShuffle(View v) {
+		//TODO remove
+		Log.d(this.toString(), "Test: Shuffle button clicked!!!");
+		expression.shuffleOrder();
+		refreshScreen();
+	}
+	public void resetOpButton() {
+		// Replaces shuffle button w/ op-button
+		ViewGroup parent = (ViewGroup) button_shuffle.getParent();
+		parent.addView(button_temp, parent.indexOfChild(button_shuffle), button_shuffle.getLayoutParams());
+		parent.removeView(button_shuffle);
+		trigger_resetOpButton.deactivateListener();
 	}
 	
 	// Called when the user clicks the number insertion button
