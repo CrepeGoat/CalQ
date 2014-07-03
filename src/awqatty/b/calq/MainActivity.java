@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
@@ -45,12 +44,10 @@ import awqatty.b.OpTree.OpTree;
  * 
  * GUI Scheme (colors, custom buttons, TextView borders)
  * 
- * Move Num button into main button block (i.e. equals, delete, etc.)
- * 
  * Add more operators (tabbed view?)
  * 
  * Add code to allow for a "blank-click" on-screen, & allow for SVG output
- * 		(i.e. )
+ * 		(i.e. at each link, add "stopPropogation" functionality)
  * 
  * 
  *****************************************************************************************/
@@ -80,83 +77,29 @@ public final class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		/*********************************************************
-		 * Set local WebView object
-		 *********************************************************/
 		webview = (WebView) findViewById(R.id.webview);
-		// Enable Javascript in Webview (warning suppressed)
-		webview.getSettings().setJavaScriptEnabled(true);
-		// Reroute "html-links" to MainActivity
-		webview.setWebViewClient(new MathmlLinksViewClient(this));
-		// vvv Used for Javascript onclick methods vvv
-		//		w.addJavascriptInterface(new JSObject(this), "onClick");
-		
-		// Loads initial MathJax configuration
-		//	(https://github.com/leathrum/android-apps/blob/master
-		//		/MathJaxApp/mml-full/MainActivity.java)
-		String base_url = "<script type='text/x-mathjax-config'>"
-					+"MathJax.Hub.Config({ "
-						+"showMathMenu: false, "
-						+"jax: ['input/MathML','output/'], "
-						+"extensions: ['mml2jax.js'], "
-						+"TeX: { extensions: ['noErrors.js','noUndefined.js'] }, "
-						+"OUTPUT: { scale: 175 }, "
-						+"});</script>"
-					+"<script type='text/javascript' "
-						+"src='file:///android_asset/MathJax_2_3_custom/MathJax.js'"
-						+"></script><span id='math'></span>";
-		// Chooses HTML-CSS vs. SVG, based on android version
-		//		(disabled SVG, causes links to nest improperly)
-		/*
-		if (android.os.Build.VERSION.SDK_INT
-				>= android.os.Build.VERSION_CODES.HONEYCOMB ) {
-			base_url = base_url
-					.replaceFirst("output/", "output/SVG")
-					.replaceFirst("OUTPUT", "SVG");
-			Log.d(this.toString(), "SVG USED!!!!!!!!!!");
-		}
-		else //*/
-			base_url = base_url
-					.replaceFirst("output/", "output/HTML-CSS")
-					.replaceFirst("OUTPUT", "\"HTML-CSS\"");
-		
-		webview.loadDataWithBaseURL(
-				"http://bar", base_url, "text/html","utf-8","" );
-		
-		// (?) Disables animation for equals/result panel
-		//((ViewSwitcher) findViewById(R.id.switchEqRes)).setAnimateFirstView(false);
 
-		/*********************************************************
-		 * Set Number Keyboard
-		 *********************************************************/
-		//*
-		KeyboardView k = (KeyboardView)findViewById(R.id.keyboardNum);
-		k.setKeyboard(new Keyboard(this, R.xml.num_keys));
-		k.setOnKeyboardActionListener(new NumberKeyboardListener(
-				this, (TextView)findViewById(R.id.textNum) ));
-		k.setEnabled(false);
-		//*/
-		
 		/*********************************************************
 		 * Set Button Listeners
 		 *********************************************************/
 		CompositeOnClickListener
 				op_listener = new CompositeOnClickListener(3),
 				num_listener = new CompositeOnClickListener(3),
-				del_listener = new CompositeOnClickListener(3);
-				// WebView does not support onClickListener's
-				//web_listener = new CompositeOnClickListener(1);
+				del_listener = new CompositeOnClickListener(3),
+				web_listener = new CompositeOnClickListener(1);
 		
 		trigger_resetOpButton = 
 				op_listener.addSwitchListener(
 				num_listener.addSwitchListener(
 				del_listener.addSwitchListener(
+				web_listener.addSwitchListener(
 						new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
 								((MainActivity)v.getContext()).resetOpButton();
 							}
-						} )));
+						}
+				))));
 		trigger_resetOpButton.deactivateListener();
 		
 		trigger_resetEqualButton = 
@@ -168,7 +111,8 @@ public final class MainActivity extends Activity {
 							public void onClick(View v) {
 								((MainActivity)v.getContext()).resetEqualButton();
 							}
-						} )));
+						}
+				)));
 		trigger_resetEqualButton.deactivateListener();
 		
 		op_listener.addListener(new View.OnClickListener() {
@@ -208,6 +152,75 @@ public final class MainActivity extends Activity {
 		}
 		
 		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
+
+		/*********************************************************
+		 * Set local WebView object
+		 *********************************************************/
+		// Enable Javascript in Webview (warning suppressed)
+		webview.getSettings().setJavaScriptEnabled(true);
+
+		// Reroute "html-links" to MainActivity
+		//*
+		MathmlLinksViewClient client = new MathmlLinksViewClient();
+		client.setOnClickListener(web_listener);
+		webview.setWebViewClient(client);
+		//*/
+
+		// vvv Used for Javascript onclick methods vvv
+		/*
+		JSBinder binder = new JSBinder(webview);
+		binder.setOnClickListener(web_listener);
+		webview.addJavascriptInterface(binder, "Android");
+		//*/
+		
+		// Loads initial MathJax configuration
+		//	(https://github.com/leathrum/android-apps/blob/master
+		//		/MathJaxApp/mml-full/MainActivity.java)
+		String base_url = "<script type='text/x-mathjax-config'>"
+					+"MathJax.Hub.Config({ "
+						+"showMathMenu: false, "
+						+"jax: ['input/MathML','output/'], "
+						+"extensions: ['mml2jax.js'], "
+						+"TeX: { extensions: ['noErrors.js','noUndefined.js'] }, "
+						+"OUTPUT: { scale: 175 }, "
+						+"});</script>"
+					+"<script type='text/javascript' "
+						+"src='file:///android_asset/MathJax_2_3_custom/MathJax.js'>"
+						+"</script>"
+					/* Used for JavaScript binding
+					+"<script>function JSOnClickMathml(id_tag){"
+						+"Android.onClickMathml(id_tag);"
+						+"return false;"
+						+"}</script>"
+					//*/
+					+"<span id='math'></span>";
+		// Chooses HTML-CSS vs. SVG, based on android version
+		//		(disabled SVG, causes links to nest improperly)
+		/*
+		if (android.os.Build.VERSION.SDK_INT
+				>= android.os.Build.VERSION_CODES.HONEYCOMB ) {
+			base_url = base_url
+					.replaceFirst("output/", "output/SVG")
+					.replaceFirst("OUTPUT", "SVG");
+			Log.d(this.toString(), "SVG USED!!!!!!!!!!");
+		}
+		else //*/
+			base_url = base_url
+					.replaceFirst("output/", "output/HTML-CSS")
+					.replaceFirst("OUTPUT", "\"HTML-CSS\"");
+		
+		webview.loadDataWithBaseURL(
+				"http://bar", base_url, "text/html","utf-8","" );
+		
+		/*********************************************************
+		 * Set Number Keyboard
+		 *********************************************************/
+		KeyboardView k = (KeyboardView)findViewById(R.id.keyboardNum);
+		k.setKeyboard(new Keyboard(this, R.xml.num_keys));
+		k.setOnKeyboardActionListener(new NumberKeyboardListener(
+				this, (TextView)findViewById(R.id.textNum) ));
+		k.setEnabled(false);
+		
 	}
 
 	@Override
@@ -242,7 +255,7 @@ public final class MainActivity extends Activity {
 				+"\njavascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);"
 				);
 	}
-	public void refreshScreen() {
+	public void refreshMathmlScreen() {
 		loadMathmlToScreen(expression.getTextPres());
 	}
 	
@@ -311,7 +324,7 @@ public final class MainActivity extends Activity {
 		// TODO (?) if clicked element is a child element of the current selection,
 		//		set selector to the index of its parent
 		expression.setSelection(index);
-		refreshScreen();
+		refreshMathmlScreen();
 	}
 	
 	// Called when the equals button is clicked
@@ -321,7 +334,7 @@ public final class MainActivity extends Activity {
 			result = expression.getCalculation();
 			
 			expression.setSelection(0);
-			refreshScreen();
+			refreshMathmlScreen();
 
 			// Set text representation of result to view
 			((TextView) findViewById(R.id.textRes))
@@ -339,7 +352,7 @@ public final class MainActivity extends Activity {
 			
 			// set selector to failed index
 			expression.setSelection((Integer)ce.getCauseObject());
-			refreshScreen();
+			refreshMathmlScreen();
 		}
 	}
 	// Called when the result text box is clicked
@@ -348,7 +361,7 @@ public final class MainActivity extends Activity {
 		expression.setSelection(0);
 		expression.addNumber(result);
 		resetEqualButton();
-		refreshScreen();
+		refreshMathmlScreen();
 	}
 	// Called on button click after Equals has been clicked
 	public void resetEqualButton() {
@@ -360,7 +373,7 @@ public final class MainActivity extends Activity {
 	// Called when the user clicks the delete button
 	public void onClickDelete(View v) {
 		expression.delete();
-		refreshScreen();
+		refreshMathmlScreen();
 	}
 	
 	// Called when the user clicks an operator button
@@ -368,7 +381,7 @@ public final class MainActivity extends Activity {
 		// Adds function to expression
 		FunctionType ftype = getFtypeFromViewId(v.getId());
 		expression.addFunction(ftype);	// sets selector in function
-		refreshScreen();
+		refreshMathmlScreen();
 		
 		// Replaces op-button with shuffle button
 		// TODO replace assertion with something with better style
@@ -384,7 +397,7 @@ public final class MainActivity extends Activity {
 		//TODO remove
 		Log.d(this.toString(), "Test: Shuffle button clicked!!!");
 		expression.shuffleOrder();
-		refreshScreen();
+		refreshMathmlScreen();
 	}
 	public void resetOpButton() {
 		// Replaces shuffle button w/ op-button
@@ -401,7 +414,7 @@ public final class MainActivity extends Activity {
 	public void onNumKeyboardResult(double d) {
 		hideKeyboard();
 		expression.addNumber(d);
-		refreshScreen();
+		refreshMathmlScreen();
 	}
 	public void onNumKeyboardCancel() {
 		hideKeyboard();

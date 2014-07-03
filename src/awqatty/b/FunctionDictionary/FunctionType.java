@@ -37,6 +37,7 @@ public enum FunctionType {
 			case BLANK:
 			case NUMBER:
 				return 0;
+			case SQUARE:
 			case SQRT:
 			case SOURCE:
 				return 1;
@@ -45,7 +46,6 @@ public enum FunctionType {
 			case MULTIPLY:
 			case DIVIDE:
 			case POWER:
-			case SQUARE:
 				return 2;
 			default:
 				return 0;

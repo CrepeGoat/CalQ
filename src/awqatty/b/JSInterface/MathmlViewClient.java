@@ -12,18 +12,12 @@ import awqatty.b.calq.MainActivity;
 
 public class MathmlViewClient extends WebViewClient {
 
-	protected final MainActivity activity;
-	public MathmlViewClient(MainActivity context) {
-		super();
-		activity = context;
-	}
-	
 	@Override
 	public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
         if (!url.startsWith("http://bar"))
         	throw new RuntimeException();
-        activity.refreshScreen();
+        ((MainActivity)view.getContext()).refreshMathmlScreen();
         // Debug Log
         //Log.d(this.toString(), "onPageFinished overloaded method called.");
 	}

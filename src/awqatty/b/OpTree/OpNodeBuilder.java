@@ -44,8 +44,8 @@ public final class OpNodeBuilder {
 	
 	private TextPresObject buildTextPres(FunctionType ftype) {		
 		String[] strlist;
-		TagFillBase[] taglist = new TagFillBase[2];
-		TagFillBase[] childtaglist = new TagFillBase[2];
+		final TagFillBase[] taglist = new TagFillBase[2];
+		final TagFillBase[] childtaglist = new TagFillBase[2];
 		
 		// Note - ID TagFill MUST be first (see TextPresObject)
 		taglist[0] = new BiTagFill(
@@ -56,7 +56,12 @@ public final class OpNodeBuilder {
 				TagFlags.HIGHLIGHT, TagFlags.HIGHLIGHT,	Tags.SELECT_L.getTag(),
 				" background='#99ddff' style='border: 1pt solid #000; padding: 2pt;'","");
 		
-		String href = " href=" + HtmlIdFormat.encloseIdInTags(Tags.ID.getTag()),
+		// (Uncomment code when using javascript binding)
+		final String href = " href=" + 
+				//"'javascript:JSOnClickMathml(&#39;" + 
+				HtmlIdFormat.encloseIdInTags(Tags.ID.getTag())
+				//+ "&#39;)'"
+				,
 				out_l = "<mstyle" + href + Tags.SELECT_L.getTag() + ">",
 				out_r = "</mstyle>";
 		

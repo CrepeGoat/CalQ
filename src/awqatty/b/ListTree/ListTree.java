@@ -147,7 +147,7 @@ public class ListTree<N extends NodeBase> {
 		if (parent_loc != -1)
 			list.get(parent_loc).incrementCount();
 		
-		int branch_loc = getNthBranchIndex(parent_loc, order);
+		final int branch_loc = getNthBranchIndex(parent_loc, order);
 		
 		list.add(branch_loc, branch);
 		return branch_loc;
@@ -157,7 +157,7 @@ public class ListTree<N extends NodeBase> {
 		if (parent_loc != -1)
 			list.get(parent_loc).incrementCount();
 		
-		int branch_loc = getNthBranchIndex(parent_loc, order);
+		final int branch_loc = getNthBranchIndex(parent_loc, order);
 		
 		list.addAll(branch_loc, branch.list);
 		return branch_loc;
@@ -174,7 +174,7 @@ public class ListTree<N extends NodeBase> {
 	}
 	
 	public int addParent(int child_loc, int order, ListTree<N> branch) throws BranchCountException  {
-		int tmp = branch.addChild(0, order, this.subTree(child_loc));
+		final int tmp = branch.addChild(0, order, this.subTree(child_loc));
 		setBranch(child_loc, branch.subTree(0));
 		return child_loc+tmp;
 	}
@@ -184,9 +184,9 @@ public class ListTree<N extends NodeBase> {
 	 * 
 	 */
 	public void swapBranches(int parent_loc, int child1, int child2) {
-		List<N> temp1 = list.subList(child1, getEndOfBranchIndex(child1));
-		List<N> temp2 = list.subList(child2, getEndOfBranchIndex(child2));
-		List<N> temp3 = new ArrayList<N>(temp1);
+		final List<N> temp1 = list.subList(child1, getEndOfBranchIndex(child1));
+		final List<N> temp2 = list.subList(child2, getEndOfBranchIndex(child2));
+		final List<N> temp3 = new ArrayList<N>(temp1);
 		
 		temp1.clear();
 		temp1.addAll(temp2);
@@ -195,16 +195,17 @@ public class ListTree<N extends NodeBase> {
 	}
 	
 	public int shiftBranchOrder(int branch_loc, int new_order) {
-		FindParentAlgorithm alg = new FindParentAlgorithm();
+		final FindParentAlgorithm alg = new FindParentAlgorithm();
 		alg.runAlgorithm(branch_loc);
 		
-		int parent_loc = alg.getParentIndex();
+		final int parent_loc = alg.getParentIndex();
 		if (parent_loc != -1)
 			new_order = Math.min(new_order,
 					list.get(parent_loc).getBranchCount()-1 );
 		
 		if (new_order != alg.getBranchNumber()) {
-			List<N> sublist = list.subList(branch_loc, getEndOfBranchIndex(branch_loc)),
+			final List<N>
+					sublist = list.subList(branch_loc, getEndOfBranchIndex(branch_loc)),
 					tmplist = new ArrayList<N>(sublist);
 			sublist.clear();
 			branch_loc = getNthBranchIndex(parent_loc, new_order);

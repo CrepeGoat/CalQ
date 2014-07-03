@@ -1,6 +1,6 @@
 package awqatty.b.JSInterface;
 
-//import android.util.Log;
+import android.view.View;
 import android.webkit.WebView;
 import awqatty.b.calq.MainActivity;
 
@@ -10,21 +10,23 @@ import awqatty.b.calq.MainActivity;
  * 		(in this case, use MathmlViewClient instead)
  */
 public class MathmlLinksViewClient extends MathmlViewClient {
-
-	public MathmlLinksViewClient(MainActivity context) {
-		super(context);
-	}
-	
+	private View.OnClickListener listener;
+		
 	@Override
 	public boolean shouldOverrideUrlLoading(WebView view, String url) {
 		// TODO (?) make method safer
-		// Debug Log
-		// Log.d(this.toString(), url+", index = "+HtmlIdFormat.getIdFromString(url));
 		
 		// Reroutes id int value to MainActivity method
-		activity.onClickMathml(
+		((MainActivity)view.getContext()).onClickMathml(
 				Integer.valueOf(HtmlIdFormat.getIdFromString(url)) );
+		
+		if (listener != null)
+			listener.onClick(view);
 		return true;
+	}
+	
+	public void setOnClickListener(View.OnClickListener l) {
+		listener = l;
 	}
 
 }

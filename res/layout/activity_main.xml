@@ -34,6 +34,11 @@
 			    android:layout_width="wrap_content"
 			    android:layout_height="match_parent"
 			    android:text="@string/delete" />		
+            <Button
+                android:id="@+id/buttonNum"
+                android:text="@string/number"
+                android:layout_width="wrap_content"
+			    android:layout_height="match_parent" />
 			<ViewSwitcher
 			    android:id="@+id/switchEqRes"
 			    android:layout_width="match_parent"
@@ -62,64 +67,45 @@
 	    
 	    <TableLayout
 	        android:layout_width="match_parent"
-	        android:layout_height="0dp"
-	        android:layout_weight="0.5"
+	        android:layout_height="wrap_content"
 	        android:layout_gravity="center_horizontal"
+	        android:stretchColumns="*"
 	        android:paddingTop="@dimen/activity_vertical_margin" >
 	        
 	        <TableRow>
 	            <Button
 	                android:id="@+id/buttonSum"
 	                android:text="@string/sum"
-	                android:layout_width="0dp"
-	                android:layout_weight="1" />
+	                android:layout_width="wrap_content" />
 	            <Button
+	                android:id="@+id/buttonDiff"
+	                android:text="@string/difference"
+	                android:layout_width="wrap_content" />
+	   	        <Button
 	                android:id="@+id/buttonProd"
 	                android:text="@string/product"
-	                android:layout_width="0dp"
-	                android:layout_weight="1" />
+	                android:layout_width="wrap_content" />
 	            <Button
-	                android:id="@+id/buttonPow"
-	                android:text="@string/power"
-	                android:layout_width="0dp"
-	                android:layout_weight="1" />
-	            <Button
-	                android:id="@+id/buttonNum"
-	                android:text="@string/number"
-	                android:layout_width="0dp"
-	                android:layout_weight="1" />
+	                android:id="@+id/buttonQuot"
+	                android:text="@string/quotient"
+	                android:layout_width="wrap_content" />
 	        </TableRow>
 	        
 	        <TableRow>
 	            <Button
-	                android:id="@+id/buttonDiff"
-	                android:text="@string/difference"
-	                android:layout_width="0dp"
-	                android:layout_weight="1" />
-	            <Button
-	                android:id="@+id/buttonQuot"
-	                android:text="@string/quotient"
-	                android:layout_width="0dp"
-	                android:layout_weight="1" />
+	                android:id="@+id/buttonPow"
+	                android:text="@string/power"
+	                android:layout_width="wrap_content" />
 	            <Button
 	                android:id="@+id/buttonSqr"
 	                android:text="@string/square"
-	                android:layout_width="0dp"
-	                android:layout_weight="1" />
+	                android:layout_width="wrap_content" />
 	            <Button
 	                android:id="@+id/buttonSqrt"
 	                android:text="@string/squareroot"
-	                android:layout_width="0dp"
-	                android:layout_weight="1" />
+	                android:layout_width="wrap_content" />
+	            
 	        </TableRow>
-	        
-	        <Button
-	            android:id="@+id/buttonEx"
-	            android:text="@string/example"
-	            android:layout_width="match_parent"
-	            android:textColor="@color/orange"
-	            android:onClick="setMathmlExample"
-	            android:visibility="invisible" />	        
 	    </TableLayout>
 	</LinearLayout>
 	

@@ -4,6 +4,7 @@ import awqatty.b.CustomExceptions.BranchCountException;
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.ListTree.ListTree;
+import awqatty.b.MathmlPresentation.TagFlags;
 import awqatty.b.MathmlPresentation.Tags;
 
 public class OpTree {
@@ -24,7 +25,7 @@ public class OpTree {
 	private void unsetHighlight() {
 		/* TODO uncomment method
 		tree.get(selection).disableTagFlag(TagFlags.HIGHLIGHT);
-		*/
+		//*/
 	}
 	private void setHighlight() {
 		/* TODO uncomment method
