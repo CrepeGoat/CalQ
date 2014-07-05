@@ -14,7 +14,7 @@ public final class R {
         public static final int black=0x7f050005;
         public static final int dark_orange=0x7f050002;
         public static final int light_blue=0x7f050003;
-        public static final int light_grey=0x7f050007;
+        public static final int light_gray=0x7f050007;
         public static final int mid_blue=0x7f050004;
         public static final int orange=0x7f050001;
         /**  Color Values 
@@ -44,22 +44,22 @@ public final class R {
     public static final class id {
         public static final int action_settings=0x7f0a0012;
         public static final int buttonCycle=0x7f0a0011;
-        public static final int buttonDel=0x7f0a0002;
-        public static final int buttonDiff=0x7f0a0008;
-        public static final int buttonEq=0x7f0a0005;
-        public static final int buttonNum=0x7f0a0003;
-        public static final int buttonPow=0x7f0a000b;
-        public static final int buttonProd=0x7f0a0009;
-        public static final int buttonQuot=0x7f0a000a;
-        public static final int buttonSqr=0x7f0a000c;
-        public static final int buttonSqrt=0x7f0a000d;
-        public static final int buttonSum=0x7f0a0007;
-        public static final int keyboardNum=0x7f0a000f;
-        public static final int numPanel=0x7f0a0010;
-        public static final int opPanel=0x7f0a0001;
-        public static final int switchEqRes=0x7f0a0004;
-        public static final int textNum=0x7f0a000e;
-        public static final int textRes=0x7f0a0006;
+        public static final int buttonDel=0x7f0a0003;
+        public static final int buttonDiff=0x7f0a0006;
+        public static final int buttonEq=0x7f0a000f;
+        public static final int buttonNum=0x7f0a0004;
+        public static final int buttonPow=0x7f0a0009;
+        public static final int buttonProd=0x7f0a0007;
+        public static final int buttonQuot=0x7f0a0008;
+        public static final int buttonSqr=0x7f0a000a;
+        public static final int buttonSqrt=0x7f0a000b;
+        public static final int buttonSum=0x7f0a0005;
+        public static final int keyboardNum=0x7f0a000c;
+        public static final int numPanel=0x7f0a000d;
+        public static final int opPanel=0x7f0a0002;
+        public static final int switchEqRes=0x7f0a000e;
+        public static final int textNum=0x7f0a0001;
+        public static final int textRes=0x7f0a0010;
         public static final int webview=0x7f0a0000;
     }
     public static final class layout {
@@ -77,19 +77,20 @@ public final class R {
          */
         public static final int delete=0x7f070002;
         public static final int deleteDesc=0x7f070003;
-        public static final int difference=0x7f07000b;
+        public static final int difference=0x7f07000c;
         public static final int equal=0x7f070004;
         public static final int example=0x7f070008;
         public static final int number=0x7f070005;
         public static final int numkeyboard_hint=0x7f070009;
-        public static final int power=0x7f07000e;
-        public static final int product=0x7f07000c;
-        public static final int quotient=0x7f07000d;
+        public static final int power=0x7f07000f;
+        public static final int product=0x7f07000d;
+        public static final int quotient=0x7f07000e;
         public static final int shuffle=0x7f070006;
         public static final int shuffleDesc=0x7f070007;
-        public static final int square=0x7f07000f;
-        public static final int squareroot=0x7f070010;
-        public static final int sum=0x7f07000a;
+        public static final int square=0x7f070010;
+        public static final int squareroot=0x7f070011;
+        public static final int sum=0x7f07000b;
+        public static final int textNum_blank=0x7f07000a;
     }
     public static final class style {
         /** 

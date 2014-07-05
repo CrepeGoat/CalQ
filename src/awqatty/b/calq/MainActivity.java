@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.ViewSwitcher;
 import android.widget.Toast;
 
 import awqatty.b.CustomExceptions.CalculationException;
@@ -36,7 +35,7 @@ import awqatty.b.OpTree.OpTree;
  * 
  * TODO
  * 
- * Fix highlighting, or eliminate highlight tags
+ * Fix highlighting, or shift to pure html display
  * 
  * Add ftype values to buttons (to avoid switch table for OnPressOperator & addFunction)
  * 
@@ -65,15 +64,17 @@ public final class MainActivity extends Activity {
 	 *********************************************************/
 	private final OpTree expression = new OpTree();
 	private double result;
+	private int blank_index;
+	
 	private CompositeOnClickListener.ListenerSwitch
-			trigger_resetEqualButton,
 			trigger_resetOpButton,
 			trigger_hideNumKeys;
 
 	private View button_shuffle;
 	private View button_temp;
 	
-	private WebView webview;		// local reference
+	private WebView webview;		// local references
+	private TextView number_text;
 	
 	//---------------------------------------------------
 	// Init Functions
@@ -84,40 +85,33 @@ public final class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		webview = (WebView) findViewById(R.id.webview);
+		number_text = (TextView) findViewById(R.id.textNum);
+		
+		refreshNumberText();
 
 		/*********************************************************
 		 * Set Button Listeners
 		 *********************************************************/
 		final CompositeOnClickListener
-				op_listener = new CompositeOnClickListener(3),
-				del_listener = new CompositeOnClickListener(3),
-				web_listener = new CompositeOnClickListener(2),
-				keys_listener = new CompositeOnClickListener(2);
+				op_listener = new CompositeOnClickListener(2),
+				del_listener = new CompositeOnClickListener(2),
+				web_listener = new CompositeOnClickListener(3),
+				txt_listener = new CompositeOnClickListener(2),
+				keys_listener = new CompositeOnClickListener(1);
 		
 		trigger_resetOpButton = 
 				op_listener.addSwitchListener(
 				del_listener.addSwitchListener(
 				web_listener.addSwitchListener(
+				txt_listener.addSwitchListener(
 						new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
 								((MainActivity)v.getContext()).resetOpButton();
 							}
 						}
-				)));
-		trigger_resetEqualButton = 
-				op_listener.addSwitchListener(
-				del_listener.addSwitchListener(
-						new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								((MainActivity)v.getContext()).resetEqualButton();
-							}
-						}
-				));
-		
+				))));
 		trigger_resetOpButton.disableListener();
-		trigger_resetEqualButton.disableListener();
 		
 		op_listener.addListener(new View.OnClickListener() {
 				@Override
@@ -131,6 +125,13 @@ public final class MainActivity extends Activity {
 					((MainActivity)v.getContext()).onClickDelete(v);
 				}
 		});
+		// web_listener has no default onClickListener
+		txt_listener.addListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					((MainActivity)v.getContext()).onClickNumberText(v);
+				}
+		});
 
 		
 		// Accommodates large screens that do not hide the number keyboard
@@ -138,9 +139,8 @@ public final class MainActivity extends Activity {
 		if (button_num != null) {
 			// Set listeners to number-keyboard button
 			final CompositeOnClickListener
-					num_listener = new CompositeOnClickListener(3);
+					num_listener = new CompositeOnClickListener(2);
 			num_listener.addSwitchListener(trigger_resetOpButton);
-			num_listener.addSwitchListener(trigger_resetEqualButton);
 			num_listener.addListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -164,13 +164,10 @@ public final class MainActivity extends Activity {
 		}
 		else {
 			keys_listener.addSwitchListener(trigger_resetOpButton);
-			keys_listener.addSwitchListener(trigger_resetEqualButton);
 			trigger_hideNumKeys = null;
 		}
-						
-		// Sets listeners to respective views
-		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
-		
+								
+		// Sets listeners to respective views		
 		final View[] op_buttons = {
 			findViewById(R.id.buttonSum),
 			findViewById(R.id.buttonDiff),
@@ -183,6 +180,8 @@ public final class MainActivity extends Activity {
 		for (View v : op_buttons) {
 			v.setOnClickListener(op_listener);
 		}
+		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
+		number_text.setOnClickListener(txt_listener);
 		
 		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
 
@@ -248,8 +247,7 @@ public final class MainActivity extends Activity {
 		/*********************************************************
 		 * Set Number Keyboard
 		 *********************************************************/
-		NumberKeyboardListener num_keyslistener = new NumberKeyboardListener(
-				(TextView)findViewById(R.id.textNum) );
+		NumberKeyboardListener num_keyslistener = new NumberKeyboardListener(number_text);
 		num_keyslistener.setOnClickListener(keys_listener);
 		
 		KeyboardView k = (KeyboardView)findViewById(R.id.keyboardNum);
@@ -294,15 +292,31 @@ public final class MainActivity extends Activity {
 	public void refreshMathmlScreen() {
 		loadMathmlToScreen(expression.getTextPres());
 	}
-	
+
+	private void refreshNumberText() {
+		number_text.setText("");
+		// Sets result of selection to textNum hint
+		try {			
+			// Calculate result (throws CalcEx)
+			result = expression.getSelectionCalculation();
+			
+			// Set text representation of result to view
+			number_text.setHint(NumberStringConverter.toString(result));
+		}
+		catch (CalculationException ce) {
+			// Set failed index
+			blank_index = (Integer)ce.getCauseObject();
+			number_text.setHint(getString(R.string.textNum_blank));
+		}
+	}
+
 	public void hideNumKeys() {
 		// Shows button panel
 		findViewById(R.id.opPanel).setVisibility(View.VISIBLE);
 		// Aligns bottom of WebView back to button panel
-		((RelativeLayout.LayoutParams)webview.getLayoutParams())
+		((RelativeLayout.LayoutParams)number_text.getLayoutParams())
 				.addRule(RelativeLayout.ABOVE, R.id.opPanel);
 		// Hides Keyboard
-		findViewById(R.id.textNum).setVisibility(View.GONE);
 		KeyboardView keyboard = (KeyboardView)findViewById(R.id.keyboardNum);
 		keyboard.setVisibility(View.GONE);
 		keyboard.setEnabled(false);
@@ -314,10 +328,9 @@ public final class MainActivity extends Activity {
 		KeyboardView keyboard = (KeyboardView)findViewById(R.id.keyboardNum);
 		keyboard.setVisibility(View.VISIBLE);
 		keyboard.setEnabled(true);
-		findViewById(R.id.textNum).setVisibility(View.VISIBLE);
 		// Aligns bottom of WebView to top of keyboard
-		((RelativeLayout.LayoutParams)webview.getLayoutParams())
-				.addRule(RelativeLayout.ABOVE, R.id.textNum);
+		((RelativeLayout.LayoutParams)number_text.getLayoutParams())
+				.addRule(RelativeLayout.ABOVE, R.id.keyboardNum);
 		// Hides button panel
 		findViewById(R.id.opPanel).setVisibility(View.GONE);
 		// Enable trigger
@@ -359,61 +372,37 @@ public final class MainActivity extends Activity {
 	//////////////////////////////////////////////////////////////////////
 	// ON-CLICK/BUTTON METHODS
 	//////////////////////////////////////////////////////////////////////
+	
 	// Called when a MathML element is clicked in the WebView
 	public void onClickMathml(int index) {
 		// TODO (?) if clicked element is a child element of the current selection,
 		//		set selector to the index of its parent
 		expression.setSelection(index);
 		refreshMathmlScreen();
+		refreshNumberText();
 	}
 	
-	// Called when the equals button is clicked
-	public void onClickEquals(View v) {
-		try {			
-			// Calculate result (throws CalcEx)
-			result = expression.getCalculation();
-			
-			expression.setSelection(0);
-			refreshMathmlScreen();
-
-			// Set text representation of result to view
-			((TextView) findViewById(R.id.textRes))
-					.setText(NumberStringConverter.toString(result));
-			
-			// Set ViewSwitcher from equal button to result text display
-			((ViewSwitcher) findViewById(R.id.switchEqRes))
-					.showNext();
-			// Set onClick response to reset eq button
-			trigger_resetEqualButton.enableListener();
-		}
-		catch (CalculationException ce) {
-			// Raise toast to alert user that expression is incomplete
-			raiseToast("Error: Expression is incomplete");
-			
-			// set selector to failed index
-			expression.setSelection((Integer)ce.getCauseObject());
-			refreshMathmlScreen();
-		}
-	}
 	// Called when the result text box is clicked
-	public void onClickResult(View v) {
-		// Replaces current expression with calculated result value
-		expression.setSelection(0);
-		expression.addNumber(result);
-		resetEqualButton();
-		refreshMathmlScreen();
+	public void onClickNumberText(View v) {		
+		if (number_text.getHint().toString() == getString(R.string.textNum_blank)) {
+			expression.setSelection(blank_index);
+		}
+		else /*if (text_num.getText().toString() == "")*/{
+			number_text.setText(number_text.getHint());
+			showNumKeys();
+		}
+		/*
+		else {
+			//
+		}
+		 */
 	}
-	// Called on button click after Equals has been clicked
-	public void resetEqualButton() {
-		ViewSwitcher panel = (ViewSwitcher) findViewById(R.id.switchEqRes);
-		panel.showPrevious();
-		trigger_resetEqualButton.disableListener();
-	}
-	
+		
 	// Called when the user clicks the delete button
 	public void onClickDelete(View v) {
 		expression.delete();
 		refreshMathmlScreen();
+		refreshNumberText();
 	}
 	
 	// Called when the user clicks an operator button
@@ -422,6 +411,7 @@ public final class MainActivity extends Activity {
 		FunctionType ftype = getFtypeFromViewId(v.getId());
 		expression.addFunction(ftype);	// sets selector in function
 		refreshMathmlScreen();
+		refreshNumberText();
 		
 		// Replaces op-button with shuffle button
 		// TODO replace assertion with something with better style
@@ -438,6 +428,7 @@ public final class MainActivity extends Activity {
 		Log.d(this.toString(), "Test: Shuffle button clicked!!!");
 		expression.shuffleOrder();
 		refreshMathmlScreen();
+		// Selection remains the same in shuffle, no refreshNumberText() necessary
 	}
 	public void resetOpButton() {
 		// Replaces shuffle button w/ op-button
@@ -455,6 +446,7 @@ public final class MainActivity extends Activity {
 		hideNumKeys();
 		expression.addNumber(d);
 		refreshMathmlScreen();
+		refreshNumberText();
 	}
 	public void onNumKeyboardCancel() {
 		hideNumKeys();

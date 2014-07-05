@@ -5,4 +5,5 @@
     android:contentDescription="@string/shuffleDesc"
     android:layout_width="0dp"
 	android:layout_weight="1"
+	android:tint="@color/black"
 	android:onClick="onClickShuffle" />

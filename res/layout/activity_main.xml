@@ -8,17 +8,31 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent"
 	    android:layout_alignParentTop="true"
-	    android:layout_above="@+id/opPanel"
+	    android:layout_above="@+id/textNum"
 	    />
     
-    <TableLayout
+	<TextView
+	    android:id="@+id/textNum"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_above="@+id/opPanel"
+	    android:paddingLeft="@dimen/activity_horizontal_margin"
+	    android:paddingRight="@dimen/activity_horizontal_margin"
+	    android:hint="@string/numkeyboard_hint"
+	    android:textSize="40sp"
+	    android:textColor="@color/orange"
+	    android:textColorHint="@color/mid_blue"
+	    android:maxLines="1"
+	    android:gravity="right"
+	     />
+	
+	<TableLayout
         android:id="@+id/opPanel"
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
 	    android:paddingBottom="@dimen/activity_vertical_margin"
 	    android:paddingLeft="@dimen/activity_horizontal_margin"
 	    android:paddingRight="@dimen/activity_horizontal_margin"
-	    android:paddingTop="@dimen/activity_vertical_margin"
 	    android:layout_alignParentBottom="true"
         android:stretchColumns="*" >
          
@@ -33,30 +47,6 @@
                 android:id="@+id/buttonNum"
                 android:text="@string/number"
                 android:textStyle="bold" />
-			<ViewSwitcher
-			    android:id="@+id/switchEqRes"
-			    android:layout_span="2" >
-	
-				<Button
-				    android:id="@+id/buttonEq"
-				    android:layout_width="match_parent"
-				    android:layout_height="match_parent"
-				    android:text="@string/equal"
-					android:textStyle="bold"
-				    android:onClick="onClickEquals" />
-				<TextView 
-				    android:id="@+id/textRes"
-				    android:layout_width="match_parent"
-				    android:layout_height="match_parent"
-				    android:textSize="30sp"
-				    android:textStyle="bold"
-				    android:textColor="@color/mid_blue"
-				    android:maxLines="1"
-				    android:gravity="right"
-				    android:clickable="true"
-				    android:onClick="onClickResult" />
-
-				</ViewSwitcher>
         </TableRow>
         
         <TableRow>
@@ -94,22 +84,7 @@
             
         </TableRow>
     </TableLayout>
-	
-	<TextView
-	    android:id="@+id/textNum"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-    	android:layout_above="@+id/keyboardNum"
-	    android:paddingLeft="@dimen/activity_horizontal_margin"
-	    android:paddingRight="@dimen/activity_horizontal_margin"
-	    android:hint="@string/numkeyboard_hint"
-	    android:textSize="40sp"
-	    android:textColor="@color/light_blue"
-	    android:background="@color/black"
-	    android:maxLines="1"
-	    android:gravity="right"
-	    android:visibility="gone" />
-    
+	    
     <android.inputmethodservice.KeyboardView
         android:id="@+id/keyboardNum"
         android:layout_width="match_parent"

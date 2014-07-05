@@ -184,6 +184,10 @@ public class OpTree {
 	public double getCalculation() throws CalculationException {
 		return new BranchCalculator().runLoop(tree).get(0);
 	}
+	public double getSelectionCalculation() throws CalculationException {
+		return new BranchCalculator().runLoop(tree.subTree(selection)).get(0);
+	}
+
 	public String getTextPres() {
 		return new BranchXmlDisplay((byte)0).runLoop(tree).get(0)
 				.replaceAll(Tags.PARENTHESIS_L.getTag(), "")
