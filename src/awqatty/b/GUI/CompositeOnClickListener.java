@@ -19,10 +19,10 @@ public class CompositeOnClickListener implements OnClickListener {
 		public ListenerSwitch(SwitchListenerBox b) {
 			box = b;
 		}
-		public void activateListener() {
+		public void enableListener() {
 			box.state = true;
 		}
-		public void deactivateListener() {
+		public void disableListener() {
 			box.state = false;
 		}
 	}

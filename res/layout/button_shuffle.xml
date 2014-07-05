@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Button xmlns:android="http://schemas.android.com/apk/res/android"
+<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
 	android:id="@+id/buttonCycle"
-    android:text="@string/cycle"
+    android:src="@drawable/ic_action_shuffle"
+    android:contentDescription="@string/shuffleDesc"
     android:layout_width="0dp"
 	android:layout_weight="1"
 	android:onClick="onClickShuffle" />

@@ -1,17 +1,21 @@
 package awqatty.b.GUI;
 
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 import awqatty.b.calq.MainActivity;
 
 public final class NumberKeyboardListener implements OnKeyboardActionListener {
 
-	private final MainActivity activity;
 	private final TextView display;
-		
-	public NumberKeyboardListener(MainActivity main, TextView view) {
-		activity = main;
+	private OnClickListener listener_hideKeyboard;
+	
+	public NumberKeyboardListener(TextView view) {
 		display = view;
+	}
+	
+	public void setOnClickListener(OnClickListener l) {
+		listener_hideKeyboard = l;
 	}
 
 	@Override
@@ -22,7 +26,7 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 
 	@Override
 	public void onRelease(int arg0) {
-		CharSequence text = display.getText();
+		String text = display.getText().toString();
 		
 		// Delete Key Logic
 		if (arg0 == -5) {
@@ -32,24 +36,30 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 		// Cancel Key Logic
 		else if (arg0 == -3) {
 			display.setText("");
-			activity.onNumKeyboardCancel();
+			listener_hideKeyboard.onClick(display);
 		}
 		// Enter Key Logic
 		else if (arg0 == -2) {
 			try {
-				activity.onNumKeyboardResult(Double.valueOf(text.toString()));
+				((MainActivity) display.getContext())
+						.onNumKeyboardResult(Double.valueOf(text.toString()));
 				display.setText("");
+				listener_hideKeyboard.onClick(display);
 			} catch (NumberFormatException e) {
 				// Raise toast to alert user that expression is incomplete
-				activity.raiseToast("Error: Invalid Number Format");
+				((MainActivity) display.getContext())
+						.raiseToast("Error: Invalid Number Format");
 			}
 		}
 		// Negative Key Logic
 		else if (arg0 == 45) {
-			if (text.length() == 0)
-				display.setText("-");
-			else if (text.charAt(text.length()-1) == 'E')
-				display.setText(text.toString() + '-');
+			final int index = text.lastIndexOf("E") + 1;
+			if (index < text.length())
+				if (text.charAt(index) == '-') {
+					display.setText(text.substring(0, index) + text.substring(index+1));
+					return;
+				}
+			display.setText(text.substring(0,index) + '-' + text.substring(index));
 		}
 		// Decimal Key Logic
 		else if (arg0 == 46) {
