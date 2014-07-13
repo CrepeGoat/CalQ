@@ -3,21 +3,28 @@
 import awqatty.b.CustomExceptions.BranchCountException;
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
+import awqatty.b.GenericTextPresentation.TagFlags;
+import awqatty.b.GenericTextPresentation.Tags;
 import awqatty.b.ListTree.ListTree;
-import awqatty.b.MathmlPresentation.TagFlags;
-import awqatty.b.MathmlPresentation.Tags;
+import awqatty.b.MathmlPresentation.MathmlTextPresBuilder;
+import awqatty.b.TextPresentation.TextPresBuilderForm;
 
-public class OpTree {
+public final class OpTree {
 
 	// Private Members
 	private final ListTree<OpNode> tree = new ListTree<OpNode>();
-	private final OpNodeBuilder node_builder = new OpNodeBuilder();
+	private final OpNodeBuilder node_builder;
 	public int selection = 0;
 	
 	// Constructor
-	public OpTree() {
+	public OpTree(TextPresBuilderForm tpb) {
+		node_builder = new OpNodeBuilder(tpb);
 		tree.addChild(-1, 0, node_builder.build(FunctionType.BLANK));
 		tree.get(0).setIdNumber(0);
+	}
+	
+	public void setTextPresBuilder(TextPresBuilderForm tpb) {
+		node_builder.setTextPresBuilder(tpb);
 	}
 	
 	//---------------------------------------------------------------
@@ -98,7 +105,7 @@ public class OpTree {
 	 */
 	public void addNumber(double num) {
 		boolean has_branch = tree.get(selection).getBranchCount() > 0;
-		node_builder.Number(num)
+		node_builder.number(num)
 					.buildInSubtree(tree.subTree(selection), FunctionType.NUMBER);
 		
 		// Set ID numbers for all elements in new locations
@@ -179,13 +186,30 @@ public class OpTree {
 		}
 	}
 	
+	public void deleteParent() {
+		int i = selection;
+		selection = tree.deleteParent(selection);
+		
+		// Reset ID tags
+		if (i != selection) {
+			final int length = tree.size();
+			for (i=selection; i<length; ++i)
+				tree.get(i).setIdNumber(i);			
+		}
+	}
+	
 	//-----------------------------------------------------------------
 	// Calculation Methods
 	public double getCalculation() throws CalculationException {
 		return new BranchCalculator().runLoop(tree).get(0);
 	}
 	public double getSelectionCalculation() throws CalculationException {
-		return new BranchCalculator().runLoop(tree.subTree(selection)).get(0);
+		try {
+			return new BranchCalculator().runLoop(tree.subTree(selection)).get(0);
+		} catch (CalculationException ce) {
+			ce.setCauseObject(((Integer)ce.getCauseObject()) + selection);
+			throw ce;
+		}
 	}
 
 	public String getTextPres() {

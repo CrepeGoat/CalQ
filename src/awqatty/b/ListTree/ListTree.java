@@ -10,6 +10,7 @@ public class ListTree<N extends NodeBase> {
 
 	protected final List<N> list;
 	
+	// TODO make this a data struct class, and run the algorithm locally
 	public class FindParentAlgorithm {
 		private int index, count;
 		
@@ -221,6 +222,23 @@ public class ListTree<N extends NodeBase> {
 		if (getParentIndex(branch_loc) != -1)
 			list.get(getParentIndex(branch_loc)).decrementCount();
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
+	}
+	
+	public int deleteParent(int branch_loc) {
+		int parent_loc = getParentIndex(branch_loc);
+		int parent_end;
+		if (parent_loc == -1) {
+			++parent_loc;
+			parent_end = list.size();
+		}
+		else {
+			parent_end = getEndOfBranchIndex(parent_loc);
+		}
+		
+		list.subList(getEndOfBranchIndex(branch_loc), parent_end).clear();
+		list.subList(parent_loc, branch_loc).clear();
+		
+		return parent_loc;
 	}
 	
 	/*********************************************************************

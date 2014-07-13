@@ -6,15 +6,18 @@
     
     <!-- Button Strings -->
     <!-- delete should be &#9747; -->
-    <string name="delete">X</string>
     <string name="deleteDesc">Delete selection</string>
+    <string name="deleteParentDesc">Delete operation above selection</string>
     <string name="equal">=</string>
     <string name="number">123</string>
     <string name="shuffle">-></string>
     <string name="shuffleDesc">Shift operation order</string>
     <string name="example">Example MathML</string>
     <string name="numkeyboard_hint">0.0</string>
-    <string name="textNum_blank">Blank</string>
+    <string name="textNum_blank">(incomplete)</string>
+    <string name="textNum_default">0</string>
+
+    <string name="arrowUp">↑</string>
     
     <string name="sum">+</string>
     <string name="difference">-</string>

@@ -26,20 +26,21 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 
 	@Override
 	public void onRelease(int arg0) {
-		String text = display.getText().toString();
+		final String text = display.getText().toString();
 		
+		switch (arg0) {
 		// Delete Key Logic
-		if (arg0 == -5) {
+		case -5:
 			if (text.length() > 0)
 				display.setText(text.subSequence(0, text.length()-1));
-		}
+			break;
 		// Cancel Key Logic
-		else if (arg0 == -3) {
+		case -3:
 			display.setText("");
 			listener_hideKeyboard.onClick(display);
-		}
+			break;
 		// Enter Key Logic
-		else if (arg0 == -2) {
+		case -2:
 			try {
 				((MainActivity) display.getContext())
 						.onNumKeyboardResult(Double.valueOf(text.toString()));
@@ -50,9 +51,9 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 				((MainActivity) display.getContext())
 						.raiseToast("Error: Invalid Number Format");
 			}
-		}
+			break;
 		// Negative Key Logic
-		else if (arg0 == 45) {
+		case 45:
 			final int index = text.lastIndexOf("E") + 1;
 			if (index < text.length())
 				if (text.charAt(index) == '-') {
@@ -60,27 +61,25 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 					return;
 				}
 			display.setText(text.substring(0,index) + '-' + text.substring(index));
-		}
+			break;
 		// Decimal Key Logic
-		else if (arg0 == 46) {
+		case 46:
 			if (text.length() == 0)
 				display.setText("0.");
 			else if (!text.toString().contains("E") && !text.toString().contains("."))
 				display.setText(text.toString() + '.');
-		}
+			break;
 		// Exponent Key Logic
-		else if (arg0 == 69) {
+		case 69:
 			if (text.length() > 0) {
 				if (!text.toString().contains("E"))
 					display.setText(text.toString() + 'E');
 			}
-		}
+			break;
 		// General Numeric Key Logic
-		else {
-			if (text.toString() == "0")
-				display.setText(String.valueOf((char) arg0));
-			else
-				display.setText(text.toString() + (char)arg0);
+		default:
+			display.setText((text.equals("0") ? "":text) + (char)arg0);
+			break;
 		}
 	}
 

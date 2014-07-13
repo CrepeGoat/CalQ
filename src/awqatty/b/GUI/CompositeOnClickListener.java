@@ -15,8 +15,8 @@ public class CompositeOnClickListener implements OnClickListener {
 	public static final boolean OFF = false;
 	// Object stored elsewhere to activate/deactivate listeners w/o using publicly
 	public final class ListenerSwitch {
-		private final SwitchListenerBox box;
-		public ListenerSwitch(SwitchListenerBox b) {
+		private final ListenerBox box;
+		public ListenerSwitch(ListenerBox b) {
 			box = b;
 		}
 		public void enableListener() {
@@ -27,9 +27,11 @@ public class CompositeOnClickListener implements OnClickListener {
 		}
 	}
 	
-	private final class SwitchListenerBox implements OnClickListener {
+	private abstract class ListenerBox implements OnClickListener {
+		public boolean state;		
+	}
+	private final class SwitchListenerBox extends ListenerBox {
 		protected final OnClickListener listener;
-		public boolean state;
 
 		public SwitchListenerBox(OnClickListener l) {
 			listener = l;
@@ -44,7 +46,28 @@ public class CompositeOnClickListener implements OnClickListener {
 				listener.onClick(v);
 		}
 	}
+	/*
+	private final class SwitchBiListenerBox extends ListenerBox {
+		protected final OnClickListener listener_on, listener_off;
 
+		public SwitchBiListenerBox(OnClickListener l_on, OnClickListener l_off) {
+			listener_on = l_on;
+			listener_off = l_off;
+			state = ON;
+		}
+		public ListenerSwitch getSwitch() {
+			return new ListenerSwitch(this);
+		}
+		@Override
+		public void onClick(View v) {
+			if (state)
+				listener_on.onClick(v);
+			else
+				listener_off.onClick(v);
+		}
+	}
+	//*/
+	
 	/*******************************************************************
 	 * Internal Data
 	 */
@@ -70,6 +93,12 @@ public class CompositeOnClickListener implements OnClickListener {
 		listener_list.add(new SwitchListenerBox(l));
 		return ((SwitchListenerBox)listener_list.get(listener_list.size()-1)).getSwitch();
 	}
+	/*
+	public ListenerSwitch addSwitchBiListener(OnClickListener l_on, OnClickListener l_off) {
+		listener_list.add(new SwitchBiListenerBox(l_on, l_off));
+		return ((SwitchBiListenerBox)listener_list.get(listener_list.size()-1)).getSwitch();
+	}
+	//*/
 	public ListenerSwitch addSwitchListener(ListenerSwitch ls) {
 		if (!listener_list.contains(ls)) {
 			listener_list.add(ls.box);
@@ -77,6 +106,8 @@ public class CompositeOnClickListener implements OnClickListener {
 		return ls;
 	}
 
+
+	
 	@Override
 	public void onClick(View v) {
 		for (OnClickListener listener:listener_list)
