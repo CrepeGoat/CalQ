@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/palette_basic"
+    android:tag="@string/plt_tag"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="*" >
+    
+	<TableRow>
+		<Button
+			android:id="@+id/buttonSum"
+			android:tag="@string/op_tag"
+			android:text="@string/sum"
+			android:textSize="25sp"
+			 />
+		<Button
+			android:id="@+id/buttonDiff"
+			android:tag="@string/op_tag"
+			android:text="@string/difference"
+			android:textSize="25sp"
+			 />
+		<Button
+			android:id="@+id/buttonProd"
+			android:tag="@string/op_tag"
+			android:text="@string/product"
+			android:textSize="25sp"
+			 />
+		<Button
+			android:id="@+id/buttonQuot"
+			android:tag="@string/op_tag"
+			android:text="@string/quotient"
+			android:textSize="25sp"
+			 />
+	</TableRow>
+	
+	<TableRow>
+		<Button
+			android:id="@+id/buttonPow"
+			android:tag="@string/op_tag"
+			android:text="@string/power"
+			android:textSize="25sp"
+			 />
+		<Button
+			android:id="@+id/buttonSqr"
+			android:tag="@string/op_tag"
+			android:text="@string/square"
+			android:textSize="25sp"
+			 />
+		<Button
+			android:id="@+id/buttonSqrt"
+			android:tag="@string/op_tag"
+			android:text="@string/squareroot"
+			android:textSize="25sp"
+			 />
+		<Button
+			android:id="@+id/buttonAbs"
+			android:tag="@string/op_tag"
+			android:text="@string/absolute"
+			android:textSize="25sp"
+			 />
+					
+	</TableRow>
+</TableLayout>

@@ -117,9 +117,11 @@ public class ListTree<N extends NodeBase> {
 	
 	public int[] getBranchIndices(int parent_loc) {
 		int[] indices = new int[list.get(parent_loc).getBranchCount()];
-		indices[0] = parent_loc+1;
-		for (int i=1; i < indices.length; ++i) {
-			indices[i] = getEndOfBranchIndex(indices[i-1]);
+		if (indices.length > 0) {
+			indices[0] = parent_loc+1;
+			for (int i=1; i < indices.length; ++i) {
+				indices[i] = getEndOfBranchIndex(indices[i-1]);
+			}
 		}
 		return indices;
 	}

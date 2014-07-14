@@ -78,7 +78,14 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 			break;
 		// General Numeric Key Logic
 		default:
-			display.setText((text.equals("0") ? "":text) + (char)arg0);
+			final String prefix;
+			if (text.equals("0"))
+				prefix = "";
+			else if (text.equals("-0"))
+				prefix = "-";
+			else
+				prefix = text;
+			display.setText(prefix + (char)arg0);
 			break;
 		}
 	}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+    <item
+        android:id="@id/palette_basic"
+        android:title="@string/palettemenu_basic"
+        android:titleCondensed="@string/palettemenu_basic_cond"
+        />
+    <item
+        android:id="@id/palette_trig"
+        android:title="@string/palettemenu_trig"
+        android:titleCondensed="@string/palettemenu_trig_cond"
+        />
+
+</menu>

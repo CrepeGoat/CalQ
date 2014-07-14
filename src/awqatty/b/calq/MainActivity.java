@@ -1,13 +1,18 @@
 package awqatty.b.calq;
 
+import java.util.List;
+
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -19,12 +24,11 @@ import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.GUI.CompositeOnClickListener;
 import awqatty.b.GUI.NumberKeyboardListener;
+import awqatty.b.GUI.ViewFinder;
 import awqatty.b.GenericTextPresentation.NumberStringConverter;
 import awqatty.b.JSInterface.*;
 import awqatty.b.MathmlPresentation.MathmlTextPresBuilder;
 import awqatty.b.OpTree.OpTree;
-
-
 
 /***************************************************************************************
  * Author - Becker Awqatty
@@ -75,6 +79,7 @@ public final class MainActivity extends Activity {
 	private double result;
 	private int blank_index;
 	
+	private CompositeOnClickListener op_listener;
 	private CompositeOnClickListener.ListenerSwitch
 			trigger_resetOpButton,
 			trigger_setEqualToText,
@@ -84,7 +89,7 @@ public final class MainActivity extends Activity {
 
 	private View button_shuffle;
 	private View button_temp;
-	
+	private View button_paletteswap;
 	private WebView webview;		// local references
 	private TextView number_text;
 	
@@ -107,14 +112,15 @@ public final class MainActivity extends Activity {
 		 * Set Button Listeners
 		 *********************************************************/
 		final CompositeOnClickListener
-				op_listener = new CompositeOnClickListener(3),
-				eql_listener = new CompositeOnClickListener(1),
+				eql_listener = new CompositeOnClickListener(2),
 				del_listener = new CompositeOnClickListener(3),
 				delp_listener = new CompositeOnClickListener(3),
 				web_listener = new CompositeOnClickListener(2),
 				txt_listener = new CompositeOnClickListener(2),
-				keys_listener = new CompositeOnClickListener(1);
-		
+				keys_listener = new CompositeOnClickListener(1),
+				plt_listener = new CompositeOnClickListener(2);
+		op_listener = new CompositeOnClickListener(3);
+
 		trigger_resetOpButton = 
 				op_listener.addSwitchListener(
 				eql_listener.addSwitchListener(
@@ -122,13 +128,14 @@ public final class MainActivity extends Activity {
 				delp_listener.addSwitchListener(
 				web_listener.addSwitchListener(
 				txt_listener.addSwitchListener(
+				plt_listener.addSwitchListener(
 						new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
 								((MainActivity)v.getContext()).resetOpButton();
 							}
 						}
-				))))));
+				)))))));
 		trigger_setEqualToText = 
 				eql_listener.addSwitchListener(
 						new View.OnClickListener() {
@@ -186,6 +193,12 @@ public final class MainActivity extends Activity {
 					((MainActivity)v.getContext()).onClickNumberText(v);
 				}
 		});
+		plt_listener.addListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((MainActivity)v.getContext()).openContextMenu(v);
+			}
+		});
 
 		
 		// Accommodates large screens that do not hide the _number keyboard
@@ -193,7 +206,7 @@ public final class MainActivity extends Activity {
 		if (button_num != null) {
 			// Set listeners to _number-keyboard button
 			final CompositeOnClickListener
-					num_listener = new CompositeOnClickListener(2);
+					num_listener = new CompositeOnClickListener(3);
 			num_listener.addSwitchListener(trigger_resetOpButton);
 			num_listener.addSwitchListener(trigger_setEqualToText);
 			num_listener.addListener(new View.OnClickListener() {
@@ -234,16 +247,11 @@ public final class MainActivity extends Activity {
 			trigger_showNumKeys = null;
 		}
 								
-		// Sets listeners to respective views		
-		final View[] op_buttons = {
-			findViewById(R.id.buttonSum),
-			findViewById(R.id.buttonDiff),
-			findViewById(R.id.buttonProd),
-			findViewById(R.id.buttonQuot),
-			findViewById(R.id.buttonSqr),
-			findViewById(R.id.buttonPow),
-			findViewById(R.id.buttonSqrt),
-		};
+		// Sets listeners to respective views	
+		final ViewFinder finder = new ViewFinder();
+		final List<View> op_buttons = finder.findViewsByTag(
+				(ViewGroup)findViewById(R.id.opPanel),
+				getString(R.string.op_tag) );
 		for (View v : op_buttons) {
 			v.setOnClickListener(op_listener);
 		}
@@ -253,6 +261,15 @@ public final class MainActivity extends Activity {
 		number_text.setOnClickListener(txt_listener);
 		
 		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
+		
+		final List<View> plt_buttons = finder.findViewsByTag(
+				(ViewGroup)findViewById(R.id.opPanel),
+				getString(R.string.buttonplt_tag) );
+		for (View button_paletteswap : plt_buttons) {
+			registerForContextMenu(button_paletteswap);
+			button_paletteswap.setLongClickable(false);
+			button_paletteswap.setOnClickListener(plt_listener);
+		}
 
 		/*********************************************************
 		 * Set local WebView object
@@ -330,6 +347,51 @@ public final class MainActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menu_info) {
+		super.onCreateContextMenu(menu, v, menu_info);
+		getMenuInflater().inflate(R.menu.menu_palettes, menu);
+		button_paletteswap = v;
+	}
+	
+	// Assumes palette is a child of palette-swap's parent
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		final int id = item.getItemId();
+		final View palette = getPaletteFromSwapButton(button_paletteswap);
+		
+		if (palette.getId() != id) {
+			final ViewGroup parent = (ViewGroup) palette.getParent();
+			final int index = parent.indexOfChild(palette);
+			parent.removeViewAt(index);
+			
+			// Condition: palette is already on-screen
+			final View palette2 = findViewById(id);
+			if (palette2 != null) {
+				// Switch selected palette with current palette
+				final ViewGroup parent2 = (ViewGroup) palette2.getParent();
+				final int index2 = parent2.indexOfChild(palette2);
+				parent2.removeViewAt(index2);
+
+				ViewGroup.LayoutParams params2 = palette2.getLayoutParams();
+				parent.addView(palette2, index, palette.getLayoutParams());
+				parent2.addView(palette, index2, params2);
+			}
+			// Condition: palette has to be inflated from layout xml
+			else {
+				parent.addView(View.inflate(
+							this, getXmlLayoutFromId(id), null),
+						index, palette.getLayoutParams() );
+				
+				for (View op_button : (new ViewFinder())
+						.findViewsByTag(parent, getString(R.string.op_tag)) )
+					op_button.setOnClickListener(op_listener);
+			}
+		}
+			
 		return true;
 	}
 	
@@ -453,12 +515,59 @@ public final class MainActivity extends Activity {
 			return FunctionType.SQUARE;
 		case R.id.buttonSqrt:
 			return FunctionType.SQRT;
+		case R.id.buttonAbs:
+			return FunctionType.ABS;
+			
+		case R.id.buttonSin:
+			return FunctionType.SINE;
+		case R.id.buttonCos:
+			return FunctionType.COSINE;
+		case R.id.buttonTan:
+			return FunctionType.TANGENT;
+		case R.id.buttonAsin:
+			return FunctionType.ARCSINE;
+		case R.id.buttonAcos:
+			return FunctionType.ARCCOSINE;
+		case R.id.buttonAtan:
+			return FunctionType.ARCTANGENT;
+		case R.id.buttonPi:
+			return FunctionType.PI;
 		// vvv Occurs only under improper use vvv
 		default:
 			return null;
 		}
 	}
 	
+	private int getXmlLayoutFromId(int id) {
+		switch (id) {
+		case R.id.palette_basic:
+			return R.layout.palette_basic;
+		case R.id.palette_trig:
+			return R.layout.palette_trig;
+		default:
+			return 0;
+		}
+	}
+	
+	private View getPaletteFromSwapButton(View swap_button) {
+		//TODO test
+		ViewGroup parent = (ViewGroup) swap_button.getParent();
+		final ViewFinder finder = new ViewFinder();
+		List<View> list = finder.findViewsByTag(parent, getString(R.string.plt_tag));
+		while (true) {
+			if (list.size() == 0) {
+				parent = (ViewGroup)parent.getParent();
+				list = finder.findViewsByTag(parent, getString(R.string.plt_tag));
+				continue;
+			}
+			else if (list.size() > 1) {
+				return null;
+			}
+			else {
+				return list.get(0);
+			}
+		}
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// ON-CLICK/BUTTON METHODS
@@ -528,7 +637,7 @@ public final class MainActivity extends Activity {
 		//refreshNumberText();
 		
 		// Replaces op-button with shuffle button
-		// TODO replace assertion with something with better style
+		// TODO replace decision condition with something with better style
 		if (ftype.defaultArgCount() > 1) {
 			ViewGroup parent = (ViewGroup) v.getParent();
 			parent.addView(button_shuffle, parent.indexOfChild(v), v.getLayoutParams());

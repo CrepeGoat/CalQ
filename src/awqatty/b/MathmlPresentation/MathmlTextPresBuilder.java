@@ -109,6 +109,63 @@ public class MathmlTextPresBuilder implements TextPresBuilderForm {
 			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
 			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
 			break;
+		case ABS:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mo>|</mo>";
+			strlist[1] = "<mo>|</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+
+		case SINE:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>sin</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case COSINE:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>cos</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case TANGENT:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>tan</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case ARCSINE:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>arcsin</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case ARCCOSINE:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>arccos</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case ARCTANGENT:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>arctan</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case PI:
+			strlist = new String[1];
+			strlist[0] = out_l + "<mi>&#960;</mi>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+
 		//TODO - throw exception?
 		default:
 			strlist = null;

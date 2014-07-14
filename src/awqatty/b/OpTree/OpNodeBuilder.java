@@ -85,6 +85,57 @@ public final class OpNodeBuilder {
 					return Math.sqrt(dlist.get(0));
 				}
 			};
+		case ABS:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.abs(dlist.get(0));
+				}
+			};
+		case SINE:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.sin(dlist.get(0));
+				}
+			};
+		case COSINE:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.cos(dlist.get(0));
+				}
+			};
+		case TANGENT:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.tan(dlist.get(0));
+				}
+			};
+		case ARCSINE:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.asin(dlist.get(0));
+				}
+			};
+		case ARCCOSINE:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.acos(dlist.get(0));
+				}
+			};
+		case ARCTANGENT:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.atan(dlist.get(0));
+				}
+			};
+		case PI:
+			return new FunctionConstant(Math.PI);
 		//TODO - throw exception?
 		default:
 			return null;
@@ -99,6 +150,7 @@ public final class OpNodeBuilder {
 		switch (ftype) {
 		case BLANK:
 		case NUMBER:
+		case PI:
 			return 0;
 		case ADD:
 		case SUBTRACT:
@@ -108,6 +160,13 @@ public final class OpNodeBuilder {
 		case SQUARE:
 			return 2;
 		case SQRT:
+		case ABS:
+		case SINE:
+		case COSINE:
+		case TANGENT:
+		case ARCSINE:
+		case ARCCOSINE:
+		case ARCTANGENT:
 			return 1;
 			//TODO - throw exception?
 		default:
@@ -118,6 +177,7 @@ public final class OpNodeBuilder {
 		switch (ftype) {
 		case BLANK:
 		case NUMBER:
+		case PI:
 			return 0;
 		case ADD:
 		case MULTIPLY:
@@ -128,6 +188,13 @@ public final class OpNodeBuilder {
 		case SQUARE:
 			return 2;
 		case SQRT:
+		case ABS:
+		case SINE:
+		case COSINE:
+		case TANGENT:
+		case ARCSINE:
+		case ARCCOSINE:
+		case ARCTANGENT:
 			return 1;
 			//TODO - throw exception?
 		default:
@@ -166,6 +233,7 @@ public final class OpNodeBuilder {
 		// 0-arg
 		case NUMBER:
 		case BLANK:
+		case PI:
 			subtree.setBranch(0, build(ftype));
 			break;
 		// 2+ args
@@ -179,6 +247,13 @@ public final class OpNodeBuilder {
 			break;
 		// 1-arg
 		case SQRT:
+		case ABS:
+		case SINE:
+		case COSINE:
+		case TANGENT:
+		case ARCSINE:
+		case ARCCOSINE:
+		case ARCTANGENT:
 			subtree.addParent(0, build(ftype));
 			break;
 		// 2-arg w/ default value

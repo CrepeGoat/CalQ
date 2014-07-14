@@ -10,7 +10,17 @@ public enum FunctionType {
 	DIVIDE,
 	POWER,
 	SQUARE,
-	SQRT;
+	SQRT,
+	ABS,
+	
+	PI,
+	SINE,
+	COSINE,
+	TANGENT,
+	ARCSINE,
+	ARCCOSINE,
+	ARCTANGENT,
+	;
 	
 	// Property-Check Methods
 	public boolean isFunction() {
@@ -18,6 +28,7 @@ public enum FunctionType {
 		case SOURCE:
 		case BLANK:
 		case NUMBER:
+		case PI:
 			return false;
 		default:
 			return true;
@@ -39,6 +50,13 @@ public enum FunctionType {
 				return 0;
 			case SQUARE:
 			case SQRT:
+			case ABS:
+			case SINE:
+			case COSINE:
+			case TANGENT:
+			case ARCSINE:
+			case ARCCOSINE:
+			case ARCTANGENT:
 			case SOURCE:
 				return 1;
 			case ADD:
@@ -52,6 +70,7 @@ public enum FunctionType {
 		}
 	}
 	
+	/*
 	public boolean doesEncapsulateBranches() {
 		switch (this) {
 		case DIVIDE:
@@ -74,4 +93,5 @@ public enum FunctionType {
 			return false;
 		}
 	}
+	//*/
 }
