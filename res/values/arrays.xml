@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="pref_renderFormat_items">
+        <item>@string/pref_renderFormat_MathmlHtmlCss</item>
+        <item>@string/pref_renderFormat_MathmlSvg</item>
+        <item>@string/pref_renderFormat_Html</item>
+    </array>
+    
+    <array name="pref_textSize_percentages">
+        <item>0.50</item>
+        <item>0.625</item>
+        <item>0.80</item>
+        <item>1.00</item>
+        <item>1.25</item>
+        <item>1.60</item>
+        <item>2.00</item>
+    </array>
+</resources>

@@ -11,25 +11,25 @@
 			android:id="@+id/buttonSum"
 			android:tag="@string/op_tag"
 			android:text="@string/sum"
-			android:textSize="25sp"
+			android:textSize="20sp"
 			 />
 		<Button
 			android:id="@+id/buttonDiff"
 			android:tag="@string/op_tag"
 			android:text="@string/difference"
-			android:textSize="25sp"
+			android:textSize="20sp"
 			 />
 		<Button
 			android:id="@+id/buttonProd"
 			android:tag="@string/op_tag"
 			android:text="@string/product"
-			android:textSize="25sp"
+			android:textSize="20sp"
 			 />
 		<Button
 			android:id="@+id/buttonQuot"
 			android:tag="@string/op_tag"
 			android:text="@string/quotient"
-			android:textSize="25sp"
+			android:textSize="20sp"
 			 />
 	</TableRow>
 	
@@ -38,25 +38,25 @@
 			android:id="@+id/buttonPow"
 			android:tag="@string/op_tag"
 			android:text="@string/power"
-			android:textSize="25sp"
+			android:textSize="20sp"
 			 />
 		<Button
 			android:id="@+id/buttonSqr"
 			android:tag="@string/op_tag"
 			android:text="@string/square"
-			android:textSize="25sp"
+			android:textSize="20sp"
 			 />
 		<Button
 			android:id="@+id/buttonSqrt"
 			android:tag="@string/op_tag"
 			android:text="@string/squareroot"
-			android:textSize="25sp"
+			android:textSize="20sp"
 			 />
 		<Button
 			android:id="@+id/buttonAbs"
 			android:tag="@string/op_tag"
 			android:text="@string/absolute"
-			android:textSize="25sp"
+			android:textSize="20sp"
 			 />
 					
 	</TableRow>

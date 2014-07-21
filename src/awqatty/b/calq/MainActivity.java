@@ -2,11 +2,11 @@ package awqatty.b.calq;
 
 import java.util.List;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -19,14 +19,13 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
-
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.GUI.CompositeOnClickListener;
 import awqatty.b.GUI.NumberKeyboardListener;
 import awqatty.b.GUI.ViewFinder;
 import awqatty.b.GenericTextPresentation.NumberStringConverter;
-import awqatty.b.JSInterface.*;
+import awqatty.b.JSInterface.MathmlLinksViewClient;
 import awqatty.b.MathmlPresentation.MathmlTextPresBuilder;
 import awqatty.b.OpTree.OpTree;
 
@@ -48,9 +47,6 @@ import awqatty.b.OpTree.OpTree;
  * 
  * GUI Scheme (colors, custom buttons, TextView borders)
  * 
- * Add more operators
- * 		(group ops into tablelayouts, swap whole layouts)
- * 
  * Add code to allow for a "blank-click" on-screen, & allow for SVG output
  * 		(i.e. at each link, add "stopPropogation" functionality)
  * 
@@ -58,9 +54,7 @@ import awqatty.b.OpTree.OpTree;
  * (also change drawables to be API specific)
  * 
  * (?) Shift textNum TextView to be constantly in view,
- * 		set text (or text hint?) to be result of current selection,
- * 		remove equals button,
- * 		make click on "blank" result move selection to blank object
+ * 		remove equals button
  * 
  * NEED TO TEST:
  * 
@@ -201,7 +195,7 @@ public final class MainActivity extends Activity {
 		});
 
 		
-		// Accommodates large screens that do not hide the _number keyboard
+		// Accommodates large screens that do not hide the number keyboard
 		final View button_num = findViewById(R.id.buttonNum);
 		if (button_num != null) {
 			// Set listeners to _number-keyboard button
@@ -249,9 +243,9 @@ public final class MainActivity extends Activity {
 								
 		// Sets listeners to respective views	
 		final ViewFinder finder = new ViewFinder();
+		final ViewGroup op_panel = (ViewGroup)findViewById(R.id.opPanel);
 		final List<View> op_buttons = finder.findViewsByTag(
-				(ViewGroup)findViewById(R.id.opPanel),
-				getString(R.string.op_tag) );
+				op_panel, getString(R.string.op_tag) );
 		for (View v : op_buttons) {
 			v.setOnClickListener(op_listener);
 		}
@@ -262,9 +256,8 @@ public final class MainActivity extends Activity {
 		
 		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
 		
-		final List<View> plt_buttons = finder.findViewsByTag(
-				(ViewGroup)findViewById(R.id.opPanel),
-				getString(R.string.buttonplt_tag) );
+		final List<View> plt_buttons = finder.findViewsById(
+				op_panel, R.id.buttonPaletteSwap );
 		for (View button_paletteswap : plt_buttons) {
 			registerForContextMenu(button_paletteswap);
 			button_paletteswap.setLongClickable(false);
@@ -348,6 +341,15 @@ public final class MainActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		return true;
+	}
+	
+	public void onClickSettings(View v) {
+		Log.d(this.toString(), "Clicked settings!!");
 	}
 	
 	@Override
@@ -544,29 +546,22 @@ public final class MainActivity extends Activity {
 			return R.layout.palette_basic;
 		case R.id.palette_trig:
 			return R.layout.palette_trig;
+		// vvv Occurs only under improper use vvv
 		default:
 			return 0;
 		}
 	}
 	
 	private View getPaletteFromSwapButton(View swap_button) {
-		//TODO test
-		ViewGroup parent = (ViewGroup) swap_button.getParent();
 		final ViewFinder finder = new ViewFinder();
-		List<View> list = finder.findViewsByTag(parent, getString(R.string.plt_tag));
-		while (true) {
-			if (list.size() == 0) {
-				parent = (ViewGroup)parent.getParent();
-				list = finder.findViewsByTag(parent, getString(R.string.plt_tag));
-				continue;
-			}
-			else if (list.size() > 1) {
-				return null;
-			}
-			else {
-				return list.get(0);
-			}
-		}
+		ViewGroup parent = (ViewGroup) swap_button.getParent();
+		List<View> list;
+		for (list = finder.findViewsByTag(parent, getString(R.string.plt_tag));
+				list.size() <= 0;
+				list = finder.findViewsByTag(
+						(parent = (ViewGroup) parent.getParent()),
+						getString(R.string.plt_tag) )) {}
+		return (list.size() > 1) ? null : list.get(0);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -647,8 +642,6 @@ public final class MainActivity extends Activity {
 		}
 	}
 	public void onClickShuffle(View v) {
-		//TODO remove
-		Log.d(this.toString(), "Test: Shuffle button clicked!!!");
 		expression.shuffleOrder();
 		refreshMathmlScreen();
 		// Selection remains the same in shuffle, no refreshNumberText() necessary

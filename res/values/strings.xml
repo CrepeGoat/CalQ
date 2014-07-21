@@ -21,7 +21,6 @@
     
     <string name="op_tag">operation_button</string>
     <string name="plt_tag">operation_palette</string>
-    <string name="buttonplt_tag">palette-swap_button</string>
     
     <string name="sum">+</string>
     <string name="difference">-</string>
@@ -46,5 +45,12 @@
     <string name="palettemenu_trig">Trigonometric Functions</string>
     <string name="palettemenu_trig_cond">Trig.</string>
     
+    <string name="pref_screenOptions">Screen Options</string>
+    <string name="pref_screenOptions_title">Screen Options</string>
+    <string name="pref_renderFormat">Rendering Format</string>
+    <string name="pref_renderFormat_Html">Raw HTML</string>
+    <string name="pref_renderFormat_MathmlSvg">MathML (SVG)</string>
+    <string name="pref_renderFormat_MathmlHtmlCss">MathML (HTML/CSS)</string>
+    <string name="pref_textSize">Text Size</string>
 
 </resources>

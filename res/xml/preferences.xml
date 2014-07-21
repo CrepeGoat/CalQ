@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<PreferenceCategory
+        android:title="@string/pref_screenOptions"
+        android:key="pref_screenOptions">
+        
+		<ListPreference
+		    android:title="@string/pref_renderFormat"
+		    android:key="pref_renderFormat"
+		    android:entries="@array/pref_renderFormat_items"
+		    android:defaultValue="@string/pref_renderFormat_Html"
+		    />
+		
+		<ListPreference
+		    android:title="@string/pref_textSize"
+		    android:key="pref_textSize"
+		    android:entries="@array/pref_textSize_percentages"
+		    android:defaultValue="1"
+		    />
+		
+	</PreferenceCategory>
+
+</PreferenceScreen>
