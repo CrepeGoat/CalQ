@@ -43,7 +43,7 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 		case -2:
 			try {
 				((MainActivity) display.getContext())
-						.onNumKeyboardResult(Double.valueOf(text.toString()));
+						.onNumKeyboardResult(Double.valueOf(text));
 				display.setText("");
 				listener_hideKeyboard.onClick(display);
 			} catch (NumberFormatException e) {
@@ -66,14 +66,17 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 		case 46:
 			if (text.length() == 0)
 				display.setText("0.");
-			else if (!text.toString().contains("E") && !text.toString().contains("."))
+			else if (!text.contains("E") && !text.contains("."))
 				display.setText(text.toString() + '.');
 			break;
 		// Exponent Key Logic
 		case 69:
 			if (text.length() > 0) {
-				if (!text.toString().contains("E"))
+				if (!text.contains("E"))
 					display.setText(text.toString() + 'E');
+				else if (text.endsWith("E"))
+					display.setText(text.substring(0,text.length()-1));
+					
 			}
 			break;
 		// General Numeric Key Logic

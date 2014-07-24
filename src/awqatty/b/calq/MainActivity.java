@@ -343,15 +343,7 @@ public final class MainActivity extends Activity {
 		return true;
 	}
 	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		return true;
-	}
-	
-	public void onClickSettings(View v) {
-		Log.d(this.toString(), "Clicked settings!!");
-	}
-	
+	// Creates the popup menu for switching out op-palettes
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menu_info) {
 		super.onCreateContextMenu(menu, v, menu_info);
@@ -369,9 +361,9 @@ public final class MainActivity extends Activity {
 			final ViewGroup parent = (ViewGroup) palette.getParent();
 			final int index = parent.indexOfChild(palette);
 			parent.removeViewAt(index);
+			final View palette2 = findViewById(id);
 			
 			// Condition: palette is already on-screen
-			final View palette2 = findViewById(id);
 			if (palette2 != null) {
 				// Switch selected palette with current palette
 				final ViewGroup parent2 = (ViewGroup) palette2.getParent();
@@ -457,7 +449,6 @@ public final class MainActivity extends Activity {
 		trigger_setTextToEqual.disableListener();
 		trigger_setEqualToText.enableListener();
 	}
-
 
 	public void hideNumKeys() {
 		// Shows button panel

@@ -27,9 +27,9 @@
     <string name="product">×</string>
     <string name="quotient">÷</string>
     <string name="power">^</string>
-    <string name="square">x²</string>
+    <string name="square">&#178;&#9702;</string>
     <string name="squareroot">√</string>
-    <string name="absolute">|x|</string>
+    <string name="absolute">|&#9702;|</string>
     
     <string name="sine">sin</string>
     <string name="cosine">cos</string>

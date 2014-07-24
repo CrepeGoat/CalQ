@@ -3,7 +3,6 @@
 	android:id="@+id/buttonCycle"
     android:src="@drawable/ic_action_shuffle"
     android:contentDescription="@string/shuffleDesc"
-    android:layout_width="0dp"
-	android:layout_weight="1"
 	android:tint="@color/black"
+	style="?android:attr/buttonBarButtonStyle"
 	android:onClick="onClickShuffle" />

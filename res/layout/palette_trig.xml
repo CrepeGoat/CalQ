@@ -4,32 +4,39 @@
     android:tag="@string/plt_tag"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:stretchColumns="*" >
+	android:shrinkColumns="*"
+	style="?android:attr/buttonBarStyle"
+     >
     
 	<TableRow>
 		<Button
 			android:id="@+id/buttonSin"
 			android:tag="@string/op_tag"
 			android:text="@string/sine"
-			android:textSize="20sp"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonCos"
 			android:tag="@string/op_tag"
 			android:text="@string/cosine"
-			android:textSize="20sp"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonTan"
 			android:tag="@string/op_tag"
 			android:text="@string/tangent"
-			android:textSize="20sp"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonPi"
 			android:tag="@string/op_tag"
 			android:text="@string/pi"
-			android:textSize="20sp"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
+			
 			 />
 	</TableRow>
 	
@@ -38,19 +45,22 @@
 			android:id="@+id/buttonAsin"
 			android:tag="@string/op_tag"
 			android:text="@string/arcsine"
-			android:textSize="20sp"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonAcos"
 			android:tag="@string/op_tag"
 			android:text="@string/arccosine"
-			android:textSize="20sp"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonAtan"
 			android:tag="@string/op_tag"
 			android:text="@string/arctangent"
-			android:textSize="20sp"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
 			 />
 			
 	</TableRow>
