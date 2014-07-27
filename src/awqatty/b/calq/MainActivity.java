@@ -1,9 +1,11 @@
 package awqatty.b.calq;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +27,7 @@ import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.GUI.CompositeOnClickListener;
 import awqatty.b.GUI.NumberKeyboardListener;
 import awqatty.b.GUI.ViewFinder;
+import awqatty.b.GUI.ViewReplacer;
 import awqatty.b.GenericTextPresentation.NumberStringConverter;
 import awqatty.b.JSInterface.MathmlLinksViewClient;
 import awqatty.b.MathmlPresentation.MathmlTextPresBuilder;
@@ -101,6 +105,53 @@ public final class MainActivity extends Activity {
 		number_text = (TextView) findViewById(R.id.textNum);
 		
 		//refreshNumberText();
+		
+		final ViewFinder finder = new ViewFinder();
+		final ViewReplacer replacer = new ViewReplacer();
+		final ViewGroup op_panel = (ViewGroup)findViewById(R.id.opPanel);
+
+		/********************************************************
+		 * Fill Incomplete Views
+		 ********************************************************/
+		
+		// Inflate Shuffle Button (substituted in dynamically for op buttons)
+		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
+		
+		// Get old palette id's from preferences
+		final SharedPreferences pref = getPreferences(MODE_PRIVATE);
+		final String keybase = getString(R.string.prefkey_palette_basestr);
+		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
+		
+		// Collect old palette ids in list (use only basic palette if none exist)
+		final List<Integer> ids = new ArrayList<Integer>(max);
+		for (int i=0; pref.contains(keybase+Integer.toString(i)) && i<max; ++i)
+			ids.add(pref.getInt(keybase+Integer.toString(i), 0));
+		if (ids.isEmpty())
+			ids.add(R.id.palette_basic);
+		
+		// Create list of inflated palettes respective to id list
+		final List<View> palette_list = new ArrayList<View>();
+		// (Loop variables)
+		ViewGroup container;
+		View placeholder;
+		View palette;
+		for (int id : ids) {
+			// Inflate palette-container layouts
+			container = (ViewGroup)View.inflate(this, R.layout.palette_container, null);
+			// Insert respective palette into container
+			placeholder
+				= finder.findViewsByTag(container, getString(R.string.tag_plt)).get(0);
+			palette = View.inflate(this, id, null);
+			replacer.replaceView(placeholder, palette);
+			// Add palette container to list
+			palette_list.add(container);
+			
+			// (add container dividers?)
+		}
+		
+		// Replace palette-container placeholder with palette containers
+		placeholder	= finder.findViewsById(op_panel, R.id.tmpPaletteHolderLoc).get(0);
+		replacer.replaceView(placeholder, palette_list);
 
 		/*********************************************************
 		 * Set Button Listeners
@@ -108,7 +159,7 @@ public final class MainActivity extends Activity {
 		final CompositeOnClickListener
 				eql_listener = new CompositeOnClickListener(2),
 				del_listener = new CompositeOnClickListener(3),
-				delp_listener = new CompositeOnClickListener(3),
+				delpar_listener = new CompositeOnClickListener(3),
 				web_listener = new CompositeOnClickListener(2),
 				txt_listener = new CompositeOnClickListener(2),
 				keys_listener = new CompositeOnClickListener(1),
@@ -119,7 +170,7 @@ public final class MainActivity extends Activity {
 				op_listener.addSwitchListener(
 				eql_listener.addSwitchListener(
 				del_listener.addSwitchListener(
-				delp_listener.addSwitchListener(
+				delpar_listener.addSwitchListener(
 				web_listener.addSwitchListener(
 				txt_listener.addSwitchListener(
 				plt_listener.addSwitchListener(
@@ -142,7 +193,7 @@ public final class MainActivity extends Activity {
 		trigger_setTextToEqual = 
 				op_listener.addSwitchListener(
 				del_listener.addSwitchListener(
-				delp_listener.addSwitchListener(
+				delpar_listener.addSwitchListener(
 				keys_listener.addSwitchListener(
 						new View.OnClickListener() {
 							@Override
@@ -174,7 +225,7 @@ public final class MainActivity extends Activity {
 					((MainActivity)v.getContext()).onClickDelete(v);
 				}
 		});
-		delp_listener.addListener(new View.OnClickListener() {
+		delpar_listener.addListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				((MainActivity)v.getContext()).onClickDeleteParent(v);
@@ -240,21 +291,17 @@ public final class MainActivity extends Activity {
 			trigger_hideNumKeys = null;
 			trigger_showNumKeys = null;
 		}
-								
+		
 		// Sets listeners to respective views	
-		final ViewFinder finder = new ViewFinder();
-		final ViewGroup op_panel = (ViewGroup)findViewById(R.id.opPanel);
 		final List<View> op_buttons = finder.findViewsByTag(
-				op_panel, getString(R.string.op_tag) );
+				op_panel, getString(R.string.tag_op) );
 		for (View v : op_buttons) {
 			v.setOnClickListener(op_listener);
 		}
 		findViewById(R.id.buttonEqual).setOnClickListener(eql_listener);
 		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
-		findViewById(R.id.buttonDelParent).setOnClickListener(delp_listener);
+		findViewById(R.id.buttonDelParent).setOnClickListener(delpar_listener);
 		number_text.setOnClickListener(txt_listener);
-		
-		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
 		
 		final List<View> plt_buttons = finder.findViewsById(
 				op_panel, R.id.buttonPaletteSwap );
@@ -335,6 +382,36 @@ public final class MainActivity extends Activity {
 		k.setEnabled(false);
 		
 	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		
+		/******************************************************
+		 * Save Palette Choices To Preferences
+		 ******************************************************/
+		final SharedPreferences pref = getPreferences(MODE_PRIVATE);
+		final SharedPreferences.Editor pref_edit = pref.edit();
+		final String keybase = getString(R.string.prefkey_palette_basestr);
+		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
+		// Gets current ids
+		List<Integer> ids = new ArrayList<Integer>();
+		for (View palette : (new ViewFinder()).findViewsByTag(
+				(ViewGroup)findViewById(R.id.opPanel),
+				getString(R.string.tag_plt) )) {
+			ids.add(palette.getId());
+		}
+		
+		int i;
+		// Adds/Replaces with current keys
+		for (i=0; i<ids.size(); ++i)
+			pref_edit.putInt(keybase+Integer.toString(i), ids.get(i));
+		// Deletes excess keys
+		for (; pref.contains(keybase+Integer.toString(i)); ++i) {
+			pref_edit.remove(keybase+Integer.toString(i));
+		}
+		pref_edit.apply();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -354,38 +431,38 @@ public final class MainActivity extends Activity {
 	// Assumes palette is a child of palette-swap's parent
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		final int id = item.getItemId();
+		final int id2 = item.getItemId();
+		// (?) Insert path for "add palette" button
 		final View palette = getPaletteFromSwapButton(button_paletteswap);
+		final int id1 = palette.getId();
 		
-		if (palette.getId() != id) {
-			final ViewGroup parent = (ViewGroup) palette.getParent();
-			final int index = parent.indexOfChild(palette);
-			parent.removeViewAt(index);
-			final View palette2 = findViewById(id);
+		if (id1 != id2) {
+			final ViewReplacer replacer = new ViewReplacer();
+			View palette2 = findViewById(id2);
+			
+			final SharedPreferences pref = getPreferences(MODE_PRIVATE);
+			final SharedPreferences.Editor pref_edit = pref.edit();
+			final String keybase = getString(R.string.prefkey_palette_basestr);
 			
 			// Condition: palette is already on-screen
 			if (palette2 != null) {
-				// Switch selected palette with current palette
-				final ViewGroup parent2 = (ViewGroup) palette2.getParent();
-				final int index2 = parent2.indexOfChild(palette2);
-				parent2.removeViewAt(index2);
-
-				ViewGroup.LayoutParams params2 = palette2.getLayoutParams();
-				parent.addView(palette2, index, palette.getLayoutParams());
-				parent2.addView(palette, index2, params2);
+				// Switch selected palettes
+				replacer.switchViews(palette, palette2);
 			}
 			// Condition: palette has to be inflated from layout xml
 			else {
-				parent.addView(View.inflate(
-							this, getXmlLayoutFromId(id), null),
-						index, palette.getLayoutParams() );
-				
+				// Inflate new palette from XML
+				palette2 = View.inflate(this, getXmlLayoutFromId(id2), null);
+				replacer.replaceView(palette, palette2);
+				// Set button listeners for buttons in inflated palette
 				for (View op_button : (new ViewFinder())
-						.findViewsByTag(parent, getString(R.string.op_tag)) )
+						.findViewsByTag((ViewGroup)palette2, getString(R.string.tag_op)) )
 					op_button.setOnClickListener(op_listener);
 			}
 		}
-			
+		// Cleanup
+		button_paletteswap = null;
+		
 		return true;
 	}
 	
@@ -547,11 +624,11 @@ public final class MainActivity extends Activity {
 		final ViewFinder finder = new ViewFinder();
 		ViewGroup parent = (ViewGroup) swap_button.getParent();
 		List<View> list;
-		for (list = finder.findViewsByTag(parent, getString(R.string.plt_tag));
+		for (list = finder.findViewsByTag(parent, getString(R.string.tag_plt));
 				list.size() <= 0;
 				list = finder.findViewsByTag(
 						(parent = (ViewGroup) parent.getParent()),
-						getString(R.string.plt_tag) )) {}
+						getString(R.string.tag_plt) )) {}
 		return (list.size() > 1) ? null : list.get(0);
 	}
 
@@ -625,9 +702,7 @@ public final class MainActivity extends Activity {
 		// Replaces op-button with shuffle button
 		// TODO replace decision condition with something with better style
 		if (ftype.defaultArgCount() > 1) {
-			ViewGroup parent = (ViewGroup) v.getParent();
-			parent.addView(button_shuffle, parent.indexOfChild(v), v.getLayoutParams());
-			parent.removeView(v);
+			(new ViewReplacer()).replaceView(v, button_shuffle);
 			button_temp = v;
 			trigger_resetOpButton.enableListener();
 		}
@@ -639,9 +714,8 @@ public final class MainActivity extends Activity {
 	}
 	public void resetOpButton() {
 		// Replaces shuffle button w/ op-button
-		ViewGroup parent = (ViewGroup) button_shuffle.getParent();
-		parent.addView(button_temp, parent.indexOfChild(button_shuffle), button_shuffle.getLayoutParams());
-		parent.removeView(button_shuffle);
+		(new ViewReplacer()).replaceView(button_shuffle, button_temp);
+		button_temp = null;
 		trigger_resetOpButton.disableListener();
 	}
 	

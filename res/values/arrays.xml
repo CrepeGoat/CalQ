@@ -15,4 +15,9 @@
         <item>1.60</item>
         <item>2.00</item>
     </array>
+    
+    <integer-array name="pref_palettes_defaults">
+		<item>@id/palette_basic</item>
+		<item>@id/palette_trig</item>
+	</integer-array>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/palette_trig"
-    android:tag="@string/plt_tag"
+    android:tag="@string/tag_plt"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 	android:shrinkColumns="*"
@@ -11,28 +11,28 @@
 	<TableRow>
 		<Button
 			android:id="@+id/buttonSin"
-			android:tag="@string/op_tag"
+			android:tag="@string/tag_op"
 			android:text="@string/sine"
 			android:textSize="25sp"
 			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonCos"
-			android:tag="@string/op_tag"
+			android:tag="@string/tag_op"
 			android:text="@string/cosine"
 			android:textSize="25sp"
 			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonTan"
-			android:tag="@string/op_tag"
+			android:tag="@string/tag_op"
 			android:text="@string/tangent"
 			android:textSize="25sp"
 			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonPi"
-			android:tag="@string/op_tag"
+			android:tag="@string/tag_op"
 			android:text="@string/pi"
 			android:textSize="25sp"
 			style="?android:attr/buttonBarButtonStyle"
@@ -43,21 +43,21 @@
 	<TableRow>
 		<Button
 			android:id="@+id/buttonAsin"
-			android:tag="@string/op_tag"
+			android:tag="@string/tag_op"
 			android:text="@string/arcsine"
 			android:textSize="25sp"
 			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonAcos"
-			android:tag="@string/op_tag"
+			android:tag="@string/tag_op"
 			android:text="@string/arccosine"
 			android:textSize="25sp"
 			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonAtan"
-			android:tag="@string/op_tag"
+			android:tag="@string/tag_op"
 			android:text="@string/arctangent"
 			android:textSize="25sp"
 			style="?android:attr/buttonBarButtonStyle"

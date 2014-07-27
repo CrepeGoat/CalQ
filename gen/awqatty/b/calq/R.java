@@ -9,6 +9,7 @@ package awqatty.b.calq;
 
 public final class R {
     public static final class array {
+        public static final int pref_palettes_defaults=0x7f050002;
         public static final int pref_renderFormat_items=0x7f050000;
         public static final int pref_textSize_percentages=0x7f050001;
     }
@@ -46,98 +47,103 @@ public final class R {
         public static final int ic_launcher=0x7f020006;
     }
     public static final class id {
-        public static final int action_settings=0x7f0b0021;
-        public static final int buttonAbs=0x7f0b0018;
-        public static final int buttonAcos=0x7f0b001f;
-        public static final int buttonAsin=0x7f0b001e;
-        public static final int buttonAtan=0x7f0b0020;
-        public static final int buttonCos=0x7f0b001b;
-        public static final int buttonCycle=0x7f0b0016;
-        public static final int buttonDel=0x7f0b0006;
-        public static final int buttonDelParent=0x7f0b0007;
-        public static final int buttonDiff=0x7f0b0010;
-        public static final int buttonEq=0x7f0b000d;
-        public static final int buttonEqual=0x7f0b0003;
-        public static final int buttonNum=0x7f0b0008;
-        public static final int buttonPaletteSwap=0x7f0b0009;
-        public static final int buttonPi=0x7f0b001d;
-        public static final int buttonPow=0x7f0b0013;
-        public static final int buttonProd=0x7f0b0011;
-        public static final int buttonQuot=0x7f0b0012;
-        public static final int buttonSin=0x7f0b001a;
-        public static final int buttonSqr=0x7f0b0014;
-        public static final int buttonSqrt=0x7f0b0015;
-        public static final int buttonSum=0x7f0b000f;
-        public static final int buttonTan=0x7f0b001c;
-        public static final int context=0x7f0b0000;
-        public static final int keyboardNum=0x7f0b000a;
-        public static final int numPanel=0x7f0b000b;
-        public static final int opPanel=0x7f0b0005;
-        public static final int palette_basic=0x7f0b0017;
-        public static final int palette_trig=0x7f0b0019;
-        public static final int switchEqRes=0x7f0b000c;
-        public static final int switchEqText=0x7f0b0002;
-        public static final int textNum=0x7f0b0004;
-        public static final int textRes=0x7f0b000e;
-        public static final int webview=0x7f0b0001;
+        public static final int action_settings=0x7f0c0022;
+        public static final int buttonAbs=0x7f0c0018;
+        public static final int buttonAcos=0x7f0c0020;
+        public static final int buttonAsin=0x7f0c001f;
+        public static final int buttonAtan=0x7f0c0021;
+        public static final int buttonCos=0x7f0c001c;
+        public static final int buttonCycle=0x7f0c0016;
+        public static final int buttonDel=0x7f0c0006;
+        public static final int buttonDelParent=0x7f0c0007;
+        public static final int buttonDiff=0x7f0c0010;
+        public static final int buttonEq=0x7f0c000d;
+        public static final int buttonEqual=0x7f0c0003;
+        public static final int buttonNum=0x7f0c0008;
+        public static final int buttonPaletteSwap=0x7f0c0019;
+        public static final int buttonPi=0x7f0c001e;
+        public static final int buttonPow=0x7f0c0013;
+        public static final int buttonProd=0x7f0c0011;
+        public static final int buttonQuot=0x7f0c0012;
+        public static final int buttonSin=0x7f0c001b;
+        public static final int buttonSqr=0x7f0c0014;
+        public static final int buttonSqrt=0x7f0c0015;
+        public static final int buttonSum=0x7f0c000f;
+        public static final int buttonTan=0x7f0c001d;
+        public static final int context=0x7f0c0000;
+        public static final int keyboardNum=0x7f0c000a;
+        public static final int numPanel=0x7f0c000b;
+        public static final int opPanel=0x7f0c0005;
+        public static final int palette_basic=0x7f0c0017;
+        public static final int palette_trig=0x7f0c001a;
+        public static final int switchEqRes=0x7f0c000c;
+        public static final int switchEqText=0x7f0c0002;
+        public static final int textNum=0x7f0c0004;
+        public static final int textRes=0x7f0c000e;
+        public static final int tmpPaletteHolderLoc=0x7f0c0009;
+        public static final int webview=0x7f0c0001;
+    }
+    public static final class integer {
+        public static final int maxPaletteQuantity=0x7f080000;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
         public static final int button_shuffle=0x7f030001;
         public static final int palette_basic=0x7f030002;
-        public static final int palette_trig=0x7f030003;
+        public static final int palette_container=0x7f030003;
+        public static final int palette_trig=0x7f030004;
     }
     public static final class menu {
-        public static final int main=0x7f0a0000;
-        public static final int menu_palettes=0x7f0a0001;
+        public static final int main=0x7f0b0000;
+        public static final int menu_palettes=0x7f0b0001;
     }
     public static final class string {
-        public static final int absolute=0x7f080017;
-        public static final int action_settings=0x7f080001;
-        public static final int app_name=0x7f080000;
-        public static final int arccosine=0x7f08001c;
-        public static final int arcsine=0x7f08001b;
-        public static final int arctangent=0x7f08001d;
-        public static final int arrowUp=0x7f08000d;
-        public static final int cosine=0x7f080019;
+        public static final int absolute=0x7f090015;
+        public static final int action_settings=0x7f090001;
+        public static final int app_name=0x7f090000;
+        public static final int arccosine=0x7f09001a;
+        public static final int arcsine=0x7f090019;
+        public static final int arctangent=0x7f09001b;
+        public static final int arrowUp=0x7f09000d;
+        public static final int cosine=0x7f090017;
         /**  Button Strings 
- delete should be &#9747; 
          */
-        public static final int deleteDesc=0x7f080002;
-        public static final int deleteParentDesc=0x7f080003;
-        public static final int difference=0x7f080011;
-        public static final int equal=0x7f080005;
-        public static final int example=0x7f080009;
-        public static final int number=0x7f080006;
-        public static final int numkeyboard_hint=0x7f08000a;
-        public static final int op_tag=0x7f08000e;
-        public static final int palettemenu_basic=0x7f080020;
-        public static final int palettemenu_basic_cond=0x7f080021;
-        public static final int palettemenu_header=0x7f08001f;
-        public static final int palettemenu_trig=0x7f080022;
-        public static final int palettemenu_trig_cond=0x7f080023;
-        public static final int panelswap_desc=0x7f080004;
-        public static final int pi=0x7f08001e;
-        public static final int plt_tag=0x7f08000f;
-        public static final int power=0x7f080014;
-        public static final int pref_renderFormat=0x7f080026;
-        public static final int pref_renderFormat_Html=0x7f080027;
-        public static final int pref_renderFormat_MathmlHtmlCss=0x7f080029;
-        public static final int pref_renderFormat_MathmlSvg=0x7f080028;
-        public static final int pref_screenOptions=0x7f080024;
-        public static final int pref_screenOptions_title=0x7f080025;
-        public static final int pref_textSize=0x7f08002a;
-        public static final int product=0x7f080012;
-        public static final int quotient=0x7f080013;
-        public static final int shuffle=0x7f080007;
-        public static final int shuffleDesc=0x7f080008;
-        public static final int sine=0x7f080018;
-        public static final int square=0x7f080015;
-        public static final int squareroot=0x7f080016;
-        public static final int sum=0x7f080010;
-        public static final int tangent=0x7f08001a;
-        public static final int textNum_blank=0x7f08000b;
-        public static final int textNum_default=0x7f08000c;
+        public static final int deleteDesc=0x7f090002;
+        public static final int deleteParentDesc=0x7f090003;
+        public static final int difference=0x7f09000f;
+        public static final int equal=0x7f090005;
+        public static final int example=0x7f090009;
+        public static final int number=0x7f090006;
+        public static final int numkeyboard_hint=0x7f09000a;
+        public static final int palettemenu_basic=0x7f090020;
+        public static final int palettemenu_basic_cond=0x7f090021;
+        public static final int palettemenu_header=0x7f09001f;
+        public static final int palettemenu_trig=0x7f090022;
+        public static final int palettemenu_trig_cond=0x7f090023;
+        public static final int panelswap_desc=0x7f090004;
+        public static final int pi=0x7f09001c;
+        public static final int power=0x7f090012;
+        public static final int pref_renderFormat=0x7f090027;
+        public static final int pref_renderFormat_Html=0x7f090028;
+        public static final int pref_renderFormat_MathmlHtmlCss=0x7f09002a;
+        public static final int pref_renderFormat_MathmlSvg=0x7f090029;
+        public static final int pref_screenOptions=0x7f090025;
+        public static final int pref_screenOptions_title=0x7f090026;
+        public static final int pref_textSize=0x7f09002b;
+        public static final int prefkey_palette_basestr=0x7f090024;
+        public static final int product=0x7f090010;
+        public static final int quotient=0x7f090011;
+        public static final int shuffle=0x7f090007;
+        public static final int shuffleDesc=0x7f090008;
+        public static final int sine=0x7f090016;
+        public static final int square=0x7f090013;
+        public static final int squareroot=0x7f090014;
+        public static final int sum=0x7f09000e;
+        public static final int tag_op=0x7f09001d;
+        public static final int tag_plt=0x7f09001e;
+        public static final int tangent=0x7f090018;
+        public static final int textNum_blank=0x7f09000b;
+        public static final int textNum_default=0x7f09000c;
     }
     public static final class style {
         /** 
@@ -161,11 +167,11 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f090000;
+        public static final int AppBaseTheme=0x7f0a0000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f090001;
+        public static final int AppTheme=0x7f0a0001;
     }
     public static final class xml {
         public static final int num_keys=0x7f040000;

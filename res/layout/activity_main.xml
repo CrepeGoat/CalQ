@@ -116,32 +116,11 @@
 	    	android:layout_height="1dp"
 	    	android:background="?android:attr/dividerHorizontal" />
 	    
-		<LinearLayout
-	        android:orientation="horizontal"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:paddingTop="5dp"
-	        android:paddingBottom="5dp" >
-			
-			<include layout="@layout/palette_basic"
-				android:layout_width="wrap_content"
-		    	android:layout_height="wrap_content"
-		         />
-			<View
-			    android:layout_width="1dp"
-				android:layout_height="match_parent"
-			    android:background="?android:attr/dividerVertical" />
-			<ImageButton
-			    android:id="@+id/buttonPaletteSwap"
-			    android:layout_width="wrap_content"
-			    android:layout_height="match_parent"
-			    android:src="@drawable/ic_action_expand"
-			    android:tint="@color/black"
-			    android:contentDescription="@string/panelswap_desc"
-				style="?android:attr/borderlessButtonStyle" />
-			
-		</LinearLayout>
-		
+		<View
+		    android:id="@+id/tmpPaletteHolderLoc"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:visibility="gone" />
 		
 	</LinearLayout>
 	

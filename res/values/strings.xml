@@ -5,7 +5,6 @@
     <string name="action_settings">Settings</string>
     
     <!-- Button Strings -->
-    <!-- delete should be &#9747; -->
     <string name="deleteDesc">Delete selection</string>
     <string name="deleteParentDesc">Delete operation above selection</string>
     <string name="panelswap_desc">Use a different set of operations</string>
@@ -19,17 +18,14 @@
     <string name="textNum_default">0</string>
     <string name="arrowUp">↑</string>
     
-    <string name="op_tag">operation_button</string>
-    <string name="plt_tag">operation_palette</string>
-    
     <string name="sum">+</string>
     <string name="difference">-</string>
     <string name="product">×</string>
     <string name="quotient">÷</string>
     <string name="power">^</string>
-    <string name="square">&#178;&#9702;</string>
+    <string name="square">&#9675;&#178;</string>
     <string name="squareroot">√</string>
-    <string name="absolute">|&#9702;|</string>
+    <string name="absolute">|&#9675;|</string>
     
     <string name="sine">sin</string>
     <string name="cosine">cos</string>
@@ -39,11 +35,16 @@
     <string name="arctangent">atan</string>
     <string name="pi">&#960;</string>
     
+    <string name="tag_op">operation_button</string>
+    <string name="tag_plt">operation_palette</string>
+    
     <string name="palettemenu_header">Button Palettes</string>
     <string name="palettemenu_basic">Basic Operations</string>
     <string name="palettemenu_basic_cond">Basic Ops</string>
     <string name="palettemenu_trig">Trigonometric Functions</string>
     <string name="palettemenu_trig_cond">Trig.</string>
+    
+    <string name="prefkey_palette_basestr">pref_palette</string>
     
     <string name="pref_screenOptions">Screen Options</string>
     <string name="pref_screenOptions_title">Screen Options</string>

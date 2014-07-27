@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" 
+	android:paddingTop="5dp"
+	android:paddingBottom="5dp" >
+    
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:tag="@string/tag_plt" />
+
+	<View
+	    android:layout_width="1dp"
+		android:layout_height="match_parent"
+	    android:background="?android:attr/dividerVertical" />
+	<ImageButton
+	    android:id="@+id/buttonPaletteSwap"
+	    android:layout_width="wrap_content"
+	    android:layout_height="match_parent"
+	    android:src="@drawable/ic_action_expand"
+	    android:tint="@color/black"
+	    android:contentDescription="@string/panelswap_desc"
+		style="?android:attr/borderlessButtonStyle" />
+
+</LinearLayout>
