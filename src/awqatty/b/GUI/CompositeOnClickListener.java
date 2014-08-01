@@ -55,8 +55,8 @@ public class CompositeOnClickListener implements OnClickListener {
 			listener_off = l_off;
 			state = ON;
 		}
-		public ListenerSwitch getSwitch() {
-			return new ListenerSwitch(this);
+		public ListenerBoxSwitch getSwitch() {
+			return new ListenerBoxSwitch(this);
 		}
 		@Override
 		public void onClick(View v) {
@@ -94,7 +94,7 @@ public class CompositeOnClickListener implements OnClickListener {
 		return ((SwitchListenerBox)listener_list.get(listener_list.size()-1)).getSwitch();
 	}
 	/*
-	public ListenerSwitch addSwitchBiListener(OnClickListener l_on, OnClickListener l_off) {
+	public ListenerBoxSwitch addSwitchBiListener(OnClickListener l_on, OnClickListener l_off) {
 		listener_list.add(new SwitchBiListenerBox(l_on, l_off));
 		return ((SwitchBiListenerBox)listener_list.get(listener_list.size()-1)).getSwitch();
 	}

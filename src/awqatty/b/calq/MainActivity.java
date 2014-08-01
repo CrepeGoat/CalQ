@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -17,21 +16,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
+import awqatty.b.CompositeSwitchEventListener.CompositeOnClickListener;
+import awqatty.b.CompositeSwitchEventListener.CompositeOnLongClickListener;
+import awqatty.b.CompositeSwitchEventListener.CompositeSwitchEventListenerBase.ListenerBoxSwitch;
+import awqatty.b.CompositeSwitchEventListener.OnViewEventListener;
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
-import awqatty.b.GUI.CompositeOnClickListener;
 import awqatty.b.GUI.NumberKeyboardListener;
-import awqatty.b.GUI.ViewFinder;
-import awqatty.b.GUI.ViewReplacer;
 import awqatty.b.GenericTextPresentation.NumberStringConverter;
 import awqatty.b.JSInterface.MathmlLinksViewClient;
 import awqatty.b.MathmlPresentation.MathmlTextPresBuilder;
 import awqatty.b.OpTree.OpTree;
+import awqatty.b.ViewManipulation.ViewFinder;
+import awqatty.b.ViewManipulation.ViewParentFinder;
+import awqatty.b.ViewManipulation.ViewReplacer;
 
 /***************************************************************************************
  * Author - Becker Awqatty
@@ -78,7 +80,11 @@ public final class MainActivity extends Activity {
 	private int blank_index;
 	
 	private CompositeOnClickListener op_listener;
-	private CompositeOnClickListener.ListenerSwitch
+	private CompositeOnLongClickListener
+			delplt_listener,
+			swapplt_listener;
+	
+	private ListenerBoxSwitch
 			trigger_resetOpButton,
 			trigger_setEqualToText,
 			trigger_setTextToEqual,
@@ -87,7 +93,7 @@ public final class MainActivity extends Activity {
 
 	private View button_shuffle;
 	private View button_temp;
-	private View button_paletteswap;
+	private View button_newpalette;
 	private WebView webview;		// local references
 	private TextView number_text;
 	
@@ -108,7 +114,7 @@ public final class MainActivity extends Activity {
 		
 		final ViewFinder finder = new ViewFinder();
 		final ViewReplacer replacer = new ViewReplacer();
-		final ViewGroup op_panel = (ViewGroup)findViewById(R.id.opPanel);
+		final ViewGroup op_panel = (ViewGroup)findViewById(R.id.panelOps);
 
 		/********************************************************
 		 * Fill Incomplete Views
@@ -141,12 +147,10 @@ public final class MainActivity extends Activity {
 			// Insert respective palette into container
 			placeholder
 				= finder.findViewsByTag(container, getString(R.string.tag_plt)).get(0);
-			palette = View.inflate(this, id, null);
+			palette = View.inflate(this, getXmlLayoutFromId(id), null);
 			replacer.replaceView(placeholder, palette);
 			// Add palette container to list
 			palette_list.add(container);
-			
-			// (add container dividers?)
 		}
 		
 		// Replace palette-container placeholder with palette containers
@@ -160,11 +164,13 @@ public final class MainActivity extends Activity {
 				eql_listener = new CompositeOnClickListener(2),
 				del_listener = new CompositeOnClickListener(3),
 				delpar_listener = new CompositeOnClickListener(3),
-				web_listener = new CompositeOnClickListener(2),
+				web_listener = new CompositeOnClickListener(3),
 				txt_listener = new CompositeOnClickListener(2),
-				keys_listener = new CompositeOnClickListener(1),
-				plt_listener = new CompositeOnClickListener(2);
+				keys_listener = new CompositeOnClickListener(1);
 		op_listener = new CompositeOnClickListener(3);
+		delplt_listener = new CompositeOnLongClickListener(2);
+		swapplt_listener = new CompositeOnLongClickListener(2);
+		
 
 		trigger_resetOpButton = 
 				op_listener.addSwitchListener(
@@ -173,19 +179,20 @@ public final class MainActivity extends Activity {
 				delpar_listener.addSwitchListener(
 				web_listener.addSwitchListener(
 				txt_listener.addSwitchListener(
-				plt_listener.addSwitchListener(
-						new View.OnClickListener() {
+				delplt_listener.addSwitchListener(
+				swapplt_listener.addSwitchListener(
+						new OnViewEventListener() {
 							@Override
-							public void onClick(View v) {
+							public void onViewEvent(View v) {
 								((MainActivity)v.getContext()).resetOpButton();
 							}
 						}
-				)))))));
+				))))))));
 		trigger_setEqualToText = 
 				eql_listener.addSwitchListener(
-						new View.OnClickListener() {
+						new OnViewEventListener() {
 							@Override
-							public void onClick(View v) {
+							public void onViewEvent(View v) {
 								((MainActivity)v.getContext()).setEqualToText();
 							}
 						}
@@ -195,13 +202,14 @@ public final class MainActivity extends Activity {
 				del_listener.addSwitchListener(
 				delpar_listener.addSwitchListener(
 				keys_listener.addSwitchListener(
-						new View.OnClickListener() {
+				web_listener.addSwitchListener(
+						new OnViewEventListener() {
 							@Override
-							public void onClick(View v) {
+							public void onViewEvent(View v) {
 								((MainActivity)v.getContext()).setTextToEqual();
 							}
 						}
-				))));
+				)))));
 		
 		trigger_resetOpButton.disableListener();
 		trigger_setEqualToText.enableListener();
@@ -238,10 +246,18 @@ public final class MainActivity extends Activity {
 					((MainActivity)v.getContext()).onClickNumberText(v);
 				}
 		});
-		plt_listener.addListener(new View.OnClickListener() {
+		swapplt_listener.addListener(new View.OnLongClickListener() {
 			@Override
-			public void onClick(View v) {
+			public boolean onLongClick(View v) {
 				((MainActivity)v.getContext()).openContextMenu(v);
+				return true;
+			}
+		});
+		delplt_listener.addListener(new View.OnLongClickListener() {
+			@Override
+			public boolean onLongClick(View v) {
+				((MainActivity)v.getContext()).onClickDeletePalette(v);
+				return true;
 			}
 		});
 
@@ -265,9 +281,9 @@ public final class MainActivity extends Activity {
 			//Set trigger to show keyboard
 			trigger_showNumKeys = 
 					txt_listener.addSwitchListener(
-							new View.OnClickListener() {
+							new OnViewEventListener() {
 								@Override
-								public void onClick(View v) {
+								public void onViewEvent(View v) {
 									((MainActivity)v.getContext()).showNumKeys();
 								}
 							}
@@ -276,9 +292,9 @@ public final class MainActivity extends Activity {
 			trigger_hideNumKeys = 
 					web_listener.addSwitchListener(
 					keys_listener.addSwitchListener(
-							new View.OnClickListener() {
+							new OnViewEventListener() {
 								@Override
-								public void onClick(View v) {
+								public void onViewEvent(View v) {
 									((MainActivity)v.getContext()).hideNumKeys();
 								}
 							}
@@ -292,25 +308,21 @@ public final class MainActivity extends Activity {
 			trigger_showNumKeys = null;
 		}
 		
-		// Sets listeners to respective views	
-		final List<View> op_buttons = finder.findViewsByTag(
-				op_panel, getString(R.string.tag_op) );
-		for (View v : op_buttons) {
-			v.setOnClickListener(op_listener);
-		}
+		// Sets listeners to respective views
+		//		Unique Views
 		findViewById(R.id.buttonEqual).setOnClickListener(eql_listener);
 		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
 		findViewById(R.id.buttonDelParent).setOnClickListener(delpar_listener);
 		number_text.setOnClickListener(txt_listener);
 		
-		final List<View> plt_buttons = finder.findViewsById(
-				op_panel, R.id.buttonPaletteSwap );
-		for (View button_paletteswap : plt_buttons) {
-			registerForContextMenu(button_paletteswap);
-			button_paletteswap.setLongClickable(false);
-			button_paletteswap.setOnClickListener(plt_listener);
+		setPaletteButtonListeners(op_panel, finder);
+		
+		final View button_addPalette = findViewById(R.id.buttonNewPalette);
+		if (button_addPalette != null) {
+			registerForContextMenu(button_addPalette);
+			button_addPalette.setOnLongClickListener(swapplt_listener);
 		}
-
+		
 		/*********************************************************
 		 * Set local WebView object
 		 *********************************************************/
@@ -393,11 +405,10 @@ public final class MainActivity extends Activity {
 		final SharedPreferences pref = getPreferences(MODE_PRIVATE);
 		final SharedPreferences.Editor pref_edit = pref.edit();
 		final String keybase = getString(R.string.prefkey_palette_basestr);
-		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
 		// Gets current ids
 		List<Integer> ids = new ArrayList<Integer>();
 		for (View palette : (new ViewFinder()).findViewsByTag(
-				(ViewGroup)findViewById(R.id.opPanel),
+				(ViewGroup)findViewById(R.id.panelOps),
 				getString(R.string.tag_plt) )) {
 			ids.add(palette.getId());
 		}
@@ -425,35 +436,64 @@ public final class MainActivity extends Activity {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menu_info) {
 		super.onCreateContextMenu(menu, v, menu_info);
 		getMenuInflater().inflate(R.menu.menu_palettes, menu);
-		button_paletteswap = v;
+		if (v.getId() == R.id.buttonNewPalette) {
+			button_newpalette = v;
+			// Get ID's of existing palettes
+			final ViewGroup panel_ops = (ViewGroup)findViewById(R.id.panelOps);
+			final List<View> palettes = (new ViewFinder()).findViewsByTag(
+					panel_ops, getString(R.string.tag_plt) );
+			int[] ids = new int[palettes.size()];
+			for (int i=0; i<palettes.size(); ++i)
+				ids[0] = palettes.get(0).getId();
+			
+			// Disable choices for existing palettes
+			for (int id : ids)
+				menu.findItem(id).setEnabled(false);
+		}
+		else {
+			button_newpalette = getPaletteFromSwapButton(v);
+			// Disable choices for existing palettes
+			menu.findItem(button_newpalette.getId()).setEnabled(false);
+		}
 	}
 	
 	// Assumes palette is a child of palette-swap's parent
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		final int id2 = item.getItemId();
-		// (?) Insert path for "add palette" button
-		final View palette = getPaletteFromSwapButton(button_paletteswap);
-		final int id1 = palette.getId();
+		final ViewReplacer replacer = new ViewReplacer();
 		
-		if (id1 != id2) {
-			final ViewReplacer replacer = new ViewReplacer();
-			View palette2 = findViewById(id2);
+		if (button_newpalette.getId() == R.id.buttonNewPalette) {
+			final ViewFinder finder = new ViewFinder();
 			
-			final SharedPreferences pref = getPreferences(MODE_PRIVATE);
-			final SharedPreferences.Editor pref_edit = pref.edit();
-			final String keybase = getString(R.string.prefkey_palette_basestr);
+			// Inflate palette-container layouts
+			final ViewGroup container = (ViewGroup)View.inflate(
+					this, R.layout.palette_container, null );
+			// Insert respective palette into container
+			final View placeholder = finder.findViewsByTag(
+					container, getString(R.string.tag_plt) ).get(0);
+			replacer.replaceView(placeholder, 
+					View.inflate(this, getXmlLayoutFromId(id2), null) );
+			
+			// Add new palette behind "add" button
+			replacer.insertView(button_newpalette, container);
+			
+			// Set Button Listeners to new palette
+			setPaletteButtonListeners(container, finder);
+		}
+		else if (getString(R.string.tag_plt).equals(button_newpalette.getTag())) {
+			View palette2 = findViewById(id2);
 			
 			// Condition: palette is already on-screen
 			if (palette2 != null) {
 				// Switch selected palettes
-				replacer.switchViews(palette, palette2);
+				replacer.switchViews(button_newpalette, palette2);
 			}
 			// Condition: palette has to be inflated from layout xml
 			else {
 				// Inflate new palette from XML
 				palette2 = View.inflate(this, getXmlLayoutFromId(id2), null);
-				replacer.replaceView(palette, palette2);
+				replacer.replaceView(button_newpalette, palette2);
 				// Set button listeners for buttons in inflated palette
 				for (View op_button : (new ViewFinder())
 						.findViewsByTag((ViewGroup)palette2, getString(R.string.tag_op)) )
@@ -461,7 +501,7 @@ public final class MainActivity extends Activity {
 			}
 		}
 		// Cleanup
-		button_paletteswap = null;
+		button_newpalette = null;
 		
 		return true;
 	}
@@ -529,7 +569,7 @@ public final class MainActivity extends Activity {
 
 	public void hideNumKeys() {
 		// Shows button panel
-		findViewById(R.id.opPanel).setVisibility(View.VISIBLE);
+		findViewById(R.id.panelOps).setVisibility(View.VISIBLE);
 		/*** Use only if root view is a RelativeLayout ***
 		// Aligns bottom of WebView back to button panel
 		((RelativeLayout.LayoutParams)number_text.getLayoutParams())
@@ -554,10 +594,31 @@ public final class MainActivity extends Activity {
 				.addRule(RelativeLayout.ABOVE, R.id.keyboardNum);
 		//*/
 		// Hides button panel
-		findViewById(R.id.opPanel).setVisibility(View.GONE);
+		findViewById(R.id.panelOps).setVisibility(View.GONE);
 		// Set triggers
 		trigger_showNumKeys.disableListener();
 		trigger_hideNumKeys.enableListener();
+	}
+	
+	public void setPaletteButtonListeners(ViewGroup container, ViewFinder finder) {
+		List<View> buttons;
+		//		Operation Buttons
+		buttons = finder.findViewsByTag(
+				container, getString(R.string.tag_op) );
+		for (View button_operator : buttons)
+			button_operator.setOnClickListener(op_listener);
+		//		Add/Swap-Palette Buttons		
+		buttons = finder.findViewsById(
+				container, R.id.buttonSwapPalette );
+		for (View button_swapPalette : buttons) {
+			registerForContextMenu(button_swapPalette);
+			button_swapPalette.setOnLongClickListener(swapplt_listener);
+		}
+		//		Delete-Palette Buttons
+		buttons = finder.findViewsById(
+				container, R.id.buttonRemovePalette );
+		for (View button_removePalette : buttons)
+			button_removePalette.setOnLongClickListener(delplt_listener);
 	}
 	
 	public void raiseToast(String str) {
@@ -621,15 +682,10 @@ public final class MainActivity extends Activity {
 	}
 	
 	private View getPaletteFromSwapButton(View swap_button) {
-		final ViewFinder finder = new ViewFinder();
-		ViewGroup parent = (ViewGroup) swap_button.getParent();
-		List<View> list;
-		for (list = finder.findViewsByTag(parent, getString(R.string.tag_plt));
-				list.size() <= 0;
-				list = finder.findViewsByTag(
-						(parent = (ViewGroup) parent.getParent()),
-						getString(R.string.tag_plt) )) {}
-		return (list.size() > 1) ? null : list.get(0);
+		final List<View> views = (new ViewParentFinder()).findParentViewsByTag(
+				(ViewGroup) swap_button.getParent(),
+				getString(R.string.tag_plt) );
+		return (views.size() == 1 ? views.get(0) : null);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -733,6 +789,13 @@ public final class MainActivity extends Activity {
 	}
 	public void onNumKeyboardCancel() {
 		hideNumKeys();
+	}
+	
+	public void onClickDeletePalette(View v) {
+		v = (new ViewParentFinder()).findParentViewsById(
+				(ViewGroup) v.getParent(),
+				R.id.panel_paletteContainer ).get(0);
+		((ViewGroup)v.getParent()).removeView(v);
 	}
 
 	//////////////////////////////////////////////////////////////////////

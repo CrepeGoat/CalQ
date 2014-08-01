@@ -1,4 +1,4 @@
-package awqatty.b.GUI;
+package awqatty.b.ViewManipulation;
 
 import java.util.ArrayList;
 import java.util.List;

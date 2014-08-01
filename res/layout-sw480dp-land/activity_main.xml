@@ -1,131 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-    
+	android:layout_width="match_parent"
+	android:layout_height="match_parent" >
+	
 	<WebView android:id="@+id/webview"
-	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:layout_alignParentTop="true"
-	    android:layout_alignParentLeft="true"
-	    android:layout_toLeftOf="@+id/opPanel"
-	    android:layout_above="@+id/numPanel"
-		/>
-    
-    <TableLayout
-        android:id="@+id/opPanel"
-    	android:layout_width="wrap_content"
-    	android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
 		android:layout_alignParentTop="true"
-	    android:layout_alignParentRight="true"
-	    android:layout_alignParentBottom="true"
+		android:layout_alignParentLeft="true"
+		android:layout_toLeftOf="@+id/panel_extraButtons"
+		android:layout_above="@+id/numPanel" />
+	
+	<LinearLayout 
+		android:id="@+id/panel_extraButtons"
+		android:orientation="vertical"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_alignParentTop="true"
+		android:layout_toLeftOf="@+id/panelOps"
+		android:layout_above="@+id/numPanel"
+		android:divider="?android:attr/dividerHorizontal"
+		android:showDividers="middle"
+		style="?android:attr/buttonBarStyle" >
+
+		<ImageButton
+			android:id="@+id/buttonDel"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:contentDescription="@string/deleteOp_desc"
+			android:src="@drawable/ic_action_remove"
+			android:tint="@color/black"
+			style="?android:attr/buttonBarButtonStyle" />
+		
+	   	<Button
+	   		android:id="@+id/buttonDelParent"
+	   		android:layout_width="wrap_content"
+	   		android:layout_height="wrap_content"
+	   		android:contentDescription="@string/deleteOp_desc"
+	   		android:drawablePadding="-7.5sp"
+	   		android:drawableRight="@drawable/ic_action_remove"
+	   		android:text="@string/arrowUp"
+	   		android:textSize="30sp"
+	   		android:tint="@color/black"
+			style="?android:attr/buttonBarButtonStyle" />
+				
+	</LinearLayout>
+	
+	<ScrollView
+		android:id="@+id/panelOps"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentBottom="true"
 		android:paddingTop="@dimen/activity_vertical_margin" 
-	    android:paddingBottom="@dimen/activity_vertical_margin"
-	    android:paddingLeft="@dimen/activity_horizontal_margin"
-	    android:paddingRight="@dimen/activity_horizontal_margin"
-        >
-        <TableRow
-            android:paddingBottom="@dimen/activity_vertical_margin">
-			<ImageButton
-			    android:id="@+id/buttonDel"
-			    android:src="@drawable/ic_action_remove"
-			    android:contentDescription="@string/deleteDesc"
-			    android:tint="@color/black" />		
+		android:paddingBottom="@dimen/activity_vertical_margin"
+		android:paddingLeft="@dimen/activity_horizontal_margin"
+		android:paddingRight="@dimen/activity_horizontal_margin" >
 
-			<ViewSwitcher
-			    android:id="@+id/switchEqRes"
-			    android:layout_span="3" >
-	
-				<Button
-				    android:id="@+id/buttonEq"
-				    android:layout_width="match_parent"
-				    android:layout_height="match_parent"
-				    android:text="@string/equal"
-					android:textStyle="bold"
-				    android:onClick="onClickEquals" />
-	
-				<TextView 
-				    android:id="@+id/textRes"
-				    android:layout_width="match_parent"
-				    android:layout_height="match_parent"
-				    android:textSize="30sp"
-				    android:textStyle="bold"
-				    android:textColor="@color/mid_blue"
-				    android:maxLines="1"
-				    android:gravity="right"
-				    android:clickable="true"
-				    android:onClick="onClickResult" />
-			</ViewSwitcher>
-        </TableRow>
-		        	        
-        <TableRow>
-            <Button
-                android:id="@+id/buttonSum"
-                android:text="@string/sum"
-				/>
-            <Button
-                android:id="@+id/buttonDiff"
-                android:text="@string/difference"
-				/>
-   	        <Button
-                android:id="@+id/buttonProd"
-                android:text="@string/product"
-				/>
-            <Button
-                android:id="@+id/buttonQuot"
-                android:text="@string/quotient"
-				/>
-        </TableRow>
-        
-        <TableRow>
-            <Button
-                android:id="@+id/buttonPow"
-                android:text="@string/power"
-				/>
-            <Button
-                android:id="@+id/buttonSqr"
-                android:text="@string/square"
-				/>
-            <Button
-                android:id="@+id/buttonSqrt"
-                android:text="@string/squareroot"
-				/>
-            
-        </TableRow>
-    </TableLayout>
-	
-    <LinearLayout
-        android:id="@+id/numPanel"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-	    android:layout_toLeftOf="@+id/opPanel"
-        >
-    
-		<TextView
-		    android:id="@+id/textNum"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:paddingLeft="@dimen/activity_horizontal_margin"
-		    android:paddingRight="@dimen/activity_horizontal_margin"
-		    android:hint="@string/numkeyboard_hint"
-		    android:textSize="40sp"
-		    android:textColor="@color/light_blue"
-		    android:background="@color/black"
-		    android:maxLines="1"
-		    android:gravity="right" />
-
-	    <android.inputmethodservice.KeyboardView
-	        android:id="@+id/keyboardNum"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center_horizontal|bottom"
-	        android:focusable="true"
-	        android:focusableInTouchMode="true" />
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:divider="?android:attr/dividerHorizontal"
+			android:showDividers="middle" >
 			
-    </LinearLayout>
+			<View
+				android:id="@+id/tmpPaletteHolderLoc"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:visibility="gone" />
+			
+			<ImageButton
+				android:id="@+id/buttonNewPalette"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:src="@drawable/ic_action_new"
+				android:contentDescription="@string/newPalette_desc"
+				style="?android:attr/borderlessButtonStyle" />
+			
+		</LinearLayout>
+	</ScrollView>
+	
+	<LinearLayout
+		android:id="@+id/numPanel"
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentBottom="true"
+		android:layout_toLeftOf="@+id/panelOps" >
+	
+		<ViewSwitcher
+			android:id="@+id/switchEqText"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:paddingLeft="@dimen/activity_horizontal_margin"
+			android:paddingRight="@dimen/activity_horizontal_margin" >
+			<Button
+				android:id="@+id/buttonEqual"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:text="@string/equal"
+				android:textSize="30sp"
+				style="?android:attr/borderlessButtonStyle" />
+			<TextView
+				android:id="@+id/textNum"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent"
+				android:hint="@string/numkeyboard_hint"
+				android:textSize="50sp"
+				android:textColor="@color/orange"
+				android:textColorHint="@color/mid_blue"
+				android:minLines="1"
+				android:maxLines="1"
+				android:gravity="right" />
+		</ViewSwitcher>
+
+		<android.inputmethodservice.KeyboardView
+			android:id="@+id/keyboardNum"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal|bottom"
+			android:focusable="true"
+			android:focusableInTouchMode="true" />
+			
+	</LinearLayout>
 
 </RelativeLayout>

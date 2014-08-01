@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/panel_paletteContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal" 
@@ -15,13 +16,14 @@
 	    android:layout_width="1dp"
 		android:layout_height="match_parent"
 	    android:background="?android:attr/dividerVertical" />
+	
 	<ImageButton
-	    android:id="@+id/buttonPaletteSwap"
+	    android:id="@+id/buttonSwapPalette"
 	    android:layout_width="wrap_content"
 	    android:layout_height="match_parent"
 	    android:src="@drawable/ic_action_expand"
 	    android:tint="@color/black"
-	    android:contentDescription="@string/panelswap_desc"
+	    android:contentDescription="@string/swapPalette_desc"
 		style="?android:attr/borderlessButtonStyle" />
 
 </LinearLayout>

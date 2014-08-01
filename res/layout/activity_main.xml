@@ -1,136 +1,117 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/context"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity" >
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/context"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".MainActivity" >
 
 	<WebView android:id="@+id/webview"
-	    android:layout_width="match_parent"
-	    android:layout_height="0dp"
-	    android:layout_weight="1"
-	    />
-    
+		android:layout_width="match_parent"
+		android:layout_height="0dp"
+		android:layout_weight="1"
+		/>
+	
 	<ViewSwitcher
-	    android:id="@+id/switchEqText"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:paddingLeft="@dimen/activity_horizontal_margin"
-	    android:paddingRight="@dimen/activity_horizontal_margin"
-	    >
-	    <Button
-	        android:id="@+id/buttonEqual"
-		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
-		    android:text="@string/equal"
-		    android:textSize="30sp"
-		    style="?android:attr/borderlessButtonStyle"
-	        />
+		android:id="@+id/switchEqText"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="@dimen/activity_horizontal_margin"
+		android:paddingRight="@dimen/activity_horizontal_margin"
+		>
+		<Button
+			android:id="@+id/buttonEqual"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:text="@string/equal"
+			android:textSize="30sp"
+			style="?android:attr/borderlessButtonStyle" />
 		<TextView
-		    android:id="@+id/textNum"
-		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
-		    android:hint="@string/numkeyboard_hint"
-		    android:textSize="50sp"
-		    android:textColor="@color/orange"
-		    android:textColorHint="@color/mid_blue"
-		    android:minLines="1"
-		    android:maxLines="1"
-		    android:gravity="right"
-		     />
+			android:id="@+id/textNum"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:hint="@string/numkeyboard_hint"
+			android:textSize="50sp"
+			android:textColor="@color/orange"
+			android:textColorHint="@color/mid_blue"
+			android:minLines="1"
+			android:maxLines="1"
+			android:gravity="right" />
 	</ViewSwitcher>
 	
 	<LinearLayout
-        android:id="@+id/opPanel"
-        android:orientation="vertical"
+		android:id="@+id/panelOps"
+		android:orientation="vertical"
 		android:layout_width="match_parent"
-    	android:layout_height="wrap_content"
-	    >
-			    
-	    <LinearLayout
-	        android:orientation="horizontal"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
+		android:layout_height="wrap_content" >
+				
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
 			android:paddingLeft="@dimen/activity_horizontal_margin"
 			android:paddingRight="@dimen/activity_horizontal_margin"
 			android:paddingBottom="5dp"
-			style="?android:attr/buttonBarStyle" >
+			style="?android:attr/buttonBarStyle"
+			android:divider="?android:attr/dividerVertical"
+			android:showDividers="middle" >
 
 			<ImageButton
-			    android:id="@+id/buttonDel"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:contentDescription="@string/deleteDesc"
-			    android:src="@drawable/ic_action_remove"
-			    android:tint="@color/black"
-				style="?android:attr/buttonBarButtonStyle"
-				 />
+				android:id="@+id/buttonDel"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:contentDescription="@string/deleteOp_desc"
+				android:src="@drawable/ic_action_remove"
+				android:tint="@color/black"
+				style="?android:attr/buttonBarButtonStyle" />
 			
-			<View
-				android:layout_width="1dp"
-				android:layout_height="match_parent"
-				android:background="?android:attr/dividerVertical" />
-			
-	       	<Button
-	       	    android:id="@+id/buttonDelParent"
-	       	    android:layout_width="wrap_content"
-	       	    android:layout_height="wrap_content"
-	       	    android:contentDescription="@string/deleteDesc"
-	       	    android:drawablePadding="-7.5sp"
-	       	    android:drawableRight="@drawable/ic_action_remove"
-	       	    android:text="@string/arrowUp"
-	       	    android:textSize="30sp"
-	       	    android:tint="@color/black"
-				style="?android:attr/buttonBarButtonStyle"
-				 />
+		   	<Button
+		   		android:id="@+id/buttonDelParent"
+		   		android:layout_width="wrap_content"
+		   		android:layout_height="wrap_content"
+		   		android:contentDescription="@string/deleteOp_desc"
+		   		android:drawablePadding="-7.5sp"
+		   		android:drawableRight="@drawable/ic_action_remove"
+		   		android:text="@string/arrowUp"
+		   		android:textSize="30sp"
+		   		android:tint="@color/black"
+				style="?android:attr/buttonBarButtonStyle" />
 
 			<View
-				android:layout_width="1dp"
-				android:layout_height="match_parent"
-				android:background="?android:attr/dividerVertical" />
+		   		android:layout_width="0dp"
+		   		android:layout_height="match_parent"
+		   		android:layout_weight="1" />
 
-			<View
-	       	    android:layout_width="0dp"
-	       	    android:layout_height="match_parent"
-	       	    android:layout_weight="1" />
-
-			<View
-				android:layout_width="1dp"
-				android:layout_height="match_parent"
-				android:background="?android:attr/dividerVertical" />
-			
 			<Button
-			    android:id="@+id/buttonNum"
-			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"
-			    android:text="@string/number"
-			    android:textSize="30sp"
-				style="?android:attr/buttonBarButtonStyle"
-				 />
-	        
-	    </LinearLayout>
-	    
+				android:id="@+id/buttonNum"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="@string/number"
+				android:textSize="30sp"
+				style="?android:attr/buttonBarButtonStyle" />
+			
+		</LinearLayout>
+		
    		<View
 			android:layout_width="match_parent"
-	    	android:layout_height="1dp"
-	    	android:background="?android:attr/dividerHorizontal" />
-	    
+			android:layout_height="1dp"
+			android:background="?android:attr/dividerHorizontal" />
+		
 		<View
-		    android:id="@+id/tmpPaletteHolderLoc"
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:visibility="gone" />
+			android:id="@+id/tmpPaletteHolderLoc"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:visibility="gone" />
 		
 	</LinearLayout>
 	
-    <android.inputmethodservice.KeyboardView
-        android:id="@+id/keyboardNum"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|bottom"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:visibility="gone" />
+	<android.inputmethodservice.KeyboardView
+		android:id="@+id/keyboardNum"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_horizontal|bottom"
+		android:focusable="true"
+		android:focusableInTouchMode="true"
+		android:visibility="gone" />
    	
 </LinearLayout>

@@ -5,9 +5,11 @@
     <string name="action_settings">Settings</string>
     
     <!-- Button Strings -->
-    <string name="deleteDesc">Delete selection</string>
-    <string name="deleteParentDesc">Delete operation above selection</string>
-    <string name="panelswap_desc">Use a different set of operations</string>
+    <string name="deleteOp_desc">Delete selection</string>
+    <string name="deleteOpParent_desc">Delete operation above selection</string>
+    <string name="swapPalette_desc">Use a different set of operations</string>
+    <string name="newPalette_desc">Add Function Palette</string>
+    <string name="removePalette_desc">Remove Function Palette</string>
     <string name="equal">=</string>
     <string name="number">123</string>
     <string name="shuffle">-></string>
