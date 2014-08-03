@@ -8,8 +8,9 @@
 	android:paddingBottom="5dp" >
     
     <View
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="4"
         android:tag="@string/tag_plt" />
 
 	<View
@@ -19,11 +20,14 @@
 	
 	<ImageButton
 	    android:id="@+id/buttonSwapPalette"
-	    android:layout_width="wrap_content"
+	    android:layout_width="0dp"
 	    android:layout_height="match_parent"
+	    android:layout_weight="1"
+	    android:scaleType="center"
 	    android:src="@drawable/ic_action_expand"
 	    android:tint="@color/black"
 	    android:contentDescription="@string/swapPalette_desc"
-		style="?android:attr/borderlessButtonStyle" />
+		style="?android:attr/borderlessButtonStyle"
+	    android:background="@color/light_gray" />
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package awqatty.b.ViewManipulation;
 
 import java.util.List;
+
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -10,7 +11,7 @@ public class ViewParentFinder extends ViewFinder {
 		List<View> views = findViewsByTag(root, tag);
 		while (views.isEmpty()) {
 			root = (ViewGroup)root.getParent();
-			views.addAll(findViewsByTag(root, tag));
+			findViewsByTag(root, tag);
 		}
 		return views;
 	}
@@ -19,7 +20,7 @@ public class ViewParentFinder extends ViewFinder {
 		List<View> views = findViewsById(root, id);
 		while (views.isEmpty()) {
 			root = (ViewGroup)root.getParent();
-			views.addAll(findViewsById(root, id));
+			findViewsById(root, id);
 		}
 		return views;
 	}

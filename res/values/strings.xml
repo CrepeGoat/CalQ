@@ -47,6 +47,7 @@
     <string name="palettemenu_trig_cond">Trig.</string>
     
     <string name="prefkey_palette_basestr">pref_palette</string>
+    <string name="prefkey_optree">expression_data</string>
     
     <string name="pref_screenOptions">Screen Options</string>
     <string name="pref_screenOptions_title">Screen Options</string>
@@ -55,5 +56,6 @@
     <string name="pref_renderFormat_MathmlSvg">MathML (SVG)</string>
     <string name="pref_renderFormat_MathmlHtmlCss">MathML (HTML/CSS)</string>
     <string name="pref_textSize">Text Size</string>
+    
 
 </resources>

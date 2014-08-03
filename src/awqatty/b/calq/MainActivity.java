@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
@@ -62,6 +63,8 @@ import awqatty.b.ViewManipulation.ViewReplacer;
  * (?) Shift textNum TextView to be constantly in view,
  * 		remove equals button
  * 
+ * handle state changes
+ * 
  * NEED TO TEST:
  * 
  * tablet views
@@ -75,15 +78,17 @@ public final class MainActivity extends Activity {
 	/*********************************************************
 	 * Private Fields
 	 *********************************************************/
-	private OpTree expression;
+	private OpTree expression = null;
 	private double result;
-	private int blank_index;
+	private int blank_index;	// stores node loc. from calc.exception
 	
+	// Click Listeners stored for inflation of new palettes
 	private CompositeOnClickListener op_listener;
 	private CompositeOnLongClickListener
 			delplt_listener,
 			swapplt_listener;
 	
+	// Listener-Box Switches to (de)activate on-view-event listeners
 	private ListenerBoxSwitch
 			trigger_resetOpButton,
 			trigger_setEqualToText,
@@ -91,10 +96,17 @@ public final class MainActivity extends Activity {
 			trigger_showNumKeys,
 			trigger_hideNumKeys;
 
+	// used to swap operators with shuffle button
 	private View button_shuffle;
 	private View button_temp;
-	private View button_newpalette;
-	private WebView webview;		// local references
+	
+	private View button_newpalette;	// local storage for context-menu operation
+	
+	// trigger for storage function in onDestroy()
+	private RetainDataFragment<OpTree> fragment_retainOpTree;
+	
+	// Local References (used for faster access of commonly-accessed views)
+	private WebView webview;
 	private TextView number_text;
 	
 	//---------------------------------------------------
@@ -105,7 +117,25 @@ public final class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		expression = new OpTree(new MathmlTextPresBuilder());
+		/*********************************************************
+		 * 
+		 *********************************************************/
+		// If activity was restarted, get old OpTree object
+		fragment_retainOpTree = (RetainDataFragment<OpTree>)
+				getFragmentManager().findFragmentByTag(
+				getString(R.string.prefkey_optree) );
+		if (fragment_retainOpTree != null) {
+			expression = fragment_retainOpTree.getData();
+		}
+		else {
+			fragment_retainOpTree = new RetainDataFragment<OpTree>();
+			expression = new OpTree(new MathmlTextPresBuilder());
+			fragment_retainOpTree.setData(expression);
+
+			getFragmentManager().beginTransaction().add(
+					fragment_retainOpTree, getString(R.string.prefkey_optree) ).commit();
+		}
+		fragment_retainOpTree.setRetainInstance(false);
 		
 		webview = (WebView) findViewById(R.id.webview);
 		number_text = (TextView) findViewById(R.id.textNum);
@@ -166,7 +196,8 @@ public final class MainActivity extends Activity {
 				delpar_listener = new CompositeOnClickListener(3),
 				web_listener = new CompositeOnClickListener(3),
 				txt_listener = new CompositeOnClickListener(2),
-				keys_listener = new CompositeOnClickListener(1);
+				keys1_listener = new CompositeOnClickListener(1),
+				keys2_listener = new CompositeOnClickListener(1);
 		op_listener = new CompositeOnClickListener(3);
 		delplt_listener = new CompositeOnLongClickListener(2);
 		swapplt_listener = new CompositeOnLongClickListener(2);
@@ -201,7 +232,7 @@ public final class MainActivity extends Activity {
 				op_listener.addSwitchListener(
 				del_listener.addSwitchListener(
 				delpar_listener.addSwitchListener(
-				keys_listener.addSwitchListener(
+				keys2_listener.addSwitchListener(
 				web_listener.addSwitchListener(
 						new OnViewEventListener() {
 							@Override
@@ -291,7 +322,7 @@ public final class MainActivity extends Activity {
 			// Set trigger to hide keyboard
 			trigger_hideNumKeys = 
 					web_listener.addSwitchListener(
-					keys_listener.addSwitchListener(
+					keys2_listener.addSwitchListener(
 							new OnViewEventListener() {
 								@Override
 								public void onViewEvent(View v) {
@@ -303,7 +334,9 @@ public final class MainActivity extends Activity {
 			trigger_hideNumKeys.disableListener();
 		}
 		else {
-			keys_listener.addSwitchListener(trigger_resetOpButton);
+			keys1_listener.addSwitchListener(trigger_resetOpButton);
+			keys1_listener.addSwitchListener(trigger_setEqualToText);
+			keys2_listener.addSwitchListener(trigger_resetOpButton);
 			trigger_hideNumKeys = null;
 			trigger_showNumKeys = null;
 		}
@@ -386,7 +419,10 @@ public final class MainActivity extends Activity {
 		 * Set Number Keyboard
 		 *********************************************************/
 		NumberKeyboardListener num_keyslistener = new NumberKeyboardListener(number_text);
-		num_keyslistener.setOnClickListener(keys_listener);
+		num_keyslistener.setOnClickListener
+				(NumberKeyboardListener.KEYS_EDIT, keys1_listener);
+		num_keyslistener.setOnClickListener
+				(NumberKeyboardListener.KEYS_ACTION, keys2_listener);
 		
 		KeyboardView k = (KeyboardView)findViewById(R.id.keyboardNum);
 		k.setKeyboard(new Keyboard(this, R.xml.num_keys));
@@ -423,6 +459,14 @@ public final class MainActivity extends Activity {
 		}
 		pref_edit.apply();
 	}
+	
+	
+	// This method saves the opTree object during runtime changes, and no-when else
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		fragment_retainOpTree.setRetainInstance(true);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -444,7 +488,7 @@ public final class MainActivity extends Activity {
 					panel_ops, getString(R.string.tag_plt) );
 			int[] ids = new int[palettes.size()];
 			for (int i=0; i<palettes.size(); ++i)
-				ids[0] = palettes.get(0).getId();
+				ids[i] = palettes.get(i).getId();
 			
 			// Disable choices for existing palettes
 			for (int id : ids)
@@ -782,13 +826,11 @@ public final class MainActivity extends Activity {
 			number_text.setText(getString(R.string.textNum_default));
 	}
 	public void onNumKeyboardResult(double d) {
-		hideNumKeys();
 		expression.addNumber(d);
 		refreshMathmlScreen();
 		//refreshNumberText();
 	}
 	public void onNumKeyboardCancel() {
-		hideNumKeys();
 	}
 	
 	public void onClickDeletePalette(View v) {

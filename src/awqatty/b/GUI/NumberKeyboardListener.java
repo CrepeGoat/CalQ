@@ -7,15 +7,21 @@ import awqatty.b.calq.MainActivity;
 
 public final class NumberKeyboardListener implements OnKeyboardActionListener {
 
+	// Constants
+	public static final int LISTENER_COUNT = 2;
+	public static final int KEYS_EDIT = 0;
+	public static final int KEYS_ACTION = 1;
+	
 	private final TextView display;
-	private OnClickListener listener_hideKeyboard;
+	private final OnClickListener[] listeners;
 	
 	public NumberKeyboardListener(TextView view) {
+		listeners = new OnClickListener[LISTENER_COUNT];
 		display = view;
 	}
 	
-	public void setOnClickListener(OnClickListener l) {
-		listener_hideKeyboard = l;
+	public void setOnClickListener(int listener_number, OnClickListener l) {
+		listeners[listener_number] = l;
 	}
 
 	@Override
@@ -29,31 +35,36 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 		final String text = display.getText().toString();
 		
 		switch (arg0) {
-		// Delete Key Logic
-		case -5:
-			if (text.length() > 0)
+		case -5:	// Delete Key Logic
+			if (text.length() == 1)
+				display.setText("0");
+			else if (text.length() == 2 && text.startsWith("-")) {
+				if (text.charAt(1) != '0')
+					display.setText("-0");
+				else
+					display.setText("0");
+			}
+			else if (text.length() > 0)
 				display.setText(text.subSequence(0, text.length()-1));
 			break;
-		// Cancel Key Logic
-		case -3:
+			
+		case -3:	// Cancel Key Logic
 			display.setText("");
-			listener_hideKeyboard.onClick(display);
 			break;
-		// Enter Key Logic
-		case -2:
+		
+		case -2:	// Enter Key Logic
 			try {
 				((MainActivity) display.getContext())
 						.onNumKeyboardResult(Double.valueOf(text));
 				display.setText("");
-				listener_hideKeyboard.onClick(display);
 			} catch (NumberFormatException e) {
 				// Raise toast to alert user that expression is incomplete
 				((MainActivity) display.getContext())
 						.raiseToast("Error: Invalid Number Format");
 			}
 			break;
-		// Negative Key Logic
-		case 45:
+		
+		case 45:	// Negative Key Logic
 			final int index = text.lastIndexOf("E") + 1;
 			if (index < text.length())
 				if (text.charAt(index) == '-') {
@@ -62,25 +73,24 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 				}
 			display.setText(text.substring(0,index) + '-' + text.substring(index));
 			break;
-		// Decimal Key Logic
-		case 46:
+		
+		case 46:	// Decimal Key Logic
 			if (text.length() == 0)
 				display.setText("0.");
 			else if (!text.contains("E") && !text.contains("."))
 				display.setText(text.toString() + '.');
 			break;
-		// Exponent Key Logic
-		case 69:
+		
+		case 69:	// Exponent Key Logic
 			if (text.length() > 0) {
 				if (!text.contains("E"))
 					display.setText(text.toString() + 'E');
 				else if (text.endsWith("E"))
-					display.setText(text.substring(0,text.length()-1));
-					
+					display.setText(text.substring(0,text.length()-1));	
 			}
 			break;
-		// General Numeric Key Logic
-		default:
+		
+		default:	// General Numeric Key Logic
 			final String prefix;
 			if (text.equals("0"))
 				prefix = "";
@@ -90,6 +100,13 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 				prefix = text;
 			display.setText(prefix + (char)arg0);
 			break;
+		}
+		
+		if (arg0 == -3 || arg0 == -2) {
+			listeners[KEYS_ACTION].onClick(display);
+		}
+		else {
+			listeners[KEYS_EDIT].onClick(display);
 		}
 	}
 

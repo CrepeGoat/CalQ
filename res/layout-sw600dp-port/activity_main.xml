@@ -16,7 +16,7 @@
 		android:baselineAligned="false" >
 		
 		<LinearLayout
-			android:id="@+id/numPanel"
+			android:id="@+id/panelNum"
 			android:orientation="vertical"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
