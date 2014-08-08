@@ -42,31 +42,31 @@
 	
 	<TableRow>
 		<Button
-			android:id="@+id/buttonPow"
+			android:id="@+id/buttonNeg"
 			android:tag="@string/tag_op"
-			android:text="@string/power"
-			android:textSize="40sp"
-			style="?android:attr/buttonBarButtonStyle"
-			 />
-		<Button
-			android:id="@+id/buttonSqr"
-			android:tag="@string/tag_op"
-			android:text="@string/square"
-			android:textSize="40sp"
-			style="?android:attr/buttonBarButtonStyle"
-			 />
-		<Button
-			android:id="@+id/buttonSqrt"
-			android:tag="@string/tag_op"
-			android:text="@string/squareroot"
-			android:textSize="40sp"
+			android:text="@string/negative"
+			android:textSize="30sp"
 			style="?android:attr/buttonBarButtonStyle"
 			 />
 		<Button
 			android:id="@+id/buttonAbs"
 			android:tag="@string/tag_op"
 			android:text="@string/absolute"
-			android:textSize="40sp"
+			android:textSize="30sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonSqr"
+			android:tag="@string/tag_op"
+			android:text="@string/square"
+			android:textSize="30sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonMultInv"
+			android:tag="@string/tag_op"
+			android:text="@string/mult_inverse"
+			android:textSize="30sp"
 			style="?android:attr/buttonBarButtonStyle"
 			 />
 					

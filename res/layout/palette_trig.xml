@@ -34,7 +34,7 @@
 		<Button
 			android:id="@+id/buttonPi"
 			android:tag="@string/tag_op"
-			android:text="@string/pi"
+			android:text="@string/const_pi"
 			android:textSize="25sp"
 			style="?android:attr/buttonBarButtonStyle"
 			

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/panel_paletteContainer"
+    android:orientation="horizontal" 
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+	android:paddingTop="5dp"
+	android:paddingBottom="5dp"
+	android:divider="?android:attr/dividerVertical"
+	android:showDividers="middle" >
+    
+    <View
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="4"
+        android:tag="@string/tag_plt" />
+	
+	<ImageButton
+	    android:id="@+id/buttonSwapPalette"
+	    android:layout_width="0dp"
+	    android:layout_height="match_parent"
+	    android:layout_weight="1"
+	    android:scaleType="center"
+	    android:src="@drawable/ic_action_expand"
+	    android:tint="@color/black"
+	    android:contentDescription="@string/swapPalette_desc"
+		style="?android:attr/borderlessButtonStyle"
+	    android:background="@color/light_gray" />
+
+</LinearLayout>

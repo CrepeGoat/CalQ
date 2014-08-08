@@ -4,22 +4,42 @@ public enum FunctionType {
 	SOURCE,		// denotes ListTree container (remove?)
 	BLANK,
 	NUMBER,
+	
 	ADD,
 	SUBTRACT,
 	MULTIPLY,
 	DIVIDE,
-	POWER,
-	SQUARE,
-	SQRT,
+	NEGATIVE,
 	ABS,
+	SQUARE,
+	MULT_INVERSE,
 	
-	PI,
+	POWER,
+	SQRT,
+	CONST_E,
+	EXP_E,
+	EXP_10,
+	LN,
+	LOG10,
+	
+	CONST_PI,
 	SINE,
 	COSINE,
 	TANGENT,
 	ARCSINE,
 	ARCCOSINE,
 	ARCTANGENT,
+
+	HYPSINE,
+	HYPCOSINE,
+	HYPTANGENT,
+	ARHYPSINE,
+	ARHYPCOSINE,
+	ARHYPTANGENT,
+	
+	FACTORIAL,
+	NCK,
+	NPK,
 	;
 	
 	// Property-Check Methods
@@ -28,7 +48,8 @@ public enum FunctionType {
 		case SOURCE:
 		case BLANK:
 		case NUMBER:
-		case PI:
+		case CONST_PI:
+		case CONST_E:
 			return false;
 		default:
 			return true;
@@ -47,16 +68,31 @@ public enum FunctionType {
 		switch(this) {
 			case BLANK:
 			case NUMBER:
+			case CONST_PI:
+			case CONST_E:
 				return 0;
 			case SQUARE:
 			case SQRT:
+			case NEGATIVE:
 			case ABS:
+			case MULT_INVERSE:
+			case EXP_E:
+			case EXP_10:
+			case LN:
+			case LOG10:
 			case SINE:
 			case COSINE:
 			case TANGENT:
 			case ARCSINE:
 			case ARCCOSINE:
 			case ARCTANGENT:
+			case HYPSINE:
+			case HYPCOSINE:
+			case HYPTANGENT:
+			case ARHYPSINE:
+			case ARHYPCOSINE:
+			case ARHYPTANGENT:
+			case FACTORIAL:
 			case SOURCE:
 				return 1;
 			case ADD:
@@ -64,9 +100,11 @@ public enum FunctionType {
 			case MULTIPLY:
 			case DIVIDE:
 			case POWER:
+			case NCK:
+			case NPK:
 				return 2;
 			default:
-				return 0;
+				throw new RuntimeException();
 		}
 	}
 	

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/palette_hyp"
+    android:tag="@string/tag_plt"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:shrinkColumns="*"
+	android:stretchColumns="*"
+	style="?android:attr/buttonBarStyle"
+     >
+    
+	<TableRow>
+		<Button
+			android:id="@+id/buttonHypSin"
+			android:tag="@string/tag_op"
+			android:text="@string/hypsine"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonHypCos"
+			android:tag="@string/tag_op"
+			android:text="@string/hypcosine"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonHypTan"
+			android:tag="@string/tag_op"
+			android:text="@string/hyptangent"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+	</TableRow>
+	
+	<TableRow>
+		<Button
+			android:id="@+id/buttonAHypSin"
+			android:tag="@string/tag_op"
+			android:text="@string/arhypsine"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonAHypCos"
+			android:tag="@string/tag_op"
+			android:text="@string/arhypcosine"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonAHypTan"
+			android:tag="@string/tag_op"
+			android:text="@string/arhyptangent"
+			android:textSize="25sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+			
+	</TableRow>
+</TableLayout>

@@ -26,7 +26,8 @@ public final class CompositeOnLongClickListener
 		boolean value;
 		for (OnViewEventListener listener:listener_list.subList(0, order))
 			listener.onViewEvent(v);
-		value = (listener_main != null ? listener_main.onLongClick(v) : false);
+		value = (listener_main != null ?
+				listener_main.onLongClick(v) : !listener_list.isEmpty());
 		for (OnViewEventListener listener:listener_list.subList(order, listener_list.size()))
 			listener.onViewEvent(v);		
 		return value;

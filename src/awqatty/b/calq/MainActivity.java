@@ -60,14 +60,16 @@ import awqatty.b.ViewManipulation.ViewReplacer;
  * Add larger device support
  * (also change drawables to be API specific)
  * 
- * (?) Shift textNum TextView to be constantly in view,
+ * Shift textNum TextView to be constantly in view,
  * 		remove equals button
  * 
- * handle state changes
+ * improve parentheses
+ * 
  * 
  * NEED TO TEST:
  * 
  * tablet views
+ * (issue: scroll panel in main-port will cover webview if too many palettes used)
  * 
  * 
  *****************************************************************************************/
@@ -115,7 +117,7 @@ public final class MainActivity extends Activity {
 	@SuppressLint("SetJavaScriptEnabled")
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.main);
 		
 		/*********************************************************
 		 * 
@@ -144,7 +146,7 @@ public final class MainActivity extends Activity {
 		
 		final ViewFinder finder = new ViewFinder();
 		final ViewReplacer replacer = new ViewReplacer();
-		final ViewGroup op_panel = (ViewGroup)findViewById(R.id.panelOps);
+		final ViewGroup root = (ViewGroup)getWindow().getDecorView().getRootView();
 
 		/********************************************************
 		 * Fill Incomplete Views
@@ -159,11 +161,20 @@ public final class MainActivity extends Activity {
 		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
 		
 		// Collect old palette ids in list (use only basic palette if none exist)
-		final List<Integer> ids = new ArrayList<Integer>(max);
-		for (int i=0; pref.contains(keybase+Integer.toString(i)) && i<max; ++i)
-			ids.add(pref.getInt(keybase+Integer.toString(i), 0));
-		if (ids.isEmpty())
-			ids.add(R.id.palette_basic);
+		final List<Integer> layout_ids = new ArrayList<Integer>(max);
+		int tmp_layout_id;
+		for (int i=0; pref.contains(keybase+Integer.toString(i)) && i<max; ++i) {
+			tmp_layout_id = getXmlIdFromViewId(pref.getInt(keybase+Integer.toString(i), 0));
+			// Old ID data stored -> clean data
+			if (tmp_layout_id == 0) {
+				layout_ids.clear();
+				break;
+			}
+			else
+				layout_ids.add(tmp_layout_id);
+		}
+		if (layout_ids.isEmpty())
+			layout_ids.add(R.layout.palette_basic);
 		
 		// Create list of inflated palettes respective to id list
 		final List<View> palette_list = new ArrayList<View>();
@@ -171,20 +182,20 @@ public final class MainActivity extends Activity {
 		ViewGroup container;
 		View placeholder;
 		View palette;
-		for (int id : ids) {
+		for (int layout_id : layout_ids) {
 			// Inflate palette-container layouts
-			container = (ViewGroup)View.inflate(this, R.layout.palette_container, null);
+			container = (ViewGroup)View.inflate(this, R.layout.palettebox, null);
 			// Insert respective palette into container
 			placeholder
 				= finder.findViewsByTag(container, getString(R.string.tag_plt)).get(0);
-			palette = View.inflate(this, getXmlLayoutFromId(id), null);
+			palette = View.inflate(this, layout_id, null);
 			replacer.replaceView(placeholder, palette);
 			// Add palette container to list
 			palette_list.add(container);
 		}
 		
 		// Replace palette-container placeholder with palette containers
-		placeholder	= finder.findViewsById(op_panel, R.id.tmpPaletteHolderLoc).get(0);
+		placeholder	= finder.findViewsById(root, R.id.tmpPaletteHolderLoc).get(0);
 		replacer.replaceView(placeholder, palette_list);
 
 		/*********************************************************
@@ -348,7 +359,7 @@ public final class MainActivity extends Activity {
 		findViewById(R.id.buttonDelParent).setOnClickListener(delpar_listener);
 		number_text.setOnClickListener(txt_listener);
 		
-		setPaletteButtonListeners(op_panel, finder);
+		setPaletteButtonListeners(root, finder);
 		
 		final View button_addPalette = findViewById(R.id.buttonNewPalette);
 		if (button_addPalette != null) {
@@ -425,7 +436,7 @@ public final class MainActivity extends Activity {
 				(NumberKeyboardListener.KEYS_ACTION, keys2_listener);
 		
 		KeyboardView k = (KeyboardView)findViewById(R.id.keyboardNum);
-		k.setKeyboard(new Keyboard(this, R.xml.num_keys));
+		k.setKeyboard(new Keyboard(this, R.xml.numkeys));
 		k.setOnKeyboardActionListener(num_keyslistener);
 		k.setEnabled(false);
 		
@@ -471,7 +482,7 @@ public final class MainActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.menu_main, menu);
 		return true;
 	}
 	
@@ -512,12 +523,12 @@ public final class MainActivity extends Activity {
 			
 			// Inflate palette-container layouts
 			final ViewGroup container = (ViewGroup)View.inflate(
-					this, R.layout.palette_container, null );
+					this, R.layout.palettebox, null );
 			// Insert respective palette into container
 			final View placeholder = finder.findViewsByTag(
 					container, getString(R.string.tag_plt) ).get(0);
 			replacer.replaceView(placeholder, 
-					View.inflate(this, getXmlLayoutFromId(id2), null) );
+					View.inflate(this, getXmlIdFromViewId(id2), null) );
 			
 			// Add new palette behind "add" button
 			replacer.insertView(button_newpalette, container);
@@ -536,7 +547,7 @@ public final class MainActivity extends Activity {
 			// Condition: palette has to be inflated from layout xml
 			else {
 				// Inflate new palette from XML
-				palette2 = View.inflate(this, getXmlLayoutFromId(id2), null);
+				palette2 = View.inflate(this, getXmlIdFromViewId(id2), null);
 				replacer.replaceView(button_newpalette, palette2);
 				// Set button listeners for buttons in inflated palette
 				for (View op_button : (new ViewFinder())
@@ -676,6 +687,7 @@ public final class MainActivity extends Activity {
 	
 	private FunctionType getFtypeFromViewId(int id) {
 		switch (id) {
+		// Basic Palette
 		case R.id.buttonSum:
 			return FunctionType.ADD;
 		case R.id.buttonDiff:
@@ -684,15 +696,32 @@ public final class MainActivity extends Activity {
 			return FunctionType.MULTIPLY;
 		case R.id.buttonQuot:
 			return FunctionType.DIVIDE;
-		case R.id.buttonPow:
-			return FunctionType.POWER;
-		case R.id.buttonSqr:
-			return FunctionType.SQUARE;
-		case R.id.buttonSqrt:
-			return FunctionType.SQRT;
+		case R.id.buttonNeg:
+			return FunctionType.NEGATIVE;
 		case R.id.buttonAbs:
 			return FunctionType.ABS;
-			
+		case R.id.buttonSqr:
+			return FunctionType.SQUARE;
+		case R.id.buttonMultInv:
+			return FunctionType.MULT_INVERSE;
+		
+		// Power/Log Palette
+		case R.id.buttonPow:
+			return FunctionType.POWER;
+		case R.id.buttonSqrt:
+			return FunctionType.SQRT;
+		case R.id.buttonExpE:
+			return FunctionType.EXP_E;
+		case R.id.buttonExp10:
+			return FunctionType.EXP_10;
+		case R.id.buttonLogE:
+			return FunctionType.LN;
+		case R.id.buttonLog10:
+			return FunctionType.LOG10;
+		case R.id.buttonConstE:
+			return FunctionType.CONST_E;
+		
+		// Trig. Palette
 		case R.id.buttonSin:
 			return FunctionType.SINE;
 		case R.id.buttonCos:
@@ -706,19 +735,48 @@ public final class MainActivity extends Activity {
 		case R.id.buttonAtan:
 			return FunctionType.ARCTANGENT;
 		case R.id.buttonPi:
-			return FunctionType.PI;
+			return FunctionType.CONST_PI;
+		
+		// Trig. Palette
+		case R.id.buttonHypSin:
+			return FunctionType.HYPSINE;
+		case R.id.buttonHypCos:
+			return FunctionType.HYPCOSINE;
+		case R.id.buttonHypTan:
+			return FunctionType.HYPTANGENT;
+		case R.id.buttonAHypSin:
+			return FunctionType.ARHYPSINE;
+		case R.id.buttonAHypCos:
+			return FunctionType.ARHYPCOSINE;
+		case R.id.buttonAHypTan:
+			return FunctionType.ARHYPTANGENT;
+		
+		// Permutation Palette
+		case R.id.buttonFact:
+			return FunctionType.FACTORIAL;
+		case R.id.buttonNPK:
+			return FunctionType.NPK;
+		case R.id.buttonNCK:
+			return FunctionType.NCK;
+
 		// vvv Occurs only under improper use vvv
 		default:
 			return null;
 		}
 	}
 	
-	private int getXmlLayoutFromId(int id) {
+	private int getXmlIdFromViewId(int id) {
 		switch (id) {
 		case R.id.palette_basic:
 			return R.layout.palette_basic;
+		case R.id.palette_log:
+			return R.layout.palette_log;
 		case R.id.palette_trig:
 			return R.layout.palette_trig;
+		case R.id.palette_hyp:
+			return R.layout.palette_hyp;
+		case R.id.palette_perm:
+			return R.layout.palette_perm;
 		// vvv Occurs only under improper use vvv
 		default:
 			return 0;

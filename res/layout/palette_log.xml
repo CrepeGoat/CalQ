@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/palette_log"
+    android:tag="@string/tag_plt"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:shrinkColumns="*"
+	android:stretchColumns="*"
+	style="?android:attr/buttonBarStyle"
+    >
+    
+	<TableRow>
+		<Button
+			android:id="@+id/buttonPow"
+			android:tag="@string/tag_op"
+			android:text="@string/power"
+			android:textSize="40sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonExpE"
+			android:tag="@string/tag_op"
+			android:text="@string/exp_e"
+			android:textSize="30sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonExp10"
+			android:tag="@string/tag_op"
+			android:text="@string/exp_10"
+			android:textSize="30sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonConstE"
+			android:tag="@string/tag_op"
+			android:text="@string/const_e"
+			android:textSize="40sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+	</TableRow>
+	
+	<TableRow>
+		<Button
+			android:id="@+id/buttonSqrt"
+			android:tag="@string/tag_op"
+			android:text="@string/squareroot"
+			android:textSize="40sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonLogE"
+			android:tag="@string/tag_op"
+			android:text="@string/ln"
+			android:textSize="30sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+		<Button
+			android:id="@+id/buttonLog10"
+			android:tag="@string/tag_op"
+			android:text="@string/log10"
+			android:textSize="30sp"
+			style="?android:attr/buttonBarButtonStyle"
+			 />
+					
+	</TableRow>
+</TableLayout>

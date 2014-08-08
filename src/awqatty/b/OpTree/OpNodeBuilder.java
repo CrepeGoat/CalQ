@@ -72,17 +72,21 @@ public final class OpNodeBuilder {
 			};
 		case POWER:
 		case SQUARE:
+		case MULT_INVERSE:
+		case EXP_E:
+		case EXP_10:
 			return new FunctionForm() {
 				@Override
 				public Double calculate(List<Double> dlist) {
 					return Math.pow(dlist.get(0), dlist.get(1));
 				}
 			};
-		case SQRT:
+		
+		case NEGATIVE:
 			return new FunctionForm() {
 				@Override
 				public Double calculate(List<Double> dlist) {
-					return Math.sqrt(dlist.get(0));
+					return -dlist.get(0);
 				}
 			};
 		case ABS:
@@ -92,6 +96,30 @@ public final class OpNodeBuilder {
 					return Math.abs(dlist.get(0));
 				}
 			};
+		case SQRT:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.sqrt(dlist.get(0));
+				}
+			};
+			
+		case LN:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.log(dlist.get(0));
+				}
+			};
+		case LOG10:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.log10(dlist.get(0));
+				}
+			};
+		
+		// Trig Functions
 		case SINE:
 			return new FunctionForm() {
 				@Override
@@ -134,7 +162,64 @@ public final class OpNodeBuilder {
 					return Math.atan(dlist.get(0));
 				}
 			};
-		case PI:
+		
+		// Hyperbolic Functions
+		case HYPSINE:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.sinh(dlist.get(0));
+				}
+			};
+		case HYPCOSINE:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.cosh(dlist.get(0));
+				}
+			};
+		case HYPTANGENT:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return Math.tanh(dlist.get(0));
+				}
+			};
+		case ARHYPSINE:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					final double x = dlist.get(0);
+					return Math.log(x + Math.sqrt(Math.pow(x, 2) + 1));
+				}
+			};
+		case ARHYPCOSINE:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					final double x = dlist.get(0);
+					return Math.log(x + Math.sqrt(Math.pow(x, 2) - 1));
+				}
+			};
+		case ARHYPTANGENT:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					final double x = dlist.get(0);
+					return 0.5*Math.log((1+x)/(1-x));
+				}
+			};
+		// Permutations
+		case FACTORIAL:
+			return new FunctionFactorial();
+		case NPK:
+			return new FunctionNPK();
+		case NCK:
+			return new FunctionNCK();
+			
+		case CONST_E:
+			return new FunctionConstant(Math.E);
+		case CONST_PI:
 			return new FunctionConstant(Math.PI);
 		//TODO - throw exception?
 		default:
@@ -150,23 +235,39 @@ public final class OpNodeBuilder {
 		switch (ftype) {
 		case BLANK:
 		case NUMBER:
-		case PI:
+		case CONST_PI:
+		case CONST_E:
 			return 0;
 		case ADD:
-		case SUBTRACT:
 		case MULTIPLY:
+		case SUBTRACT:
 		case DIVIDE:
 		case POWER:
 		case SQUARE:
+		case MULT_INVERSE:
+		case EXP_E:
+		case EXP_10:
+		case NCK:
+		case NPK:
 			return 2;
-		case SQRT:
+		case NEGATIVE:
 		case ABS:
+		case SQRT:
+		case LN:
+		case LOG10:
 		case SINE:
 		case COSINE:
 		case TANGENT:
 		case ARCSINE:
 		case ARCCOSINE:
 		case ARCTANGENT:
+		case HYPSINE:
+		case HYPCOSINE:
+		case HYPTANGENT:
+		case ARHYPSINE:
+		case ARHYPCOSINE:
+		case ARHYPTANGENT:
+		case FACTORIAL:
 			return 1;
 			//TODO - throw exception?
 		default:
@@ -177,7 +278,8 @@ public final class OpNodeBuilder {
 		switch (ftype) {
 		case BLANK:
 		case NUMBER:
-		case PI:
+		case CONST_PI:
+		case CONST_E:
 			return 0;
 		case ADD:
 		case MULTIPLY:
@@ -186,15 +288,30 @@ public final class OpNodeBuilder {
 		case DIVIDE:
 		case POWER:
 		case SQUARE:
+		case MULT_INVERSE:
+		case EXP_E:
+		case EXP_10:
+		case NCK:
+		case NPK:
 			return 2;
-		case SQRT:
+		case NEGATIVE:
 		case ABS:
+		case SQRT:
+		case LN:
+		case LOG10:
 		case SINE:
 		case COSINE:
 		case TANGENT:
 		case ARCSINE:
 		case ARCCOSINE:
 		case ARCTANGENT:
+		case HYPSINE:
+		case HYPCOSINE:
+		case HYPTANGENT:
+		case ARHYPSINE:
+		case ARHYPCOSINE:
+		case ARHYPTANGENT:
+		case FACTORIAL:
 			return 1;
 			//TODO - throw exception?
 		default:
@@ -208,6 +325,9 @@ public final class OpNodeBuilder {
 	private static FunctionType getImplementingType(FunctionType ftype) {
 		switch(ftype){
 		case SQUARE:
+		case EXP_E:
+		case EXP_10:
+		case MULT_INVERSE:
 			return FunctionType.POWER;
 		default:
 			return ftype;
@@ -229,11 +349,13 @@ public final class OpNodeBuilder {
 	}
 		
 	public void buildInSubtree(ListTree<OpNode> subtree, FunctionType ftype) {
+		final double tmp = _number;
 		switch(ftype){
 		// 0-arg
 		case NUMBER:
 		case BLANK:
-		case PI:
+		case CONST_PI:
+		case CONST_E:
 			subtree.setBranch(0, build(ftype));
 			break;
 		// 2+ args
@@ -242,26 +364,53 @@ public final class OpNodeBuilder {
 		case MULTIPLY:
 		case DIVIDE:
 		case POWER:
+		case NCK:
+		case NPK:
 			subtree.addParent(0, build(ftype));
 			subtree.addChild(0, 1, build(FunctionType.BLANK));
 			break;
 		// 1-arg
-		case SQRT:
+		case NEGATIVE:
 		case ABS:
+		case SQRT:
+		case LN:
+		case LOG10:
 		case SINE:
 		case COSINE:
 		case TANGENT:
 		case ARCSINE:
 		case ARCCOSINE:
 		case ARCTANGENT:
+		case HYPSINE:
+		case HYPCOSINE:
+		case HYPTANGENT:
+		case ARHYPSINE:
+		case ARHYPCOSINE:
+		case ARHYPTANGENT:
+		case FACTORIAL:
 			subtree.addParent(0, build(ftype));
 			break;
 		// 2-arg w/ default value
 		case SQUARE:
-			double tmp = _number;
 			number(2);
 			subtree.addParent(0, build(ftype));
 			subtree.addChild(0, 1, build(FunctionType.NUMBER));
+			number(tmp);
+			break;
+		case MULT_INVERSE:
+			number(-1);
+			subtree.addParent(0, build(ftype));
+			subtree.addChild(0, 1, build(FunctionType.NUMBER));
+			number(tmp);
+			break;
+		case EXP_E:
+			subtree.addParent(0, build(ftype));
+			subtree.addChild(0, 0, build(FunctionType.CONST_E));
+			break;
+		case EXP_10:
+			number(10);
+			subtree.addParent(0, build(ftype));
+			subtree.addChild(0, 0, build(FunctionType.NUMBER));
 			number(tmp);
 			break;
 		default:

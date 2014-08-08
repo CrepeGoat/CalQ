@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="main" 			type="layout"	>@layout/main_port_thinlong</item>
+    <item name="panelpalette" 	type="layout"	>@layout/panelpalette_scroll</item>
+    <item name="palettebox" 	type="layout"	>@layout/palettebox_swapdel_right</item>
+    <integer name="maxPaletteQuantity">5</integer>
+    
+    <item name="numkeys" 		type="xml"		>@xml/numkeys_3x5_right</item>
+    <item name="panelpalette_weight" type="fraction">0</item>
+</resources>

@@ -61,6 +61,8 @@ public class MathmlTextPresBuilder implements TextPresBuilderForm {
 			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
 			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
 			break;
+			
+		// Standard Functions
 		case ADD:
 			strlist = new String[3];
 			strlist[0] = out_l + Tags.PARENTHESIS_L.getTag();
@@ -79,11 +81,11 @@ public class MathmlTextPresBuilder implements TextPresBuilderForm {
 			break;
 		case MULTIPLY:
 			strlist = new String[3];
-			strlist[0] = out_l + Tags.PARENTHESIS_L.getTag();
-			strlist[1] = "<mo>&times;</mo>";
-			strlist[2] = Tags.PARENTHESIS_R.getTag() + out_r;
-			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "<mo>(</mo>");
-			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "<mo>)</mo>");
+			strlist[0] = out_l + "<mo>(</mo>";
+			strlist[1] = "<mo>)</mo><mo>(</mo>";
+			strlist[2] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
 			break;
 		case DIVIDE:
 			strlist = new String[3];
@@ -93,8 +95,25 @@ public class MathmlTextPresBuilder implements TextPresBuilderForm {
 			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
 			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
 			break;
+		case NEGATIVE:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mo>-</mo>";
+			strlist[1] = out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "<mo>(</mo>");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "<mo>)</mo>");
+			break;
+		case ABS:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mo>|</mo>";
+			strlist[1] = "<mo>|</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+
+		// Power Functions
 		case POWER:
 		case SQUARE:
+		case MULT_INVERSE:
 			strlist = new String[3];
 			strlist[0] = out_l + "<msup><mrow>";
 			strlist[1] = "</mrow><mrow>";
@@ -109,14 +128,33 @@ public class MathmlTextPresBuilder implements TextPresBuilderForm {
 			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
 			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
 			break;
-		case ABS:
+		
+		// Log Functions
+		case EXP_E:
+		case EXP_10:
+			strlist = new String[3];
+			strlist[0] = out_l + "<msup><mstyle mathsize=0.75>";
+			strlist[1] = "</mstyle><mstyle mathsize=1.33>";
+			strlist[2] = "</mstyle></msup>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "<mo>(</mo>");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "<mo>)</mo>");
+			break;
+		case LN:
 			strlist = new String[2];
-			strlist[0] = out_l + "<mo>|</mo>";
-			strlist[1] = "<mo>|</mo>" + out_r;
+			strlist[0] = out_l + "<mi>ln</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case LOG10:
+			strlist = new String[2];
+			strlist[0] = out_l + "<msub><mi>log</mi><mn>10</mn></msub> <mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
 			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
 			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
 			break;
 
+		// Trig Functions
 		case SINE:
 			strlist = new String[2];
 			strlist[0] = out_l + "<mi>sin</mi><mo>(</mo>";
@@ -159,7 +197,84 @@ public class MathmlTextPresBuilder implements TextPresBuilderForm {
 			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
 			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
 			break;
-		case PI:
+
+		// Trig Functions
+		case HYPSINE:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>sinh</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case HYPCOSINE:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>cosh</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case HYPTANGENT:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>tanh</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case ARHYPSINE:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>arsinh</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case ARHYPCOSINE:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>arcosh</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case ARHYPTANGENT:
+			strlist = new String[2];
+			strlist[0] = out_l + "<mi>artanh</mi><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+			
+		// Probability
+		case FACTORIAL:
+			strlist = new String[2];
+			strlist[0] = out_l;
+			strlist[1] = "<mi>!</mi>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "<mo>(</mo>");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "<mo>)</mo>");
+			break;
+		case NCK:	// TODO change to col.vec. shorthand format
+			strlist = new String[3];
+			strlist[0] = out_l;
+			strlist[1] = "<mi>C</mi>";
+			strlist[2] = out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "<mo>(</mo>");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "<mo>)</mo>");
+			break;
+		case NPK:
+			strlist = new String[3];
+			strlist[0] = out_l;
+			strlist[1] = "<mi>P</mi>";
+			strlist[2] = out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "<mo>(</mo>");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "<mo>)</mo>");
+			break;
+
+		// Constants
+		case CONST_E:
+			strlist = new String[1];
+			strlist[0] = out_l + "<mi>e</mi>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case CONST_PI:
 			strlist = new String[1];
 			strlist[0] = out_l + "<mi>&#960;</mi>" + out_r;
 			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");

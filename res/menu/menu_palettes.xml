@@ -7,9 +7,24 @@
         android:titleCondensed="@string/palettemenu_basic_cond"
         />
     <item
+        android:id="@id/palette_log"
+        android:title="@string/palettemenu_log"
+        android:titleCondensed="@string/palettemenu_log_cond"
+        />
+    <item
         android:id="@id/palette_trig"
         android:title="@string/palettemenu_trig"
         android:titleCondensed="@string/palettemenu_trig_cond"
         />
-
+    <item
+        android:id="@id/palette_hyp"
+        android:title="@string/palettemenu_hyp"
+        android:titleCondensed="@string/palettemenu_hyp_cond"
+        />
+    <item
+        android:id="@id/palette_perm"
+        android:title="@string/palettemenu_perm"
+        android:titleCondensed="@string/palettemenu_hyp_cond"
+        />
+    
 </menu>

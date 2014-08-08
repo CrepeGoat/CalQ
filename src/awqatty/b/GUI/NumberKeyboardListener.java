@@ -66,12 +66,10 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 		
 		case 45:	// Negative Key Logic
 			final int index = text.lastIndexOf("E") + 1;
-			if (index < text.length())
-				if (text.charAt(index) == '-') {
-					display.setText(text.substring(0, index) + text.substring(index+1));
-					return;
-				}
-			display.setText(text.substring(0,index) + '-' + text.substring(index));
+			if (index < text.length() && text.charAt(index) == '-')
+				display.setText(text.substring(0, index) + text.substring(index+1));
+			else
+				display.setText(text.substring(0,index) + '-' + text.substring(index));
 			break;
 		
 		case 46:	// Decimal Key Logic

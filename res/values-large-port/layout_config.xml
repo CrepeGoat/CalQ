@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="main" 			type="layout"	>@layout/main_portwide</item>
+    <item name="panelpalette" 	type="layout"	>@layout/panelpalette_scroll</item>
+    <item name="palettebox" 	type="layout"	>@layout/palettebox_swapdel_right</item>
+    <item name="numkeys" 		type="xml"		>@xml/numkeys_5x3_right</item>
+</resources>
