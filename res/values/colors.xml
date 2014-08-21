@@ -3,13 +3,31 @@
 <resources>
     
     <!-- Color Values -->
-    <color name="red">#FF0000</color>
-    <color name="orange">#FF8D42</color>
+    <color name="blue">#FF33B5E5</color>
+    <color name="purple">#FFAA66CC</color>
+    <color name="green">#FF99CC00</color>
+    <color name="orange">#FFFFBB33</color>
+    <color name="red">#FFFF4444</color>
+    <color name="darkblue">#FF0099CC</color>
+    <color name="darkpurple">#FF9933CC</color>
+    <color name="darkgreen">#FF669900</color>
+    <color name="darkorange">#FFFF8800</color>
+    <color name="darkred">#FFCC0000</color>
+    
+    <color name="blank">#0000</color>
+    <color name="red_">#FF0000</color>
+    <color name="orange_">#FF8D42</color>
     <color name="dark_orange">#D67518</color>
     <color name="light_blue">#9ED8FF</color>
-    <color name="mid_blue">#42B4FF</color>
-    <color name="black">#000000</color>
+    <color name="sky_blue">#42B4FF</color>
     <color name="white">#FFFFFF</color>
+    <color name="near_black">#222222</color>
+    <color name="black">#000000</color>
     <color name="light_gray">#CCCCCC</color>
+    
+    <color name="color_paletteSwap">@color/blue</color>
+    <color name="colorNeg_paletteSwap">@color/white</color>
+    <color name="color_paletteDel">@color/orange</color>
+    <color name="colorNeg_paletteDel">@color/white</color>
     
 </resources>

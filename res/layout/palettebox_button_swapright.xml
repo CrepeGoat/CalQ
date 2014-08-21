@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/palettebox"
+	android:orientation="horizontal" 
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:divider="?android:attr/dividerVertical"
+	android:showDividers="middle" >
+	
+	<View
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_weight="4"
+		android:tag="@string/tag_plt"
+		android:visibility="gone" />
+	
+	<ImageButton
+		android:id="@+id/buttonSwapPalette"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_weight="1"
+		android:scaleType="center"
+		android:src="@drawable/ic_action_expand"
+		android:tint="@color/color_paletteSwap"
+		android:contentDescription="@string/swapPalette_desc"
+		style="?android:attr/borderlessButtonStyle"
+		android:longClickable="false"
+		 />
+
+</LinearLayout>

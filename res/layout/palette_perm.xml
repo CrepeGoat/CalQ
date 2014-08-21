@@ -4,32 +4,30 @@
     android:tag="@string/tag_plt"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-	android:shrinkColumns="*"
-	android:stretchColumns="*"
-	style="?android:attr/buttonBarStyle"
+    android:stretchColumns="@string/stretchPaletteCols"
     >
     
 	<TableRow>
-		<Button
+		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonFact"
 			android:tag="@string/tag_op"
 			android:text="@string/factorial"
-			android:textSize="35sp"
-			style="?android:attr/buttonBarButtonStyle"
+			android:textSize="@dimen/button_textSize_M"
+			style="?android:attr/borderlessButtonStyle"
 			 />
-		<Button
+		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonNPK"
 			android:tag="@string/tag_op"
 			android:text="@string/nPk"
-			android:textSize="30sp"
-			style="?android:attr/buttonBarButtonStyle"
+			android:textSize="@dimen/button_textSize_M"
+			style="?android:attr/borderlessButtonStyle"
 			 />
-		<Button
+		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonNCK"
 			android:tag="@string/tag_op"
 			android:text="@string/nCk"
-			android:textSize="30sp"
-			style="?android:attr/buttonBarButtonStyle"
+			android:textSize="@dimen/button_textSize_M"
+			style="?android:attr/borderlessButtonStyle"
 			 />
 	</TableRow>
 </TableLayout>

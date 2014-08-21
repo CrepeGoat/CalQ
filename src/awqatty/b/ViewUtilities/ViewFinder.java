@@ -1,4 +1,4 @@
-package awqatty.b.ViewManipulation;
+package awqatty.b.ViewUtilities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,10 @@ public class ViewFinder {
 	/*****************************************************************
 	 * Private Classes/Interfaces
 	 */
-	private static interface ViewMatcher {
+	public static interface ViewMatcher {
 		public boolean viewIsAMatch(View v);
 	}
-	private static class IdMatcher implements ViewMatcher {
+	protected static class IdMatcher implements ViewMatcher {
 		private final int match_id;
 		
 		public IdMatcher(int id) {
@@ -25,7 +25,7 @@ public class ViewFinder {
 			return v.getId() == match_id;
 		}
 	}
-	private static class TagMatcher implements ViewMatcher {
+	protected static class TagMatcher implements ViewMatcher {
 		private final String match_tag;
 		
 		public TagMatcher(String tag) {
@@ -57,7 +57,7 @@ public class ViewFinder {
 		view_groups = new ArrayList<ViewGroup>();
 	}
 		
-	private List<View> findViews(ViewMatcher match, ViewGroup root) {
+	protected List<View> findViews(ViewMatcher match, View root) {
 		// Clears results from last search
 		views.clear();
 		
@@ -66,9 +66,10 @@ public class ViewFinder {
 		// Checks root view
 		if (matcher.viewIsAMatch(root))
 			views.add(root);
-		
 		// Adds root to checking list, & starts loop
-		view_groups.add(root);
+		if (isAValidViewGroup(root))
+			view_groups.add((ViewGroup)root);
+		
 		while (!view_groups.isEmpty()) {
 			// Assigns group to local variable & removes it from future loops
 			temp_group = view_groups.remove(0);
@@ -79,24 +80,29 @@ public class ViewFinder {
 				// Assigns child to local variable
 				temp_child = temp_group.getChildAt(i);
 				
-				// Adds any groups to future loops
-				if (temp_child instanceof ViewGroup)
-					view_groups.add((ViewGroup)temp_child);
 				// Adds valid views to results list
 				if (matcher.viewIsAMatch(temp_child))
 					views.add(temp_child);
+				// Adds any groups to future loops
+				if (isAValidViewGroup(temp_child))
+					view_groups.add((ViewGroup)temp_child);
 			}
 		}
 		// Returns results
 		return views;
 	}
+	// Methods that can be overriden in inherited class
+	protected boolean isAValidViewGroup(View v) {
+		return v instanceof ViewGroup;
+	}
 	
-	public List<View> findViewsByTag(ViewGroup root, String view_tag) {
+	public final List<View> findViewsByTag(View root, String view_tag) {
 		return findViews(new TagMatcher(view_tag), root);
 	}
 	
-	public List<View> findViewsById(ViewGroup root, int view_id) {
+	public final List<View> findViewsById(View root, int view_id) {
 		return findViews(new IdMatcher(view_id), root);
 	}
+	
 
 }

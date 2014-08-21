@@ -3,5 +3,12 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-
+    
+    <dimen name="button_textSize_L">35sp</dimen>
+    <dimen name="button_textSize_M">30sp</dimen>
+    <dimen name="button_textSize_S">25sp</dimen>
+    
+    <dimen name="min_palette_width">280dp</dimen>
+	<dimen name="paletteboxCurtain_minWidth">3dp</dimen>    
+    
 </resources>

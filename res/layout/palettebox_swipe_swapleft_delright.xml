@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/palettebox"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content" >
+	
+	<View
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:tag="@string/tag_plt"
+		android:visibility="gone" />
+	
+	<FrameLayout
+	    android:id="@+id/palettebox_leftCurtain"
+	    android:layout_width="@dimen/paletteboxCurtain_minWidth"
+	    android:layout_height="match_parent"
+	    android:layout_gravity="left"
+	    android:clipChildren="true"
+	    android:background="@color/color_paletteSwap" >
+	    <ImageView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_vertical|left"
+	        android:src="@drawable/ic_action_expand"
+			android:tint="@color/colorNeg_paletteSwap"
+			android:contentDescription="@string/swapPalette_desc"
+			android:scaleType="center"
+			android:layout_marginLeft="20dp"
+			android:layout_marginRight="20dp" />
+	</FrameLayout>
+	
+	<FrameLayout
+	    android:id="@+id/palettebox_rightCurtain"
+	    android:layout_width="@dimen/paletteboxCurtain_minWidth"
+	    android:layout_height="match_parent"
+	    android:layout_gravity="right"
+	    android:clipChildren="true"
+	    android:background="@color/color_paletteDel" >
+	    <ImageView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_vertical|right"
+	        android:src="@drawable/ic_action_remove"
+			android:tint="@color/colorNeg_paletteDel"
+			android:contentDescription="@string/removePalette_desc"
+			android:scaleType="center"
+			android:layout_marginLeft="20dp"
+			android:layout_marginRight="20dp" />
+	</FrameLayout>
+	    	
+</FrameLayout>

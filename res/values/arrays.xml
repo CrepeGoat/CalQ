@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="pref_renderFormat_items">
-        <item>@string/pref_renderFormat_MathmlHtmlCss</item>
-        <item>@string/pref_renderFormat_MathmlSvg</item>
-        <item>@string/pref_renderFormat_Html</item>
-    </array>
-    
-    <array name="pref_textSize_percentages">
-        <item>0.50</item>
-        <item>0.625</item>
-        <item>0.80</item>
-        <item>1.00</item>
-        <item>1.25</item>
-        <item>1.60</item>
-        <item>2.00</item>
-    </array>
-    
-    <integer-array name="pref_palettes_defaults">
-		<item>@id/palette_basic</item>
-		<item>@id/palette_trig</item>
-	</integer-array>
+	<array name="pref_renderFormat_items">
+		<item>@string/prefEntry_renderFormat_MathmlHtmlCss</item>
+		<item>@string/prefEntry_renderFormat_MathmlSvg</item>
+		<item>@string/prefEntry_renderFormat_Html</item>
+	</array>
+	
+	<array name="pref_textSize_percentages">
+		<item>0.50</item>
+		<item>0.625</item>
+		<item>0.80</item>
+		<item>1.00</item>
+		<item>1.25</item>
+		<item>1.60</item>
+		<item>2.00</item>
+	</array>
+	
+	<string-array name="prefEntries_paletteActionMode">
+		<item>@string/prefEntry_paletteActionMode_sidebutton</item>
+		<item>@string/prefEntry_paletteActionMode_swipe</item>
+	</string-array>
+	<string-array name="prefValues_paletteActionMode">
+		<item>@string/prefValue_paletteActionMode_sidebutton</item>
+		<item>@string/prefValue_paletteActionMode_swipe</item>
+	</string-array>
+	
 </resources>

@@ -2,9 +2,13 @@
 <resources>
     <item name="main" 			type="layout"	>@layout/main_port</item>
     <item name="panelpalette" 	type="layout"	>@layout/panelpalette_single</item>
-    <item name="palettebox" 	type="layout"	>@layout/palettebox_swap_right</item>
+    <item name="palettebox" 	type="layout"	>@layout/palettebox_swipe_swapleftright</item>
+    <item name="panelpalettes_weight" type="fraction">0</item>
+    
+    <bool name="canDeletePalette">false</bool>
+    <string name="stretchPaletteCols">*</string>
     <integer name="maxPaletteQuantity">1</integer>
     
     <item name="numkeys" 		type="xml"		>@xml/numkeys_4x4_right_hideable</item>
-    <item name="panelpalette_weight" type="fraction">0</item>
+    
 </resources>

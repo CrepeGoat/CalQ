@@ -5,11 +5,14 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Fragment;
+import android.app.ActionBar;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -22,19 +25,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 import awqatty.b.CompositeSwitchEventListener.CompositeOnClickListener;
-import awqatty.b.CompositeSwitchEventListener.CompositeOnLongClickListener;
 import awqatty.b.CompositeSwitchEventListener.CompositeSwitchEventListenerBase.ListenerBoxSwitch;
 import awqatty.b.CompositeSwitchEventListener.OnViewEventListener;
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.GUI.NumberKeyboardListener;
+import awqatty.b.GUI.PaletteManager;
+import awqatty.b.GUI.PaletteboxAnimator;
+import awqatty.b.GUI.SideButtonPaletteManager;
+import awqatty.b.GUI.SwipePaletteManager;
 import awqatty.b.GenericTextPresentation.NumberStringConverter;
 import awqatty.b.JSInterface.MathmlLinksViewClient;
 import awqatty.b.MathmlPresentation.MathmlTextPresBuilder;
 import awqatty.b.OpTree.OpTree;
-import awqatty.b.ViewManipulation.ViewFinder;
-import awqatty.b.ViewManipulation.ViewParentFinder;
-import awqatty.b.ViewManipulation.ViewReplacer;
+import awqatty.b.OpButtons.OperationButton;
+import awqatty.b.ViewUtilities.ViewFinder;
+import awqatty.b.ViewUtilities.ViewParentFinder;
+import awqatty.b.ViewUtilities.ViewReplacer;
 
 /***************************************************************************************
  * Author - Becker Awqatty
@@ -65,17 +72,20 @@ import awqatty.b.ViewManipulation.ViewReplacer;
  * 
  * improve parentheses
  * 
+ * make sure numText contains result in one line
  * 
- * NEED TO TEST:
+ * convert single-palette view to be swipe up/down (not scroll) list
  * 
- * tablet views
- * (issue: scroll panel in main-port will cover webview if too many palettes used)
+ * divide panels into fragments
  * 
+ * TODO Bugs
  * 
  *****************************************************************************************/
 
 
-public final class MainActivity extends Activity {
+public final class MainActivity extends Activity  implements
+	SharedPreferences.OnSharedPreferenceChangeListener
+	{
 	
 	/*********************************************************
 	 * Private Fields
@@ -85,10 +95,8 @@ public final class MainActivity extends Activity {
 	private int blank_index;	// stores node loc. from calc.exception
 	
 	// Click Listeners stored for inflation of new palettes
-	private CompositeOnClickListener op_listener;
-	private CompositeOnLongClickListener
-			delplt_listener,
-			swapplt_listener;
+	private PaletteManager pltmanager;
+	private CompositeOnClickListener op_listener, swapplt_listener, delplt_listener;
 	
 	// Listener-Box Switches to (de)activate on-view-event listeners
 	private ListenerBoxSwitch
@@ -102,7 +110,7 @@ public final class MainActivity extends Activity {
 	private View button_shuffle;
 	private View button_temp;
 	
-	private View button_newpalette;	// local storage for context-menu operation
+	private View view_newpalette;	// local storage for context-menu operation
 	
 	// trigger for storage function in onDestroy()
 	private RetainDataFragment<OpTree> fragment_retainOpTree;
@@ -115,88 +123,40 @@ public final class MainActivity extends Activity {
 	// Init Functions
 	@Override
 	@SuppressLint("SetJavaScriptEnabled")
+	@SuppressWarnings("unchecked")
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
+		webview = (WebView) findViewById(R.id.webview);
+		number_text = (TextView) findViewById(R.id.textNum);
+
 		/*********************************************************
-		 * 
+		 * Fragment Management
 		 *********************************************************/
+		
 		// If activity was restarted, get old OpTree object
 		fragment_retainOpTree = (RetainDataFragment<OpTree>)
 				getFragmentManager().findFragmentByTag(
-				getString(R.string.prefkey_optree) );
-		if (fragment_retainOpTree != null) {
-			expression = fragment_retainOpTree.getData();
-		}
-		else {
+				getString(R.string.fragtag_retainOpTree) );
+		
+		if (fragment_retainOpTree == null) {
 			fragment_retainOpTree = new RetainDataFragment<OpTree>();
+			getFragmentManager().beginTransaction()
+					.add(fragment_retainOpTree,
+							getString(R.string.fragtag_retainOpTree) )
+					.commit();
+		}
+		if (fragment_retainOpTree.getData() == null) {
 			expression = new OpTree(new MathmlTextPresBuilder());
 			fragment_retainOpTree.setData(expression);
-
-			getFragmentManager().beginTransaction().add(
-					fragment_retainOpTree, getString(R.string.prefkey_optree) ).commit();
 		}
+		else
+			expression = fragment_retainOpTree.getData();
+		
 		fragment_retainOpTree.setRetainInstance(false);
-		
-		webview = (WebView) findViewById(R.id.webview);
-		number_text = (TextView) findViewById(R.id.textNum);
-		
+				
 		//refreshNumberText();
-		
-		final ViewFinder finder = new ViewFinder();
-		final ViewReplacer replacer = new ViewReplacer();
-		final ViewGroup root = (ViewGroup)getWindow().getDecorView().getRootView();
-
-		/********************************************************
-		 * Fill Incomplete Views
-		 ********************************************************/
-		
-		// Inflate Shuffle Button (substituted in dynamically for op buttons)
-		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
-		
-		// Get old palette id's from preferences
-		final SharedPreferences pref = getPreferences(MODE_PRIVATE);
-		final String keybase = getString(R.string.prefkey_palette_basestr);
-		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
-		
-		// Collect old palette ids in list (use only basic palette if none exist)
-		final List<Integer> layout_ids = new ArrayList<Integer>(max);
-		int tmp_layout_id;
-		for (int i=0; pref.contains(keybase+Integer.toString(i)) && i<max; ++i) {
-			tmp_layout_id = getXmlIdFromViewId(pref.getInt(keybase+Integer.toString(i), 0));
-			// Old ID data stored -> clean data
-			if (tmp_layout_id == 0) {
-				layout_ids.clear();
-				break;
-			}
-			else
-				layout_ids.add(tmp_layout_id);
-		}
-		if (layout_ids.isEmpty())
-			layout_ids.add(R.layout.palette_basic);
-		
-		// Create list of inflated palettes respective to id list
-		final List<View> palette_list = new ArrayList<View>();
-		// (Loop variables)
-		ViewGroup container;
-		View placeholder;
-		View palette;
-		for (int layout_id : layout_ids) {
-			// Inflate palette-container layouts
-			container = (ViewGroup)View.inflate(this, R.layout.palettebox, null);
-			// Insert respective palette into container
-			placeholder
-				= finder.findViewsByTag(container, getString(R.string.tag_plt)).get(0);
-			palette = View.inflate(this, layout_id, null);
-			replacer.replaceView(placeholder, palette);
-			// Add palette container to list
-			palette_list.add(container);
-		}
-		
-		// Replace palette-container placeholder with palette containers
-		placeholder	= finder.findViewsById(root, R.id.tmpPaletteHolderLoc).get(0);
-		replacer.replaceView(placeholder, palette_list);
 
 		/*********************************************************
 		 * Set Button Listeners
@@ -208,12 +168,13 @@ public final class MainActivity extends Activity {
 				web_listener = new CompositeOnClickListener(3),
 				txt_listener = new CompositeOnClickListener(2),
 				keys1_listener = new CompositeOnClickListener(1),
-				keys2_listener = new CompositeOnClickListener(1);
+				keys2_listener = new CompositeOnClickListener(1),
+				plt_listener = new CompositeOnClickListener(1),
+				addplt_listener = new CompositeOnClickListener(2);
 		op_listener = new CompositeOnClickListener(3);
-		delplt_listener = new CompositeOnLongClickListener(2);
-		swapplt_listener = new CompositeOnLongClickListener(2);
+		swapplt_listener = new CompositeOnClickListener(2);
+		delplt_listener = new CompositeOnClickListener(2);
 		
-
 		trigger_resetOpButton = 
 				op_listener.addSwitchListener(
 				eql_listener.addSwitchListener(
@@ -221,15 +182,17 @@ public final class MainActivity extends Activity {
 				delpar_listener.addSwitchListener(
 				web_listener.addSwitchListener(
 				txt_listener.addSwitchListener(
-				delplt_listener.addSwitchListener(
+				plt_listener.addSwitchListener(
+				addplt_listener.addSwitchListener(
 				swapplt_listener.addSwitchListener(
+				delplt_listener.addSwitchListener(
 						new OnViewEventListener() {
 							@Override
 							public void onViewEvent(View v) {
 								((MainActivity)v.getContext()).resetOpButton();
 							}
 						}
-				))))))));
+				))))))))));
 		trigger_setEqualToText = 
 				eql_listener.addSwitchListener(
 						new OnViewEventListener() {
@@ -288,22 +251,31 @@ public final class MainActivity extends Activity {
 					((MainActivity)v.getContext()).onClickNumberText(v);
 				}
 		});
-		swapplt_listener.addListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				((MainActivity)v.getContext()).openContextMenu(v);
-				return true;
-			}
-		});
-		delplt_listener.addListener(new View.OnLongClickListener() {
-			@Override
-			public boolean onLongClick(View v) {
-				((MainActivity)v.getContext()).onClickDeletePalette(v);
-				return true;
-			}
-		});
-
 		
+		addplt_listener.addListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((MainActivity)v.getContext()).openContextMenu(v);
+			}
+		});
+		swapplt_listener.addListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((MainActivity)v.getContext()).openContextMenu(
+						(new ViewParentFinder()).findViewsByTag((ViewGroup)
+						v.getParent(), getString(R.string.tag_plt) ).get(0));
+			}
+		});
+		delplt_listener.addListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				((MainActivity)v.getContext()).onClickDeletePalette(
+						(new ViewParentFinder()).findViewsById(
+						v, R.id.palettebox ).get(0) );
+			}
+		});
+		
+				
 		// Accommodates large screens that do not hide the number keyboard
 		final View button_num = findViewById(R.id.buttonNum);
 		if (button_num != null) {
@@ -352,20 +324,72 @@ public final class MainActivity extends Activity {
 			trigger_showNumKeys = null;
 		}
 		
-		// Sets listeners to respective views
+		/********************************************************
+		 * Fill Incomplete Views
+		 ********************************************************/
+		// Inflate Shuffle Button (substituted in dynamically for op buttons)
+		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
+		
+		final SharedPreferences pref = PreferenceManager
+				.getDefaultSharedPreferences(this);
+						
+		// Get palette action mode preferences
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		final String plt_actionmode = pref.getString(
+				getString(R.string.prefKey_paletteActionMode), null );
+		
+		if (plt_actionmode.equals(getString(
+				R.string.prefValue_paletteActionMode_sidebutton ))) {
+			pltmanager = new SideButtonPaletteManager(this,
+					(getResources().getBoolean(R.bool.canDeletePalette)
+							? R.layout.palettebox_button_swapdelright
+							: R.layout.palettebox_button_swapright ),
+					op_listener, swapplt_listener, delplt_listener);
+		}
+		else if (plt_actionmode.equals(getString(
+				R.string.prefValue_paletteActionMode_swipe ))) {
+			pltmanager = new SwipePaletteManager(this,
+					(getResources().getBoolean(R.bool.canDeletePalette)
+							? R.layout.palettebox_swipe_swapleft_delright
+							: R.layout.palettebox_swipe_swapleftright ),
+					op_listener, swapplt_listener, delplt_listener);
+		}
+
+		// Get old palette id's from preferences
+		final String keybase = getString(R.string.prefkey_paletteIds_basestr);
+		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
+		
+		// Collect old palette ids in list (use only basic palette if none exist)
+		final List<Integer> palette_ids = new ArrayList<Integer>(max);
+		
+		for (int i=0; pref.contains(keybase+Integer.toString(i)) && i<max; ++i)
+			palette_ids.add(pref.getInt(keybase+Integer.toString(i), 0));
+		
+		// Add Palettes to Layout
+		if (pltmanager.addPalettes(palette_ids,
+				findViewById(R.id.tmp_palette) ) == null &&
+				pltmanager.addPalette(R.id.palette_basic,
+				findViewById(R.id.tmp_palette) ) == null )
+			throw new RuntimeException();
+		
+		pref.registerOnSharedPreferenceChangeListener(this);
+		
+		/***********************************************************
+		 * Sets listeners to respective views
+		 */
 		//		Unique Views
 		findViewById(R.id.buttonEqual).setOnClickListener(eql_listener);
 		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
 		findViewById(R.id.buttonDelParent).setOnClickListener(delpar_listener);
 		number_text.setOnClickListener(txt_listener);
 		
-		setPaletteButtonListeners(root, finder);
-		
 		final View button_addPalette = findViewById(R.id.buttonNewPalette);
-		if (button_addPalette != null) {
+		if (button_addPalette !=  null) {
 			registerForContextMenu(button_addPalette);
-			button_addPalette.setOnLongClickListener(swapplt_listener);
+			button_addPalette.setLongClickable(false);
+			button_addPalette.setOnClickListener(addplt_listener);
 		}
+
 		
 		/*********************************************************
 		 * Set local WebView object
@@ -375,7 +399,7 @@ public final class MainActivity extends Activity {
 
 		// Reroute "html-links" to MainActivity
 		//*
-		MathmlLinksViewClient client = new MathmlLinksViewClient();
+		final MathmlLinksViewClient client = new MathmlLinksViewClient();
 		client.setOnClickListener(web_listener);
 		webview.setWebViewClient(client);
 		//*/
@@ -390,24 +414,24 @@ public final class MainActivity extends Activity {
 		// Loads initial MathJax configuration
 		//	(https://github.com/leathrum/android-apps/blob/master
 		//		/MathJaxApp/mml-full/MainActivity.java)
-		String base_url = "<script type='text/x-mathjax-config'>"
-					+"MathJax.Hub.Config({ "
-						+"showMathMenu: false, "
-						+"jax: ['input/MathML','output/'], "
-						+"extensions: ['mml2jax.js'], "
-						+"TeX: { extensions: ['noErrors.js','noUndefined.js'] }, "
-						+"OUTPUT: { scale: 175 }, "
-						+"});</script>"
-					+"<script type='text/javascript' "
-						+"src='file:///android_asset/MathJax-2.3-trim/MathJax.js'>"
-						+"</script>"
-					/* Used for JavaScript binding
-					+"<script>function JSOnClickMathml(id_tag){"
-						+"Android.onClickMathml(id_tag);"
-						+"return false;"
-						+"}</script>"
-					//*/
-					+"<span id='math'></span>";
+		String data = "<script type='text/x-mathjax-config'>"
+				+"MathJax.Hub.Config({ "
+					+"showMathMenu: false, "
+					+"jax: ['input/MathML','output/'], "
+					+"extensions: ['mml2jax.js'], "
+					+"TeX: { extensions: ['noErrors.js','noUndefined.js'] }, "
+					+"OUTPUT: { scale: 175 }, "
+					+"});</script>"
+				+"<script type='text/javascript' "
+					+"src='file:///android_asset/MathJax-2.3-trim/MathJax.js'>"
+					+"</script>"
+				/* Used for JavaScript binding
+				+"<script>function JSOnClickMathml(id_tag){"
+					+"Android.onClickMathml(id_tag);"
+					+"return false;"
+					+"}</script>"
+				//*/
+				+"<span id='math'></span>";
 		// Chooses HTML-CSS vs. SVG, based on android version
 		//		(disabled SVG, causes links to nest improperly)
 		/*
@@ -416,20 +440,21 @@ public final class MainActivity extends Activity {
 			base_url = base_url
 					.replaceFirst("output/", "output/SVG")
 					.replaceFirst("OUTPUT", "SVG");
-			Log.d(this.toString(), "SVG USED!!!!!!!!!!");
+			Log.d(this.toString(), "SVG used!");
 		}
 		else //*/
-			base_url = base_url
+			data = data
 					.replaceFirst("output/", "output/HTML-CSS")
 					.replaceFirst("OUTPUT", "\"HTML-CSS\"");
 		
 		webview.loadDataWithBaseURL(
-				"http://bar", base_url, "text/html","utf-8","" );
-		
+				"http://bar", data, "text/html","utf-8",null );
+
 		/*********************************************************
 		 * Set Number Keyboard
 		 *********************************************************/
-		NumberKeyboardListener num_keyslistener = new NumberKeyboardListener(number_text);
+		NumberKeyboardListener num_keyslistener
+				= new NumberKeyboardListener(number_text);
 		num_keyslistener.setOnClickListener
 				(NumberKeyboardListener.KEYS_EDIT, keys1_listener);
 		num_keyslistener.setOnClickListener
@@ -439,9 +464,15 @@ public final class MainActivity extends Activity {
 		k.setKeyboard(new Keyboard(this, R.xml.numkeys));
 		k.setOnKeyboardActionListener(num_keyslistener);
 		k.setEnabled(false);
-		
 	}
-	
+
+	// This method saves the opTree object during runtime changes, and no-when else
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		fragment_retainOpTree.setRetainInstance(true);
+	}
+		
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -449,13 +480,14 @@ public final class MainActivity extends Activity {
 		/******************************************************
 		 * Save Palette Choices To Preferences
 		 ******************************************************/
-		final SharedPreferences pref = getPreferences(MODE_PRIVATE);
+		final SharedPreferences pref = PreferenceManager
+				.getDefaultSharedPreferences(this);
 		final SharedPreferences.Editor pref_edit = pref.edit();
-		final String keybase = getString(R.string.prefkey_palette_basestr);
+		final String keybase = getString(R.string.prefkey_paletteIds_basestr);
 		// Gets current ids
 		List<Integer> ids = new ArrayList<Integer>();
 		for (View palette : (new ViewFinder()).findViewsByTag(
-				(ViewGroup)findViewById(R.id.panelOps),
+				(ViewGroup)getWindow().getDecorView().getRootView(),
 				getString(R.string.tag_plt) )) {
 			ids.add(palette.getId());
 		}
@@ -470,97 +502,110 @@ public final class MainActivity extends Activity {
 		}
 		pref_edit.apply();
 	}
-	
-	
-	// This method saves the opTree object during runtime changes, and no-when else
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		fragment_retainOpTree.setRetainInstance(true);
-	}
 
+	/*
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+	//*/
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
 		return true;
 	}
-	
-	// Creates the popup menu for switching out op-palettes
+
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menu_info) {
-		super.onCreateContextMenu(menu, v, menu_info);
-		getMenuInflater().inflate(R.menu.menu_palettes, menu);
-		if (v.getId() == R.id.buttonNewPalette) {
-			button_newpalette = v;
-			// Get ID's of existing palettes
-			final ViewGroup panel_ops = (ViewGroup)findViewById(R.id.panelOps);
-			final List<View> palettes = (new ViewFinder()).findViewsByTag(
-					panel_ops, getString(R.string.tag_plt) );
-			int[] ids = new int[palettes.size()];
-			for (int i=0; i<palettes.size(); ++i)
-				ids[i] = palettes.get(i).getId();
-			
-			// Disable choices for existing palettes
-			for (int id : ids)
-				menu.findItem(id).setEnabled(false);
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.action_settings) {
+			// Move to settings menu activity
+			startActivity(new Intent(this, SettingsActivity.class));
+			/* Displays settings in the same activity (bug: overlaps main screen)
+			getFragmentManager().beginTransaction()
+					.replace(android.R.id.content, new SettingsFragment())
+					.addToBackStack(null)
+					.commit();
+			//*/
+			return true;
 		}
 		else {
-			button_newpalette = getPaletteFromSwapButton(v);
-			// Disable choices for existing palettes
-			menu.findItem(button_newpalette.getId()).setEnabled(false);
+			return super.onOptionsItemSelected(item);
 		}
+	}
+	
+	/************************************************************************
+	 *  Creates the popup menu for switching out op-palettes(non-Javadoc)
+	 */
+	@Override
+	public void onCreateContextMenu(
+			ContextMenu menu, View v, ContextMenuInfo menu_info) {
+		super.onCreateContextMenu(menu, v, menu_info);
+		getMenuInflater().inflate(R.menu.menu_palettes, menu);
+		
+		// Save view locally (activity-scope) for later use
+		view_newpalette = v;
+		// Get ID's of existing palettes
+		final ViewGroup root = (ViewGroup)getWindow().getDecorView().getRootView();
+		final List<View> palettes = (new ViewFinder()).findViewsByTag(
+				root, getString(R.string.tag_plt) );
+		int[] ids = new int[palettes.size()];
+		for (int i=0; i<palettes.size(); ++i)
+			ids[i] = palettes.get(i).getId();
+		
+		// Disable choices for existing palettes
+		for (int id : ids)
+			menu.findItem(id).setEnabled(false);
 	}
 	
 	// Assumes palette is a child of palette-swap's parent
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		final int id2 = item.getItemId();
-		final ViewReplacer replacer = new ViewReplacer();
+		if (view_newpalette.getId() == R.id.buttonNewPalette)
+			pltmanager.addPalette(item.getItemId(), view_newpalette);
 		
-		if (button_newpalette.getId() == R.id.buttonNewPalette) {
-			final ViewFinder finder = new ViewFinder();
-			
-			// Inflate palette-container layouts
-			final ViewGroup container = (ViewGroup)View.inflate(
-					this, R.layout.palettebox, null );
-			// Insert respective palette into container
-			final View placeholder = finder.findViewsByTag(
-					container, getString(R.string.tag_plt) ).get(0);
-			replacer.replaceView(placeholder, 
-					View.inflate(this, getXmlIdFromViewId(id2), null) );
-			
-			// Add new palette behind "add" button
-			replacer.insertView(button_newpalette, container);
-			
-			// Set Button Listeners to new palette
-			setPaletteButtonListeners(container, finder);
-		}
-		else if (getString(R.string.tag_plt).equals(button_newpalette.getTag())) {
-			View palette2 = findViewById(id2);
-			
-			// Condition: palette is already on-screen
-			if (palette2 != null) {
-				// Switch selected palettes
-				replacer.switchViews(button_newpalette, palette2);
-			}
-			// Condition: palette has to be inflated from layout xml
-			else {
-				// Inflate new palette from XML
-				palette2 = View.inflate(this, getXmlIdFromViewId(id2), null);
-				replacer.replaceView(button_newpalette, palette2);
-				// Set button listeners for buttons in inflated palette
-				for (View op_button : (new ViewFinder())
-						.findViewsByTag((ViewGroup)palette2, getString(R.string.tag_op)) )
-					op_button.setOnClickListener(op_listener);
-			}
-		}
+		else if (getString(R.string.tag_plt).equals(view_newpalette.getTag()))
+			pltmanager.swapPalette(view_newpalette, item.getItemId());
+		
 		// Cleanup
-		button_newpalette = null;
+		view_newpalette = null;
 		
 		return true;
 	}
 	
+	@Override
+	public void onContextMenuClosed(Menu menu) {
+		super.onContextMenuClosed(menu);
+		
+		final PaletteboxAnimator boxanimator = pltmanager.getPaletteboxAnimator();
+		if (boxanimator != null)
+			boxanimator.animateAfterSwap();
+	}
+	
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
+		if (key.equals(getString(R.string.prefKey_paletteActionMode))) {
+			final String plt_actionmode = pref.getString(key, null);
+			if (plt_actionmode.equals(getString(
+					R.string.prefValue_paletteActionMode_sidebutton ))) {
+				pltmanager = new SideButtonPaletteManager(this,
+						(getResources().getBoolean(R.bool.canDeletePalette)
+								? R.layout.palettebox_button_swapdelright
+								: R.layout.palettebox_button_swapright ),
+						op_listener, swapplt_listener, delplt_listener);
+			}
+			else if (plt_actionmode.equals(getString(
+					R.string.prefValue_paletteActionMode_swipe ))) {
+				pltmanager = new SwipePaletteManager(this,
+						(getResources().getBoolean(R.bool.canDeletePalette)
+								? R.layout.palettebox_swipe_swapleft_delright
+								: R.layout.palettebox_swipe_swapleftright ),
+						op_listener, swapplt_listener, delplt_listener);
+			}
+			pltmanager.refreshPaletteBoxes();
+		}
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	// INTERNAL FUNCTIONS
@@ -654,28 +699,7 @@ public final class MainActivity extends Activity {
 		trigger_showNumKeys.disableListener();
 		trigger_hideNumKeys.enableListener();
 	}
-	
-	public void setPaletteButtonListeners(ViewGroup container, ViewFinder finder) {
-		List<View> buttons;
-		//		Operation Buttons
-		buttons = finder.findViewsByTag(
-				container, getString(R.string.tag_op) );
-		for (View button_operator : buttons)
-			button_operator.setOnClickListener(op_listener);
-		//		Add/Swap-Palette Buttons		
-		buttons = finder.findViewsById(
-				container, R.id.buttonSwapPalette );
-		for (View button_swapPalette : buttons) {
-			registerForContextMenu(button_swapPalette);
-			button_swapPalette.setOnLongClickListener(swapplt_listener);
-		}
-		//		Delete-Palette Buttons
-		buttons = finder.findViewsById(
-				container, R.id.buttonRemovePalette );
-		for (View button_removePalette : buttons)
-			button_removePalette.setOnLongClickListener(delplt_listener);
-	}
-	
+		
 	public void raiseToast(String str) {
 		Toast t = Toast.makeText(
 				getApplicationContext(), str, Toast.LENGTH_SHORT );
@@ -685,111 +709,8 @@ public final class MainActivity extends Activity {
 		t.show();
 	}
 	
-	private FunctionType getFtypeFromViewId(int id) {
-		switch (id) {
-		// Basic Palette
-		case R.id.buttonSum:
-			return FunctionType.ADD;
-		case R.id.buttonDiff:
-			return FunctionType.SUBTRACT;
-		case R.id.buttonProd:
-			return FunctionType.MULTIPLY;
-		case R.id.buttonQuot:
-			return FunctionType.DIVIDE;
-		case R.id.buttonNeg:
-			return FunctionType.NEGATIVE;
-		case R.id.buttonAbs:
-			return FunctionType.ABS;
-		case R.id.buttonSqr:
-			return FunctionType.SQUARE;
-		case R.id.buttonMultInv:
-			return FunctionType.MULT_INVERSE;
-		
-		// Power/Log Palette
-		case R.id.buttonPow:
-			return FunctionType.POWER;
-		case R.id.buttonSqrt:
-			return FunctionType.SQRT;
-		case R.id.buttonExpE:
-			return FunctionType.EXP_E;
-		case R.id.buttonExp10:
-			return FunctionType.EXP_10;
-		case R.id.buttonLogE:
-			return FunctionType.LN;
-		case R.id.buttonLog10:
-			return FunctionType.LOG10;
-		case R.id.buttonConstE:
-			return FunctionType.CONST_E;
-		
-		// Trig. Palette
-		case R.id.buttonSin:
-			return FunctionType.SINE;
-		case R.id.buttonCos:
-			return FunctionType.COSINE;
-		case R.id.buttonTan:
-			return FunctionType.TANGENT;
-		case R.id.buttonAsin:
-			return FunctionType.ARCSINE;
-		case R.id.buttonAcos:
-			return FunctionType.ARCCOSINE;
-		case R.id.buttonAtan:
-			return FunctionType.ARCTANGENT;
-		case R.id.buttonPi:
-			return FunctionType.CONST_PI;
-		
-		// Trig. Palette
-		case R.id.buttonHypSin:
-			return FunctionType.HYPSINE;
-		case R.id.buttonHypCos:
-			return FunctionType.HYPCOSINE;
-		case R.id.buttonHypTan:
-			return FunctionType.HYPTANGENT;
-		case R.id.buttonAHypSin:
-			return FunctionType.ARHYPSINE;
-		case R.id.buttonAHypCos:
-			return FunctionType.ARHYPCOSINE;
-		case R.id.buttonAHypTan:
-			return FunctionType.ARHYPTANGENT;
-		
-		// Permutation Palette
-		case R.id.buttonFact:
-			return FunctionType.FACTORIAL;
-		case R.id.buttonNPK:
-			return FunctionType.NPK;
-		case R.id.buttonNCK:
-			return FunctionType.NCK;
-
-		// vvv Occurs only under improper use vvv
-		default:
-			return null;
-		}
-	}
+//	private static FunctionType getFtypeFromViewId(int id) {}
 	
-	private int getXmlIdFromViewId(int id) {
-		switch (id) {
-		case R.id.palette_basic:
-			return R.layout.palette_basic;
-		case R.id.palette_log:
-			return R.layout.palette_log;
-		case R.id.palette_trig:
-			return R.layout.palette_trig;
-		case R.id.palette_hyp:
-			return R.layout.palette_hyp;
-		case R.id.palette_perm:
-			return R.layout.palette_perm;
-		// vvv Occurs only under improper use vvv
-		default:
-			return 0;
-		}
-	}
-	
-	private View getPaletteFromSwapButton(View swap_button) {
-		final List<View> views = (new ViewParentFinder()).findParentViewsByTag(
-				(ViewGroup) swap_button.getParent(),
-				getString(R.string.tag_plt) );
-		return (views.size() == 1 ? views.get(0) : null);
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// ON-CLICK/BUTTON METHODS
 	//////////////////////////////////////////////////////////////////////
@@ -852,7 +773,7 @@ public final class MainActivity extends Activity {
 	// Called when the user clicks an operator button
 	public void onClickOperator(View v) {
 		// Adds function to expression
-		FunctionType ftype = getFtypeFromViewId(v.getId());
+		FunctionType ftype = ((OperationButton)v).getFtype();
 		expression.addFunction(ftype);	// sets selector in function
 		refreshMathmlScreen();
 		//refreshNumberText();
@@ -888,14 +809,10 @@ public final class MainActivity extends Activity {
 		refreshMathmlScreen();
 		//refreshNumberText();
 	}
-	public void onNumKeyboardCancel() {
-	}
+	public void onNumKeyboardCancel() {}
 	
 	public void onClickDeletePalette(View v) {
-		v = (new ViewParentFinder()).findParentViewsById(
-				(ViewGroup) v.getParent(),
-				R.id.panel_paletteContainer ).get(0);
-		((ViewGroup)v.getParent()).removeView(v);
+		pltmanager.removePalette(v);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -909,8 +826,13 @@ public final class MainActivity extends Activity {
 	public void setMathmlExample(View v) {
 		// Augment test expression
 		++temp_count;
-		temp_out = "<mstyle  background='#9df' style='border: 1pt solid #000; padding: 2pt;'>"
-				+ "<mn>1</mn><mo>+</mo><mn>" + temp_count.toString() + "</mn></mstyle>";
+		temp_out = "<mstyle" + 
+				" background='#9df'" + 
+				" style='border: 1pt solid #000;" + 
+				" padding: 2pt;'>" + 
+				"<mn>1</mn><mo>+</mo><mn>" + 
+				temp_count.toString() + 
+				"</mn></mstyle>";
 		//temp_out += "<mo href=" + HtmlIdFormat.encloseIdInTags(0) + ">+</mo>"
 				//+ "<mn href=" + HtmlIdFormat.encloseIdInTags(temp_count) + ">"
 				//+ temp_count.toString() + "</mn>";
@@ -947,10 +869,5 @@ public final class MainActivity extends Activity {
 		refreshScreen();
 	}
 	//*/
-
-
-	/*
-	 * // Test Code (TODO remove)
-	 * Log.d(this.toString(), "Loaded MathML: " + mathml_exp);
-	 */
+	
 }

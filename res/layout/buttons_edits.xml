@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
+	
+	<Button
+		android:id="@+id/buttonDel"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:contentDescription="@string/deleteOp_desc"
+		android:drawableRight="@drawable/ic_action_remove"
+   		android:drawablePadding="-57dp"
+		android:text="@string/circle"
+		android:textSize="@dimen/button_textSize_L"
+		style="?android:attr/buttonBarButtonStyle" />
+	
+   	<Button
+   		android:id="@+id/buttonDelParent"
+   		android:layout_width="wrap_content"
+   		android:layout_height="wrap_content"
+   		android:contentDescription="@string/deleteOp_desc"
+   		android:drawablePadding="-7.5sp"
+   		android:drawableRight="@drawable/ic_action_remove"
+   		android:text="@string/arrowUp"
+		android:textSize="@dimen/button_textSize_M"
+		style="?android:attr/buttonBarButtonStyle" />
+   	
+	<View
+   		android:layout_width="0dp"
+   		android:layout_height="match_parent"
+   		android:layout_weight="1"
+   		android:visibility="invisible" />
+   	
+</merge>

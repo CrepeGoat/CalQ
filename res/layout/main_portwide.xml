@@ -43,7 +43,7 @@
 					android:hint="@string/numkeyboard_hint"
 					android:textSize="50sp"
 					android:textColor="@color/orange"
-					android:textColorHint="@color/mid_blue"
+					android:textColorHint="@color/sky_blue"
 					android:minLines="1"
 					android:maxLines="1"
 					android:gravity="right" />
@@ -57,26 +57,7 @@
 				android:showDividers="middle"
 				style="?android:attr/buttonBarStyle" >
 
-			   	<ImageButton
-			   		android:id="@+id/buttonDel"
-			   		android:layout_width="wrap_content"
-			   		android:layout_height="match_parent"
-			   		android:contentDescription="@string/deleteOp_desc"
-			   		android:src="@drawable/ic_action_remove"
-			   		android:tint="@color/black"
-					style="?android:attr/buttonBarButtonStyle" />
-
-			   	<Button
-			   		android:id="@+id/buttonDelParent"
-			   		android:layout_width="wrap_content"
-			   		android:layout_height="match_parent"
-			   		android:contentDescription="@string/deleteOp_desc"
-			   		android:drawablePadding="-10sp"
-			   		android:drawableRight="@drawable/ic_action_remove"
-			   		android:text="@string/arrowUp"
-			   		android:textSize="25sp"
-			   		android:tint="@color/black"
-					style="?android:attr/buttonBarButtonStyle" />
+				<incude layout="@layout/buttons_edits" />
 
 			</LinearLayout>
 			

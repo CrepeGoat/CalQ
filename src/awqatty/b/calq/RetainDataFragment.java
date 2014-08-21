@@ -4,12 +4,11 @@ import android.app.Fragment;
 
 public class RetainDataFragment<T> extends Fragment {
 
-	private T expression;
+	private T data;
 	
-	public void setData(T xp) {
-		expression = xp;
-	}
-	public T getData() {
-		return expression;
-	}
+	public RetainDataFragment() 	{data = null;}
+	public RetainDataFragment(T t) 	{data = t;}
+	
+	public T getData() 			{return data;}
+	public void setData(T xp) 	{data = xp;}
 }

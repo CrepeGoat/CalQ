@@ -8,10 +8,11 @@
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:divider="?android:attr/dividerHorizontal"
-			android:showDividers="beginning|middle" >
+			android:showDividers="beginning|middle"
+			android:animateLayoutChanges="true" >
 			
 			<View
-				android:id="@+id/tmpPaletteHolderLoc"
+				android:id="@+id/tmp_palette"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:visibility="gone" />

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/switchEqText"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:paddingLeft="@dimen/activity_horizontal_margin"
+	android:paddingRight="@dimen/activity_horizontal_margin" >
+	<Button
+		android:id="@+id/buttonEqual"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:text="@string/equal"
+		android:textSize="30sp"
+		style="?android:attr/borderlessButtonStyle" />
+	<TextView
+		android:id="@+id/textNum"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:hint="@string/numkeyboard_hint"
+		android:textSize="50sp"
+		android:textColor="@color/orange"
+		android:textColorHint="@color/sky_blue"
+		android:minLines="1"
+		android:maxLines="1"
+		android:gravity="right" />
+</ViewSwitcher>

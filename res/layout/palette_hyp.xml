@@ -4,56 +4,54 @@
     android:tag="@string/tag_plt"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-	android:shrinkColumns="*"
-	android:stretchColumns="*"
-	style="?android:attr/buttonBarStyle"
+    android:stretchColumns="@string/stretchPaletteCols"
      >
     
 	<TableRow>
-		<Button
+		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonHypSin"
 			android:tag="@string/tag_op"
 			android:text="@string/hypsine"
-			android:textSize="25sp"
-			style="?android:attr/buttonBarButtonStyle"
+			android:textSize="@dimen/button_textSize_M"
+			style="?android:attr/borderlessButtonStyle"
 			 />
-		<Button
+		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonHypCos"
 			android:tag="@string/tag_op"
 			android:text="@string/hypcosine"
-			android:textSize="25sp"
-			style="?android:attr/buttonBarButtonStyle"
+			android:textSize="@dimen/button_textSize_M"
+			style="?android:attr/borderlessButtonStyle"
 			 />
-		<Button
+		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonHypTan"
 			android:tag="@string/tag_op"
 			android:text="@string/hyptangent"
-			android:textSize="25sp"
-			style="?android:attr/buttonBarButtonStyle"
+			android:textSize="@dimen/button_textSize_M"
+			style="?android:attr/borderlessButtonStyle"
 			 />
 	</TableRow>
 	
 	<TableRow>
-		<Button
+		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonAHypSin"
 			android:tag="@string/tag_op"
 			android:text="@string/arhypsine"
-			android:textSize="25sp"
-			style="?android:attr/buttonBarButtonStyle"
+			android:textSize="@dimen/button_textSize_S"
+			style="?android:attr/borderlessButtonStyle"
 			 />
-		<Button
+		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonAHypCos"
 			android:tag="@string/tag_op"
 			android:text="@string/arhypcosine"
-			android:textSize="25sp"
-			style="?android:attr/buttonBarButtonStyle"
+			android:textSize="@dimen/button_textSize_S"
+			style="?android:attr/borderlessButtonStyle"
 			 />
-		<Button
+		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonAHypTan"
 			android:tag="@string/tag_op"
 			android:text="@string/arhyptangent"
-			android:textSize="25sp"
-			style="?android:attr/buttonBarButtonStyle"
+			android:textSize="@dimen/button_textSize_S"
+			style="?android:attr/borderlessButtonStyle"
 			 />
 			
 	</TableRow>

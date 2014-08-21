@@ -1,6 +1,5 @@
 package awqatty.b.GenericTextPresentation;
 
-import java.text.DecimalFormat;
 
 //import java.text.DecimalFormat;
 

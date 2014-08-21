@@ -5,7 +5,7 @@
     
 	<include layout="@layout/panelpalette"
 		android:id="@+id/panelOps"
-		android:layout_width="350dp"
+		android:layout_width="wrap_content"
 		android:layout_height="match_parent"
 		android:layout_below="@+id/panelCoreFunctions"
 		android:layout_alignParentRight="true"
@@ -18,7 +18,7 @@
 	<LinearLayout 
 	    android:id="@id/panelCoreFunctions"
 		android:orientation="horizontal"
-		android:layout_width="wrap_content"
+		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:layout_alignParentTop="true"
 		android:layout_alignLeft="@id/panelOps"
@@ -26,25 +26,9 @@
 		android:divider="?android:attr/dividerHorizontal"
 		android:showDividers="middle"
 		style="?android:attr/buttonBarStyle" >
-		<ImageButton
-			android:id="@+id/buttonDel"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:contentDescription="@string/deleteOp_desc"
-			android:src="@drawable/ic_action_remove"
-			android:tint="@color/black"
-			style="?android:attr/buttonBarButtonStyle" />
-	   	<Button
-	   		android:id="@+id/buttonDelParent"
-	   		android:layout_width="wrap_content"
-	   		android:layout_height="wrap_content"
-	   		android:contentDescription="@string/deleteOp_desc"
-	   		android:drawablePadding="-7.5sp"
-	   		android:drawableRight="@drawable/ic_action_remove"
-	   		android:text="@string/arrowUp"
-	   		android:textSize="30sp"
-	   		android:tint="@color/black"
-			style="?android:attr/buttonBarButtonStyle" />	
+		
+		<include layout="@layout/buttons_edits"/>
+		
 	</LinearLayout>
 	
 	<LinearLayout
@@ -56,31 +40,7 @@
 		android:layout_alignParentBottom="true"
 		android:layout_toLeftOf="@id/panelOps" >
 	
-		<ViewSwitcher
-			android:id="@+id/switchEqText"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:paddingLeft="@dimen/activity_horizontal_margin"
-			android:paddingRight="@dimen/activity_horizontal_margin" >
-			<Button
-				android:id="@+id/buttonEqual"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:text="@string/equal"
-				android:textSize="30sp"
-				style="?android:attr/borderlessButtonStyle" />
-			<TextView
-				android:id="@+id/textNum"
-				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:hint="@string/numkeyboard_hint"
-				android:textSize="50sp"
-				android:textColor="@color/orange"
-				android:textColorHint="@color/mid_blue"
-				android:minLines="1"
-				android:maxLines="1"
-				android:gravity="right" />
-		</ViewSwitcher>
+		<include layout="@layout/textnum_buttonequal" />
 
 		<android.inputmethodservice.KeyboardView
 			android:id="@+id/keyboardNum"

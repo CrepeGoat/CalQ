@@ -82,7 +82,7 @@ public class MathmlTextPresBuilder implements TextPresBuilderForm {
 		case MULTIPLY:
 			strlist = new String[3];
 			strlist[0] = out_l + "<mo>(</mo>";
-			strlist[1] = "<mo>)</mo><mo>(</mo>";
+			strlist[1] = "<mo>)</mo>" + /*"<mo>&#8901;</mo>" + */ "<mo>(</mo>";
 			strlist[2] = "<mo>)</mo>" + out_r;
 			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
 			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");

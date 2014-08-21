@@ -2,9 +2,10 @@
 <resources>
     <item name="main" 			type="layout"	>@layout/main_port_thinlong</item>
     <item name="panelpalette" 	type="layout"	>@layout/panelpalette_single</item>
-    <item name="palettebox" 	type="layout"	>@layout/palettebox_swap_right</item>
+    <item name="palettebox" 	type="layout"	>@layout/palettebox_button_swapright</item>
     <integer name="maxPaletteQuantity">1</integer>
     
     <item name="numkeys" 		type="xml"		>@xml/numkeys_3x5_right</item>
-    <item name="panelpalette_weight" type="fraction">0</item>
+    <dimen name="panelpalettes_height">-2dp</dimen>
+    <item name="panelpalettes_weight" type="fraction">0</item>
 </resources>
