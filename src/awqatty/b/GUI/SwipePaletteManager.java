@@ -8,13 +8,11 @@ import awqatty.b.calq.R;
 
 public final class SwipePaletteManager extends PaletteManager {
 
-	private final OnClickListener op_listener;
 	private final PaletteSwipeListener swipe_listener;
 	
 	public SwipePaletteManager(Activity activity, int palettebox_layout_id,
-			OnClickListener op, OnClickListener swap, OnClickListener del ) {
+			OnClickListener swap, OnClickListener del ) {
 		super(activity, palettebox_layout_id);
-		op_listener = op;
 		
 		PaletteSwipeListener.setDpi(activity);
 		swipe_listener = new PaletteSwipeListener(activity);
@@ -35,7 +33,6 @@ public final class SwipePaletteManager extends PaletteManager {
 		// Operation Buttons
 		for (View button_op : finder.findViewsByTag(root, 
 				activity.getString(R.string.tag_op) )) {
-			button_op.setOnClickListener(op_listener);
 			button_op.setOnTouchListener(swipe_listener);
 		}
 		

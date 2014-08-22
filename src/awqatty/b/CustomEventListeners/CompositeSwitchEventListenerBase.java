@@ -1,4 +1,4 @@
-package awqatty.b.CompositeSwitchEventListener;
+package awqatty.b.CustomEventListeners;
 
 import java.util.ArrayList;
 import java.util.List;

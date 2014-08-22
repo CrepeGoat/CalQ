@@ -8,9 +8,8 @@ import awqatty.b.calq.MainActivity;
 public final class NumberKeyboardListener implements OnKeyboardActionListener {
 
 	// Constants
-	public static final int LISTENER_COUNT = 2;
+	public static final int LISTENER_COUNT = 1;
 	public static final int KEYS_EDIT = 0;
-	public static final int KEYS_ACTION = 1;
 	
 	private final TextView display;
 	private final OnClickListener[] listeners;
@@ -50,6 +49,7 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 			
 		case -3:	// Cancel Key Logic
 			display.setText("");
+			((MainActivity) display.getContext()).onNumKeyboardCancel();
 			break;
 		
 		case -2:	// Enter Key Logic
@@ -100,9 +100,7 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 			break;
 		}
 		
-		if (arg0 == -3 || arg0 == -2) {
-			listeners[KEYS_ACTION].onClick(display);
-		}
+		if (arg0 == -3 || arg0 == -2) {}
 		else {
 			listeners[KEYS_EDIT].onClick(display);
 		}

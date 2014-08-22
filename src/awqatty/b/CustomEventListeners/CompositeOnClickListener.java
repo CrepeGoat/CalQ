@@ -1,4 +1,4 @@
-package awqatty.b.CompositeSwitchEventListener;
+package awqatty.b.CustomEventListeners;
 
 import android.view.View;
 import android.view.View.OnClickListener;

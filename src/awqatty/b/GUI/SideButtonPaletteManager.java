@@ -11,14 +11,12 @@ import awqatty.b.calq.R;
 public final class SideButtonPaletteManager extends PaletteManager {
 
 	private final OnClickListener
-			op_listener,
 			swap_listener,
 			del_listener;
 	
 	public SideButtonPaletteManager(Activity activity, int palettebox_layout_id,
-			OnClickListener op, OnClickListener swap, OnClickListener del ) {
+			OnClickListener swap, OnClickListener del ) {
 		super(activity, palettebox_layout_id);
-		op_listener = op;
 		swap_listener = swap;
 		del_listener = del;
 	}
@@ -29,7 +27,6 @@ public final class SideButtonPaletteManager extends PaletteManager {
 		// Operation Buttons
 		views = finder.findViewsByTag(root,	activity.getString(R.string.tag_op));
 		for (View button_op : views) {
-			button_op.setOnClickListener(op_listener);
 			// (This removes any listeners set from OnSwipeManager) (I think?)
 			button_op.setOnTouchListener(null);
 		}

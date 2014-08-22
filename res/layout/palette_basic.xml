@@ -14,6 +14,7 @@
 			android:text="@string/sum"
 			android:textSize="@dimen/button_textSize_L"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonDiff"
@@ -21,6 +22,7 @@
 			android:text="@string/difference"
 			android:textSize="@dimen/button_textSize_L"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonProd"
@@ -28,6 +30,7 @@
 			android:text="@string/product"
 			android:textSize="@dimen/button_textSize_L"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonQuot"
@@ -35,6 +38,7 @@
 			android:text="@string/quotient"
 			android:textSize="@dimen/button_textSize_L"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 	</TableRow>
 	
@@ -45,6 +49,7 @@
 			android:text="@string/negative"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonAbs"
@@ -52,6 +57,7 @@
 			android:text="@string/absolute"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonSqr"
@@ -59,6 +65,7 @@
 			android:text="@string/square"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonMultInv"
@@ -66,6 +73,7 @@
 			android:text="@string/mult_inverse"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 					
 	</TableRow>

@@ -7,7 +7,7 @@ import awqatty.b.GenericTextPresentation.Tags;
 import awqatty.b.ListTree.ListTree;
 import awqatty.b.TextPresentation.TextPresBuilderForm;
 
-public final class OpTree {
+public class OpTree {
 
 	// Private Members
 	private final ListTree<OpNode> tree = new ListTree<OpNode>();
@@ -23,6 +23,7 @@ public final class OpTree {
 	
 	public void setTextPresBuilder(TextPresBuilderForm tpb) {
 		node_builder.setTextPresBuilder(tpb);
+		// TODO change out all objects to have proper TextPres objects
 	}
 	
 	//---------------------------------------------------------------

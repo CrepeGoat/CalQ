@@ -22,5 +22,6 @@
 		android:textColorHint="@color/sky_blue"
 		android:minLines="1"
 		android:maxLines="1"
-		android:gravity="right" />
+		android:gravity="right"
+		android:onClick="onClickNumberText" />
 </ViewSwitcher>

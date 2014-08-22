@@ -14,6 +14,7 @@
 			android:text="@string/factorial"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonNPK"
@@ -21,6 +22,7 @@
 			android:text="@string/nPk"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonNCK"
@@ -28,6 +30,7 @@
 			android:text="@string/nCk"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 	</TableRow>
 </TableLayout>

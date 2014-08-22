@@ -23,6 +23,8 @@
 				android:layout_height="wrap_content"
 				android:src="@drawable/ic_action_new"
 				android:contentDescription="@string/newPalette_desc"
+				android:onClick="openContextMenu"
+				android:longClickable="false"
 				style="?android:attr/borderlessButtonStyle" />
 			
 		</LinearLayout>    

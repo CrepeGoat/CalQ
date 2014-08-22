@@ -10,8 +10,7 @@ import awqatty.b.ViewUtilities.ViewParentFinder;
 import awqatty.b.calq.R;
 
 public class PaletteSwipeListener extends OnSwipeListener implements
-		PaletteboxAnimator 
-{
+		PaletteboxAnimator {
 
 	private OnClickListener action_left=null,
 							action_right=null;

@@ -10,7 +10,8 @@
    		android:drawablePadding="-57dp"
 		android:text="@string/circle"
 		android:textSize="@dimen/button_textSize_L"
-		style="?android:attr/buttonBarButtonStyle" />
+		style="?android:attr/buttonBarButtonStyle"
+		android:onClick="onClickDelete" />
 	
    	<Button
    		android:id="@+id/buttonDelParent"
@@ -21,7 +22,8 @@
    		android:drawableRight="@drawable/ic_action_remove"
    		android:text="@string/arrowUp"
 		android:textSize="@dimen/button_textSize_M"
-		style="?android:attr/buttonBarButtonStyle" />
+		style="?android:attr/buttonBarButtonStyle"
+		android:onClick="onClickDeleteParent" />
    	
 	<View
    		android:layout_width="0dp"

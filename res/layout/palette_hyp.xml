@@ -14,6 +14,7 @@
 			android:text="@string/hypsine"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonHypCos"
@@ -21,6 +22,7 @@
 			android:text="@string/hypcosine"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonHypTan"
@@ -28,6 +30,7 @@
 			android:text="@string/hyptangent"
 			android:textSize="@dimen/button_textSize_M"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 	</TableRow>
 	
@@ -38,6 +41,7 @@
 			android:text="@string/arhypsine"
 			android:textSize="@dimen/button_textSize_S"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonAHypCos"
@@ -45,6 +49,7 @@
 			android:text="@string/arhypcosine"
 			android:textSize="@dimen/button_textSize_S"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 		<awqatty.b.OpButtons.OperationButton
 			android:id="@+id/buttonAHypTan"
@@ -52,6 +57,7 @@
 			android:text="@string/arhyptangent"
 			android:textSize="@dimen/button_textSize_S"
 			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
 			 />
 			
 	</TableRow>

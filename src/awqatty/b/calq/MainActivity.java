@@ -5,7 +5,6 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.inputmethodservice.Keyboard;
@@ -24,9 +23,14 @@ import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
-import awqatty.b.CompositeSwitchEventListener.CompositeOnClickListener;
-import awqatty.b.CompositeSwitchEventListener.CompositeSwitchEventListenerBase.ListenerBoxSwitch;
-import awqatty.b.CompositeSwitchEventListener.OnViewEventListener;
+import awqatty.b.CustomEventListeners.ChangeEvent;
+import awqatty.b.CustomEventListeners.CompositeOnChangeListener;
+import awqatty.b.CustomEventListeners.CompositeOnClickListener;
+import awqatty.b.CustomEventListeners.OnViewEventListener;
+import awqatty.b.CustomEventListeners.CompositeSwitchEventListenerBase.ListenerBoxSwitch;
+import awqatty.b.CustomEventListeners.OnChangeListener;
+import awqatty.b.CustomEventListeners.SwitchOnChangeListener;
+import awqatty.b.CustomEventListeners.SwitchedEventListenerBase;
 import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.GUI.NumberKeyboardListener;
@@ -37,7 +41,7 @@ import awqatty.b.GUI.SwipePaletteManager;
 import awqatty.b.GenericTextPresentation.NumberStringConverter;
 import awqatty.b.JSInterface.MathmlLinksViewClient;
 import awqatty.b.MathmlPresentation.MathmlTextPresBuilder;
-import awqatty.b.OpTree.OpTree;
+import awqatty.b.CustomEventListeners.ObservedOpTree;
 import awqatty.b.OpButtons.OperationButton;
 import awqatty.b.ViewUtilities.ViewFinder;
 import awqatty.b.ViewUtilities.ViewParentFinder;
@@ -84,27 +88,27 @@ import awqatty.b.ViewUtilities.ViewReplacer;
 
 
 public final class MainActivity extends Activity  implements
-	SharedPreferences.OnSharedPreferenceChangeListener
-	{
+	SharedPreferences.OnSharedPreferenceChangeListener {
 	
 	/*********************************************************
 	 * Private Fields
 	 *********************************************************/
-	private OpTree expression = null;
+	private ObservedOpTree expression = null;
 	private double result;
 	private int blank_index;	// stores node loc. from calc.exception
 	
 	// Click Listeners stored for inflation of new palettes
 	private PaletteManager pltmanager;
-	private CompositeOnClickListener op_listener, swapplt_listener, delplt_listener;
+	private View.OnClickListener swapplt_listener, delplt_listener;
 	
 	// Listener-Box Switches to (de)activate on-view-event listeners
 	private ListenerBoxSwitch
-			trigger_resetOpButton,
-			trigger_setEqualToText,
-			trigger_setTextToEqual,
-			trigger_showNumKeys,
-			trigger_hideNumKeys;
+			trigger_setEqualToText,	// on click equal, or click num
+			trigger_showNumKeys;	// on Num click, or textNum click
+	private SwitchedEventListenerBase.ListenerSwitch
+			switch_unsetShuffleButton,
+			switch_setTextToEqual,
+			switch_hideNumKeys;
 
 	// used to swap operators with shuffle button
 	private View button_shuffle;
@@ -113,7 +117,7 @@ public final class MainActivity extends Activity  implements
 	private View view_newpalette;	// local storage for context-menu operation
 	
 	// trigger for storage function in onDestroy()
-	private RetainDataFragment<OpTree> fragment_retainOpTree;
+	private RetainDataFragment<ObservedOpTree> fragment_retainOpTree;
 	
 	// Local References (used for faster access of commonly-accessed views)
 	private WebView webview;
@@ -136,19 +140,19 @@ public final class MainActivity extends Activity  implements
 		 *********************************************************/
 		
 		// If activity was restarted, get old OpTree object
-		fragment_retainOpTree = (RetainDataFragment<OpTree>)
+		fragment_retainOpTree = (RetainDataFragment<ObservedOpTree>)
 				getFragmentManager().findFragmentByTag(
 				getString(R.string.fragtag_retainOpTree) );
 		
 		if (fragment_retainOpTree == null) {
-			fragment_retainOpTree = new RetainDataFragment<OpTree>();
+			fragment_retainOpTree = new RetainDataFragment<ObservedOpTree>();
 			getFragmentManager().beginTransaction()
 					.add(fragment_retainOpTree,
 							getString(R.string.fragtag_retainOpTree) )
 					.commit();
 		}
 		if (fragment_retainOpTree.getData() == null) {
-			expression = new OpTree(new MathmlTextPresBuilder());
+			expression = new ObservedOpTree(new MathmlTextPresBuilder());
 			fragment_retainOpTree.setData(expression);
 		}
 		else
@@ -161,119 +165,93 @@ public final class MainActivity extends Activity  implements
 		/*********************************************************
 		 * Set Button Listeners
 		 *********************************************************/
-		final CompositeOnClickListener
-				eql_listener = new CompositeOnClickListener(2),
-				del_listener = new CompositeOnClickListener(3),
-				delpar_listener = new CompositeOnClickListener(3),
-				web_listener = new CompositeOnClickListener(3),
-				txt_listener = new CompositeOnClickListener(2),
-				keys1_listener = new CompositeOnClickListener(1),
-				keys2_listener = new CompositeOnClickListener(1),
-				plt_listener = new CompositeOnClickListener(1),
-				addplt_listener = new CompositeOnClickListener(2);
-		op_listener = new CompositeOnClickListener(3);
-		swapplt_listener = new CompositeOnClickListener(2);
-		delplt_listener = new CompositeOnClickListener(2);
-		
-		trigger_resetOpButton = 
-				op_listener.addSwitchListener(
-				eql_listener.addSwitchListener(
-				del_listener.addSwitchListener(
-				delpar_listener.addSwitchListener(
-				web_listener.addSwitchListener(
-				txt_listener.addSwitchListener(
-				plt_listener.addSwitchListener(
-				addplt_listener.addSwitchListener(
-				swapplt_listener.addSwitchListener(
-				delplt_listener.addSwitchListener(
-						new OnViewEventListener() {
-							@Override
-							public void onViewEvent(View v) {
-								((MainActivity)v.getContext()).resetOpButton();
-							}
-						}
-				))))))))));
-		trigger_setEqualToText = 
-				eql_listener.addSwitchListener(
-						new OnViewEventListener() {
-							@Override
-							public void onViewEvent(View v) {
-								((MainActivity)v.getContext()).setEqualToText();
-							}
-						}
-				);
-		trigger_setTextToEqual = 
-				op_listener.addSwitchListener(
-				del_listener.addSwitchListener(
-				delpar_listener.addSwitchListener(
-				keys2_listener.addSwitchListener(
-				web_listener.addSwitchListener(
-						new OnViewEventListener() {
-							@Override
-							public void onViewEvent(View v) {
-								((MainActivity)v.getContext()).setTextToEqual();
-							}
-						}
-				)))));
-		
-		trigger_resetOpButton.disableListener();
-		trigger_setEqualToText.enableListener();
-		trigger_setTextToEqual.disableListener();
-		
-		op_listener.addListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					((MainActivity)v.getContext()).onClickOperator(v);
-				}
+		// Make new onChangeListeners
+		//		Collect listeners into one composite listener
+		final CompositeOnChangeListener comp_listener = 
+				new CompositeOnChangeListener(2);
+		//		Set change listener
+		expression.setOnChangeListener(comp_listener);
+
+		//		Observer to refresh MathML screen
+		comp_listener.setOnChangeListener(new OnChangeListener() {
+			@Override
+			public void onChange(ChangeEvent event) {
+				refreshMathmlScreen();
+			}
 		});
+		//		Observer to Unset Shuffle Button
+		final SwitchOnChangeListener listener_unsetShuffleButton = 
+				new SwitchOnChangeListener(new OnChangeListener() {
+					@Override
+					public void onChange(ChangeEvent event) {
+						if (event.getSourceObject() instanceof ObservedOpTree &&
+								event.getTimingCode() == ObservedOpTree.POST_EVENT &&
+								event.getTypeCode() != ObservedOpTree.EVENT_SHUFFLE) {
+							unsetShuffleButton();
+						}
+					}
+				});
+		switch_unsetShuffleButton = listener_unsetShuffleButton.getSwitch();
+		switch_unsetShuffleButton.disableListener();
+		comp_listener.setOnChangeListener(listener_unsetShuffleButton);
+		
+		//		Observer to Set Text To Equal
+		final SwitchOnChangeListener listener_setTextToEqual = 
+			new SwitchOnChangeListener(new OnChangeListener() {
+				@Override
+				public void onChange(ChangeEvent event) {
+					setTextToEqual();
+				}
+			});
+		switch_setTextToEqual = listener_setTextToEqual.getSwitch();
+		switch_setTextToEqual.disableListener();		
+		comp_listener.setOnChangeListener(listener_setTextToEqual);
+		
+		// Create OnClickListeners
+		final CompositeOnClickListener
+				eql_listener = new CompositeOnClickListener(1),
+				txt_listener = new CompositeOnClickListener(1),
+				keys1_listener = new CompositeOnClickListener(1);
+		
 		eql_listener.addListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((MainActivity)v.getContext()).onClickEquals(v);
+				onClickEquals(v);
 			}
 		});
-		del_listener.addListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					((MainActivity)v.getContext()).onClickDelete(v);
-				}
-		});
-		delpar_listener.addListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				((MainActivity)v.getContext()).onClickDeleteParent(v);
-			}
-		});
-		// web_listener has no default onClickListener
 		txt_listener.addListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					((MainActivity)v.getContext()).onClickNumberText(v);
-				}
-		});
-		
-		addplt_listener.addListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((MainActivity)v.getContext()).openContextMenu(v);
+				onClickNumberText(v);
 			}
 		});
-		swapplt_listener.addListener(new View.OnClickListener() {
+		trigger_setEqualToText = 
+				eql_listener.addSwitchListener(
+					new OnViewEventListener() {
+						@Override
+						public void onViewEvent(View v) {
+							setEqualToText();
+						}
+					}
+				);
+		trigger_setEqualToText.enableListener();
+				
+		swapplt_listener = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((MainActivity)v.getContext()).openContextMenu(
-						(new ViewParentFinder()).findViewsByTag((ViewGroup)
-						v.getParent(), getString(R.string.tag_plt) ).get(0));
+				openContextMenu(
+						(new ViewParentFinder()).findViewsByTag(
+						v, getString(R.string.tag_plt) ).get(0));
 			}
-		});
-		delplt_listener.addListener(new View.OnClickListener() {
+		};
+		delplt_listener = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				((MainActivity)v.getContext()).onClickDeletePalette(
+				onClickDeletePalette(
 						(new ViewParentFinder()).findViewsById(
 						v, R.id.palettebox ).get(0) );
 			}
-		});
+		};
 		
 				
 		// Accommodates large screens that do not hide the number keyboard
@@ -281,46 +259,43 @@ public final class MainActivity extends Activity  implements
 		if (button_num != null) {
 			// Set listeners to _number-keyboard button
 			final CompositeOnClickListener
-					num_listener = new CompositeOnClickListener(3);
-			num_listener.addSwitchListener(trigger_resetOpButton);
+					num_listener = new CompositeOnClickListener(2);
 			num_listener.addSwitchListener(trigger_setEqualToText);
 			num_listener.addListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						((MainActivity)v.getContext()).onClickNumbersButton(v);
-					}
+				@Override
+				public void onClick(View v) {
+					onClickNumbersButton(v);
+				}
 			});
 			button_num.setOnClickListener(num_listener);
 
 			//Set trigger to show keyboard
 			trigger_showNumKeys = 
 					txt_listener.addSwitchListener(
-							new OnViewEventListener() {
-								@Override
-								public void onViewEvent(View v) {
-									((MainActivity)v.getContext()).showNumKeys();
-								}
+						new OnViewEventListener() {
+							@Override
+							public void onViewEvent(View v) {
+								showNumKeys();
 							}
+						}
 					);
 			// Set trigger to hide keyboard
-			trigger_hideNumKeys = 
-					web_listener.addSwitchListener(
-					keys2_listener.addSwitchListener(
-							new OnViewEventListener() {
-								@Override
-								public void onViewEvent(View v) {
-									((MainActivity)v.getContext()).hideNumKeys();
-								}
-							}
-					));
+			final SwitchOnChangeListener keys2_listener = 
+					new SwitchOnChangeListener(new OnChangeListener() {
+						@Override
+						public void onChange(ChangeEvent event) {
+							hideNumKeys();
+						}
+			});
+			switch_hideNumKeys = keys2_listener.getSwitch();
+			switch_hideNumKeys.disableListener();
+			comp_listener.setOnChangeListener(keys2_listener);
+			
 			trigger_showNumKeys.enableListener();
-			trigger_hideNumKeys.disableListener();
 		}
 		else {
-			keys1_listener.addSwitchListener(trigger_resetOpButton);
 			keys1_listener.addSwitchListener(trigger_setEqualToText);
-			keys2_listener.addSwitchListener(trigger_resetOpButton);
-			trigger_hideNumKeys = null;
+			switch_hideNumKeys = null;
 			trigger_showNumKeys = null;
 		}
 		
@@ -333,28 +308,10 @@ public final class MainActivity extends Activity  implements
 		final SharedPreferences pref = PreferenceManager
 				.getDefaultSharedPreferences(this);
 						
-		// Get palette action mode preferences
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-		final String plt_actionmode = pref.getString(
-				getString(R.string.prefKey_paletteActionMode), null );
+		// Get palette action mode preferences		
+		pltmanager = initPaletteManager(pref.getString(
+				this.getString(R.string.prefKey_paletteActionMode), null ));
 		
-		if (plt_actionmode.equals(getString(
-				R.string.prefValue_paletteActionMode_sidebutton ))) {
-			pltmanager = new SideButtonPaletteManager(this,
-					(getResources().getBoolean(R.bool.canDeletePalette)
-							? R.layout.palettebox_button_swapdelright
-							: R.layout.palettebox_button_swapright ),
-					op_listener, swapplt_listener, delplt_listener);
-		}
-		else if (plt_actionmode.equals(getString(
-				R.string.prefValue_paletteActionMode_swipe ))) {
-			pltmanager = new SwipePaletteManager(this,
-					(getResources().getBoolean(R.bool.canDeletePalette)
-							? R.layout.palettebox_swipe_swapleft_delright
-							: R.layout.palettebox_swipe_swapleftright ),
-					op_listener, swapplt_listener, delplt_listener);
-		}
-
 		// Get old palette id's from preferences
 		final String keybase = getString(R.string.prefkey_paletteIds_basestr);
 		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
@@ -379,15 +336,11 @@ public final class MainActivity extends Activity  implements
 		 */
 		//		Unique Views
 		findViewById(R.id.buttonEqual).setOnClickListener(eql_listener);
-		findViewById(R.id.buttonDel).setOnClickListener(del_listener);
-		findViewById(R.id.buttonDelParent).setOnClickListener(delpar_listener);
 		number_text.setOnClickListener(txt_listener);
 		
 		final View button_addPalette = findViewById(R.id.buttonNewPalette);
 		if (button_addPalette !=  null) {
 			registerForContextMenu(button_addPalette);
-			button_addPalette.setLongClickable(false);
-			button_addPalette.setOnClickListener(addplt_listener);
 		}
 
 		
@@ -399,9 +352,7 @@ public final class MainActivity extends Activity  implements
 
 		// Reroute "html-links" to MainActivity
 		//*
-		final MathmlLinksViewClient client = new MathmlLinksViewClient();
-		client.setOnClickListener(web_listener);
-		webview.setWebViewClient(client);
+		webview.setWebViewClient(new MathmlLinksViewClient());
 		//*/
 
 		// vvv Used for Javascript onclick methods vvv
@@ -457,8 +408,6 @@ public final class MainActivity extends Activity  implements
 				= new NumberKeyboardListener(number_text);
 		num_keyslistener.setOnClickListener
 				(NumberKeyboardListener.KEYS_EDIT, keys1_listener);
-		num_keyslistener.setOnClickListener
-				(NumberKeyboardListener.KEYS_ACTION, keys2_listener);
 		
 		KeyboardView k = (KeyboardView)findViewById(R.id.keyboardNum);
 		k.setKeyboard(new Keyboard(this, R.xml.numkeys));
@@ -586,23 +535,7 @@ public final class MainActivity extends Activity  implements
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
 		if (key.equals(getString(R.string.prefKey_paletteActionMode))) {
-			final String plt_actionmode = pref.getString(key, null);
-			if (plt_actionmode.equals(getString(
-					R.string.prefValue_paletteActionMode_sidebutton ))) {
-				pltmanager = new SideButtonPaletteManager(this,
-						(getResources().getBoolean(R.bool.canDeletePalette)
-								? R.layout.palettebox_button_swapdelright
-								: R.layout.palettebox_button_swapright ),
-						op_listener, swapplt_listener, delplt_listener);
-			}
-			else if (plt_actionmode.equals(getString(
-					R.string.prefValue_paletteActionMode_swipe ))) {
-				pltmanager = new SwipePaletteManager(this,
-						(getResources().getBoolean(R.bool.canDeletePalette)
-								? R.layout.palettebox_swipe_swapleft_delright
-								: R.layout.palettebox_swipe_swapleftright ),
-						op_listener, swapplt_listener, delplt_listener);
-			}
+			pltmanager = initPaletteManager(pref.getString(key, null));
 			pltmanager.refreshPaletteBoxes();
 		}
 	}
@@ -656,14 +589,14 @@ public final class MainActivity extends Activity  implements
 	// Called on button click after Equals has been clicked
 	public void setEqualToText() {
 		((ViewSwitcher) findViewById(R.id.switchEqText)).showNext();
-		trigger_setTextToEqual.enableListener();
+		switch_setTextToEqual.enableListener();
 		trigger_setEqualToText.disableListener();
 	}
 	public void setTextToEqual() {
 		((ViewSwitcher) findViewById(R.id.switchEqText)).showPrevious();
 		// TODO this shouldn't have to be here
 		number_text.setText("");
-		trigger_setTextToEqual.disableListener();
+		switch_setTextToEqual.disableListener();
 		trigger_setEqualToText.enableListener();
 	}
 
@@ -681,7 +614,7 @@ public final class MainActivity extends Activity  implements
 		keyboard.setEnabled(false);
 		// Set triggers
 		trigger_showNumKeys.enableListener();
-		trigger_hideNumKeys.disableListener();
+		switch_hideNumKeys.disableListener();
 	}
 	public void showNumKeys() {
 		// Shows keyboard
@@ -697,7 +630,7 @@ public final class MainActivity extends Activity  implements
 		findViewById(R.id.panelOps).setVisibility(View.GONE);
 		// Set triggers
 		trigger_showNumKeys.disableListener();
-		trigger_hideNumKeys.enableListener();
+		switch_hideNumKeys.enableListener();
 	}
 		
 	public void raiseToast(String str) {
@@ -707,6 +640,26 @@ public final class MainActivity extends Activity  implements
 		t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0,
 				webview.getBottom() - 10 );
 		t.show();
+	}
+	
+	private PaletteManager initPaletteManager(String plt_actionmode) {
+		if (plt_actionmode.equals(getString(
+				R.string.prefValue_paletteActionMode_sidebutton ))) {
+			return new SideButtonPaletteManager(this,
+					(getResources().getBoolean(R.bool.canDeletePalette)
+							? R.layout.palettebox_button_swapdelright
+							: R.layout.palettebox_button_swapright ),
+					swapplt_listener, delplt_listener);
+		}
+		else if (plt_actionmode.equals(getString(
+				R.string.prefValue_paletteActionMode_swipe ))) {
+			return new SwipePaletteManager(this,
+					(getResources().getBoolean(R.bool.canDeletePalette)
+							? R.layout.palettebox_swipe_swapleft_delright
+							: R.layout.palettebox_swipe_swapleftright ),
+					swapplt_listener, delplt_listener);
+		}
+		else return null;
 	}
 	
 //	private static FunctionType getFtypeFromViewId(int id) {}
@@ -720,7 +673,6 @@ public final class MainActivity extends Activity  implements
 		// TODO (?) if clicked element is a child element of the current selection,
 		//		set selector to the index of its parent
 		expression.setSelection(index);
-		refreshMathmlScreen();
 		//refreshNumberText();
 	}
 	
@@ -730,7 +682,6 @@ public final class MainActivity extends Activity  implements
 			result = expression.getCalculation();
 
 			expression.setSelection(0);
-			refreshMathmlScreen();
 
 			// Set text representation of result to view
 			((TextView) findViewById(R.id.textNum))
@@ -748,7 +699,9 @@ public final class MainActivity extends Activity  implements
 	// Called when the result text box is clicked
 	public void onClickNumberText(View v) {		
 		if (number_text.getHint() == getString(R.string.textNum_blank)) {
+			switch_setTextToEqual.disableListener();
 			expression.setSelection(blank_index);
+			switch_setTextToEqual.enableListener();
 			number_text.setText(getString(R.string.textNum_default));
 		}
 		else {
@@ -759,14 +712,12 @@ public final class MainActivity extends Activity  implements
 	// Called when the user clicks the delete button
 	public void onClickDelete(View v) {
 		expression.delete();
-		refreshMathmlScreen();
 		//refreshNumberText();
 	}
 
 	// Called when the user clicks the delete-parent button
 	public void onClickDeleteParent(View v) {
 		expression.deleteParent();
-		refreshMathmlScreen();
 		//refreshNumberText();
 	}
 
@@ -775,7 +726,6 @@ public final class MainActivity extends Activity  implements
 		// Adds function to expression
 		FunctionType ftype = ((OperationButton)v).getFtype();
 		expression.addFunction(ftype);	// sets selector in function
-		refreshMathmlScreen();
 		//refreshNumberText();
 		
 		// Replaces op-button with shuffle button
@@ -783,19 +733,18 @@ public final class MainActivity extends Activity  implements
 		if (ftype.defaultArgCount() > 1) {
 			(new ViewReplacer()).replaceView(v, button_shuffle);
 			button_temp = v;
-			trigger_resetOpButton.enableListener();
+			switch_unsetShuffleButton.enableListener();
 		}
 	}
 	public void onClickShuffle(View v) {
 		expression.shuffleOrder();
-		refreshMathmlScreen();
 		// Selection remains the same in shuffle, no refreshNumberText() necessary
 	}
-	public void resetOpButton() {
+	public void unsetShuffleButton() {
 		// Replaces shuffle button w/ op-button
 		(new ViewReplacer()).replaceView(button_shuffle, button_temp);
 		button_temp = null;
-		trigger_resetOpButton.disableListener();
+		switch_unsetShuffleButton.disableListener();
 	}
 	
 	// Called when the user clicks the _number insertion button
@@ -806,10 +755,11 @@ public final class MainActivity extends Activity  implements
 	}
 	public void onNumKeyboardResult(double d) {
 		expression.addNumber(d);
-		refreshMathmlScreen();
 		//refreshNumberText();
 	}
-	public void onNumKeyboardCancel() {}
+	public void onNumKeyboardCancel() {
+		expression.setSelection(0);
+	}
 	
 	public void onClickDeletePalette(View v) {
 		pltmanager.removePalette(v);
