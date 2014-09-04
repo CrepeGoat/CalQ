@@ -725,12 +725,12 @@ public final class MainActivity extends Activity  implements
 	public void onClickOperator(View v) {
 		// Adds function to expression
 		FunctionType ftype = ((OperationButton)v).getFtype();
-		expression.addFunction(ftype);	// sets selector in function
+		// (sets selector in function)
+		final boolean canShuffle = expression.addFunction(ftype);
 		//refreshNumberText();
 		
 		// Replaces op-button with shuffle button
-		// TODO replace decision condition with something with better style
-		if (ftype.defaultArgCount() > 1) {
+		if (canShuffle) {
 			(new ViewReplacer()).replaceView(v, button_shuffle);
 			button_temp = v;
 			switch_unsetShuffleButton.enableListener();

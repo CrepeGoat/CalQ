@@ -50,32 +50,44 @@ public class OpTree {
 	
 	/****************************************************************
 	 * 
+	 * Returns whether or not the new selected object can be shuffled.
+	 * Based on parent's branch count.
+	 * 
 	 */
-	public void addFunction(FunctionType ftype) {
+	public boolean addFunction(FunctionType ftype) {
 		int i;
 		// Condition for commutative operations
 		if (ftype.isCommutative()) {
 			if (ftype == tree.get(selection).ftype) {
-				i = selection = tree.addChild(selection,
+				final boolean ret_val = tree.get(selection).getBranchCount()>0;
+				i = selection = tree.addChild(
+						selection,
 						tree.get(selection).getBranchCount(),
 						node_builder.build(FunctionType.BLANK) );
 				// Set ID numbers for all elements in new locations
 				for (; i<tree.size(); ++i)
 					tree.get(i).setIdNumber(i);
-				return;
+				return ret_val;
 			}
-			else if (selection != 0)
-				if (ftype == tree.get(tree.getParentIndex(selection)).ftype) {
+			else {
+				final ListTree<OpNode>.FindParentAlgorithm alg = 
+						tree.new FindParentAlgorithm();
+				alg.run(selection);
+				
+				if (alg.getParentIndex() >= 0
+						&& ftype == tree.get(alg.getParentIndex()).ftype) {
 					unsetHighlight();
-					i = selection = tree.addChild(tree.getParentIndex(selection),
-							tree.getBranchNumber(selection)+1,
+					i = selection = tree.addChild(
+							alg.getParentIndex(),
+							alg.getBranchNumber()+1,
 							node_builder.build(FunctionType.BLANK) );
 					setHighlight();
 					// Set ID numbers for all elements in new locations
 					for (; i<tree.size(); ++i)
 						tree.get(i).setIdNumber(i);
-					return;
+					return tree.get(alg.getParentIndex()).getBranchCount()>1;
 				}
+			}
 		}
 		unsetHighlight();
 		i = selection;
@@ -87,7 +99,7 @@ public class OpTree {
 		for (; i<last_index; ++i)
 			tree.get(i).setIdNumber(i);
 		
-		// Set index to new location
+		// Set selection index to new location (i.e. first blank element)
 		int[] indices = tree.getBranchIndices(selection);
 		last_index = tree.get(selection).getBranchCount();
 		for (i=0; i<last_index; ++i) {
@@ -97,8 +109,30 @@ public class OpTree {
 			}
 		}
 		setHighlight();
+		
+		// Returns whether shuffle operation is valid or not
+		return indices.length>1;
 	}
 	
+	/*****************************************************************
+	 * 
+	 */
+	public void shuffleOrder() {
+		ListTree<OpNode>.FindParentAlgorithm alg = tree.new FindParentAlgorithm();
+		alg.run(selection);
+		
+		final int parent_loc = alg.getParentIndex();
+		int i = selection;
+		selection = tree.shiftBranchOrder(selection,
+				(alg.getBranchNumber()+1) % tree.get(parent_loc).getBranchCount() );
+		
+		int last_loc = tree.getEndOfBranchIndex(Math.max(i,selection));
+		// Set ID numbers for all elements in new locations
+		for (i = Math.min(i,selection); i < last_loc; ++i)
+			tree.get(i).setIdNumber(i);
+		// No need to reset highlight, selection shifts w/ object movement
+	}
+
 	/*****************************************************************
 	 * 
 	 */
@@ -116,21 +150,6 @@ public class OpTree {
 		setHighlight();
 	}
 	
-	public void shuffleOrder() {
-		ListTree<OpNode>.FindParentAlgorithm alg = tree.new FindParentAlgorithm();
-		alg.runAlgorithm(selection);
-		
-		int parent_loc = alg.getParentIndex();
-		int i = selection;
-		selection = tree.shiftBranchOrder(selection,
-				(alg.getBranchNumber()+1) % tree.get(parent_loc).getBranchCount() );
-		
-		int last_loc = tree.getEndOfBranchIndex(Math.max(i,selection));
-		// Set ID numbers for all elements in new locations
-		for (i = Math.min(i,selection); i < last_loc; ++i)
-			tree.get(i).setIdNumber(i);
-		// No need to reset highlight, selection shifts w/ object movement
-	}
 	
 	/*****************************************************************
 	 * 

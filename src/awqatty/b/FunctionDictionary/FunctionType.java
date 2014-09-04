@@ -64,6 +64,8 @@ public enum FunctionType {
 			return false;	
 		}
 	}
+	
+	/*
 	public int defaultArgCount() {
 		switch(this) {
 			case BLANK:
@@ -107,8 +109,6 @@ public enum FunctionType {
 				throw new RuntimeException();
 		}
 	}
-	
-	/*
 	public boolean doesEncapsulateBranches() {
 		switch (this) {
 		case DIVIDE:

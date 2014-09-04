@@ -17,6 +17,8 @@ public abstract class NodeBase {
 		this(0, Integer.MAX_VALUE);
 	}
 
+	// Increment/Decrement Operations
+	//		throws Exception on illegal child counts
 	public void incrementCount() throws BranchCountException {
 		if (branch_count >= branch_max)
 			throw new BranchCountException();
@@ -26,6 +28,11 @@ public abstract class NodeBase {
 		if (branch_count <= branch_min)
 			throw new BranchCountException();
 		--branch_count;
+	}
+	
+	public void checkCount() throws BranchCountException {
+		if (branch_count <= branch_min || branch_count >= branch_max)
+			throw new BranchCountException();
 	}
 	
 	public int getBranchCount() {

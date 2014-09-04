@@ -3,7 +3,8 @@ package awqatty.b.ListTree;
 import java.util.List;
 import java.util.ArrayList;
 
-abstract public class BranchFunctorBase<N extends NodeBase,U> implements BranchFunctorForm<N, U> {
+abstract public class BranchFunctorBase<N extends NodeBase,U> implements
+		BranchFunctorForm<N, U> {
 
 	protected final List<U> result_stack;
 	
@@ -20,7 +21,8 @@ abstract public class BranchFunctorBase<N extends NodeBase,U> implements BranchF
 			result_stack.subList(1, element.getBranchCount()).clear();
 		}
 		else {
-			result_stack.add(0, calculateNestedResult(element, result_stack.subList(0, 0)));
+			result_stack.add(0, calculateNestedResult(element,
+					result_stack.subList(0, 0) ));
 		}		
 	}
 

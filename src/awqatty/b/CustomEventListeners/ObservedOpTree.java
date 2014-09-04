@@ -47,12 +47,13 @@ public class ObservedOpTree extends OpTree {
 	}
 	
 	@Override
-	public void addFunction(FunctionType ftype) {
+	public boolean addFunction(FunctionType ftype) {
 		if (listener != null) listener.onChange(
 				new ChangeEvent(this, EVENT_ADDFUNCTION, PRE_EVENT) );
-		super.addFunction(ftype);
+		final boolean tmp = super.addFunction(ftype);
 		if (listener != null) listener.onChange(
 				new ChangeEvent(this, EVENT_ADDFUNCTION, POST_EVENT) );
+		return tmp;
 	}
 	
 	@Override

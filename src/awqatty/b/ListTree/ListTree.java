@@ -6,15 +6,25 @@ import java.util.ArrayList;
 import awqatty.b.CustomExceptions.BranchCountException;
 import awqatty.b.CustomExceptions.CalculationException;
 
+/********************************************************************
+ * CLASS - ListTree
+ * A tree-organized collection of elements, stored in a list. The list
+ * is ordered depth-wise, such that one can find each child node of an 
+ * element from the number of children each node has.
+ */
 public class ListTree<N extends NodeBase> {
 
 	protected final List<N> list;
 	
-	// TODO make this a data struct class, and run the algorithm locally
+	/********************************************************************
+	 * CLASS - FindParentAlgorithm
+	 * Used to run the parent-finder algorithm, and recover both the 
+	 * parent index and the child number concurrently.
+	 */
 	public class FindParentAlgorithm {
 		private int index, count;
 		
-		public void runAlgorithm(int child_loc) {
+		public void run(int child_loc) {
 			count = 0;
 			index = child_loc-1;
 			for (; index >= 0; --index) {
@@ -35,7 +45,7 @@ public class ListTree<N extends NodeBase> {
 	public ListTree() {
 		list = new ArrayList<N>();
 	}
-	public ListTree(List<N> in) {
+	protected ListTree(List<N> in) {
 		list = in;
 	}
 	public ListTree(ListTree<N> tree) {
@@ -52,7 +62,8 @@ public class ListTree<N extends NodeBase> {
 	}
 	
 	/********************************************************************
-	 * 
+	 * METHOD - subTree
+	 * Returns a new tree object, with subList as base list
 	 */
 	public ListTree<N> subTree(int index) {
 		return new ListTree<N>( list.subList(index, getEndOfBranchIndex(index)) );
@@ -62,7 +73,7 @@ public class ListTree<N extends NodeBase> {
 	//Navigation Methods
 	
 	/*********************************************************************
-	 * METHOD - getRoot
+	 * METHOD - getParentIndex
 	 * Returns ref. index of parent node to the given "index"
 	 * 
 	 */
@@ -76,7 +87,7 @@ public class ListTree<N extends NodeBase> {
 		return index;
 	}
 	/*********************************************************************
-	 * METHOD - getNextInLevel
+	 * METHOD - getEndOfBranchIndex
 	 *  Returns the index of next child node to "index"'s parent
 	 *	If "index" is the rightmost node in level, it returns the
 	 *	index at which the next child would be located
@@ -93,18 +104,28 @@ public class ListTree<N extends NodeBase> {
 		return index;
 	}
 	
+	/*********************************************************************
+	 * METHOD - getNthBranchIndex
+	 *  Returns the index of the n-th child node of the given parent. 
+	 *  If the parent has less than n children, it returns the list size.
+	 * 
+	 */
 	public int getNthBranchIndex(int parent_loc, int order) {
 		if (parent_loc != -1)
 			order = Math.min(order, list.get(parent_loc).getBranchCount());
-		
 		int branch_loc = parent_loc+1;
 
-		for (int index=0; index < order && branch_loc < list.size(); ++index) {
+		for (int index=0; index < order && branch_loc < list.size(); ++index)
 			branch_loc = getEndOfBranchIndex(branch_loc);
-		}
-		
+			
 		return branch_loc;
 	}
+	/*********************************************************************
+	 * METHOD - getBranchNumber
+	 *  Returns the child number of this branch in its parent.
+	 *  (Algorithm is identical to that of FindParentAlgorithm.)
+	 * 
+	 */
 	public int getBranchNumber(int index) {
 		int tmp=0; --index;
 		for (; index >= 0; --index) {
@@ -115,6 +136,11 @@ public class ListTree<N extends NodeBase> {
 		return list.get(index).getBranchCount()-1 - tmp;
 	}
 	
+	/*********************************************************************
+	 * METHOD - getBranchIndices
+	 *  Returns a list of the indices for each child of the designated branch.
+	 * 
+	 */
 	public int[] getBranchIndices(int parent_loc) {
 		int[] indices = new int[list.get(parent_loc).getBranchCount()];
 		if (indices.length > 0) {
@@ -135,8 +161,7 @@ public class ListTree<N extends NodeBase> {
 	/*********************************************************************
 	 * FUNCTION - addChild
 	 *	branch - object to insert
- 	 *	parent_loc - the index of the parent under which to insert
- 	 *		the new object
+ 	 *	parent_loc - the index of the parent under which to insert the new object
  	 *		domain values: 0 - array.size()-1
  	 *	order - the position among the current child objects in which
  	 *		to insert the "branch" object (0 is first, & fastest)
@@ -146,7 +171,8 @@ public class ListTree<N extends NodeBase> {
 	 * Set (parent_loc==-1) to create a new separate tree
 	 * 
 	 */
-	public int addChild(int parent_loc, int order, N branch) throws BranchCountException {		
+	public int addChild(int parent_loc, int order, N branch)
+			throws BranchCountException {		
 		if (parent_loc != -1)
 			list.get(parent_loc).incrementCount();
 		
@@ -169,6 +195,14 @@ public class ListTree<N extends NodeBase> {
 	/*********************************************************************
 	 * FUNCTION - addParent
 	 * 
+	 * child_loc - the index used for insertion
+	 * branch - the object to use as the new parent
+	 * order - the location in the new parent in which to add the existing object
+	 * Return - the new index of the object originally at the child_loc index
+	 * 
+	 * Inserts the provided object into the tree location of an existing object,
+	 * and sets the existing object as its child
+	 * 
 	 */
 	public int addParent(int child_loc, N branch) throws BranchCountException {
 		branch.incrementCount();
@@ -176,7 +210,8 @@ public class ListTree<N extends NodeBase> {
 		return child_loc+1;
 	}
 	
-	public int addParent(int child_loc, int order, ListTree<N> branch) throws BranchCountException  {
+	public int addParent(int child_loc, int order, ListTree<N> branch)
+			throws BranchCountException  {
 		final int tmp = branch.addChild(0, order, this.subTree(child_loc));
 		setBranch(child_loc, branch.subTree(0));
 		return child_loc+tmp;
@@ -185,8 +220,10 @@ public class ListTree<N extends NodeBase> {
 	/*********************************************************************
 	 * FUNCTION - swapBranches
 	 * 
+	 * Swaps the locations of two children under the same parent node.
+	 * 
 	 */
-	public void swapBranches(int parent_loc, int child1, int child2) {
+	public void swapBranches(int child1, int child2) {
 		final List<N> temp1 = list.subList(child1, getEndOfBranchIndex(child1));
 		final List<N> temp2 = list.subList(child2, getEndOfBranchIndex(child2));
 		final List<N> temp3 = new ArrayList<N>(temp1);
@@ -197,15 +234,26 @@ public class ListTree<N extends NodeBase> {
 		temp2.addAll(temp3);
 	}
 	
+	/*********************************************************************
+	 * FUNCTION - shiftBranchOrder
+	 * 
+	 * Moves a child node from its current ordered location to a new order.
+	 * All other nodes will retain their relative ordering.
+	 * 
+	 * branch_loc - the index location of the branch to move
+	 * new_order - the new order location of the indicated branch
+	 * 
+	 */
 	public int shiftBranchOrder(int branch_loc, int new_order) {
 		final FindParentAlgorithm alg = new FindParentAlgorithm();
-		alg.runAlgorithm(branch_loc);
+		alg.run(branch_loc);
 		
 		final int parent_loc = alg.getParentIndex();
-		if (parent_loc != -1)
-			new_order = Math.min(new_order,
-					list.get(parent_loc).getBranchCount()-1 );
+		if (parent_loc != -1) {
+			new_order = Math.min(new_order,	list.get(parent_loc).getBranchCount()-1);
+		}
 		
+		// Avoids redundant actions
 		if (new_order != alg.getBranchNumber()) {
 			final List<N>
 					sublist = list.subList(branch_loc, getEndOfBranchIndex(branch_loc)),
@@ -219,6 +267,12 @@ public class ListTree<N extends NodeBase> {
 	/*********************************************************************
 	 * FUNCTION - deleteBranch
 	 * 
+	 * Removes branch from tree. If the parent branch cannot have so few children,
+	 * an exception is thrown from the parent node. Is effectively the inverse
+	 * operation to "addChild".
+	 * 
+	 * branch_loc - the index of the branch to be deleted.
+	 * 
 	 */
 	public void deleteBranch(int branch_loc) throws BranchCountException {
 		if (getParentIndex(branch_loc) != -1)
@@ -226,6 +280,15 @@ public class ListTree<N extends NodeBase> {
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
 	}
 	
+	/*********************************************************************
+	 * FUNCTION - deleteParent
+	 * 
+	 * Deletes the entire parent branch of the designated node, replacing it with
+	 * the designated branch itself. The inverse operation of "addParent".
+	 * 
+	 * branch_loc - the index of the designated branch
+	 * 
+	 */
 	public int deleteParent(int branch_loc) {
 		int parent_loc = getParentIndex(branch_loc);
 		int parent_end;
@@ -246,6 +309,9 @@ public class ListTree<N extends NodeBase> {
 	/*********************************************************************
 	 * FUNCTION - setBranch
 	 * 
+	 * Replaces a branch with a new node object, or an existing Tree.
+	 * Avoids child-count increments/decrements.
+	 * 
 	 */
 	public void setBranch(int branch_loc, N branch) {
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
@@ -258,7 +324,8 @@ public class ListTree<N extends NodeBase> {
 	}
 
 	//--------------------------------------------------------------------
-	//Calculation Methods	
+	//Calculation Methods
+	// TODO replace functionality by returning a reverse iterator
 	public <U> List<U> forAllInReverse(BranchFunctorForm<N,U> func) {
 		int i = list.size()-1;
 		try {
