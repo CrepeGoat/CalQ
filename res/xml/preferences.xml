@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 	
-	<PreferenceCategory android:title="@string/settingsHeader_UiStyle">
+	<PreferenceCategory android:title="@string/prefCategory_UiStyle">
 		<ListPreference
 			android:key="@string/prefKey_paletteActionMode"
 			android:title="@string/prefTitle_paletteActionMode"
+			android:summary="@string/prefSummary_paletteActionMode"
 			android:dialogTitle="@string/prefDialog_paletteActionMode"
 			android:entries="@array/prefEntries_paletteActionMode"
 			android:entryValues="@array/prefValues_paletteActionMode"
 			android:defaultValue="@string/prefValue_paletteActionMode_default" />
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:title="@string/prefCategory_meta" >
+		<Preference
+		    android:title="@string/prefTitle_donate"
+		    android:key="@string/prefKey_donate"
+		    android:summary="@string/prefSummary_donate" />
 	</PreferenceCategory>
 
 </PreferenceScreen>

@@ -75,22 +75,23 @@
 	<string name="palettemenu_perm_cond">Perm.</string>
 			
 	<!-- Preferences Strings -->
-	<string name="prefkey_paletteIds_basestr">pref_palette_</string>
+	<string name="prefKey_paletteIds_baseStr">pref_palette_</string>
 	<string name="fragtag_retainOpTree">expression_data</string>
 	<string name="fragtag_settings">settings</string>
 	
-	<string name="settingsHeader_UiStyle">UI Styles</string>
+	<string name="prefCategory_UiStyle">User Interface</string>
 	<string name="prefKey_paletteActionMode">pref_palette_action_mode</string>
-	<string name="prefTitle_paletteActionMode">Action: Change Function Palettes</string>
-	<string name="prefDialog_paletteActionMode">UI Action Styles</string>
+	<string name="prefTitle_paletteActionMode">Action: Manage Functions</string>
+	<string name="prefSummary_paletteActionMode">
+	    Set how to change/remove function palettes</string>
+	<string name="prefDialog_paletteActionMode">Action Style</string>
 	<string name="prefEntry_paletteActionMode_sidebutton">Side Buttons</string>
 	<string name="prefValue_paletteActionMode_sidebutton">0</string>
 	<string name="prefEntry_paletteActionMode_swipe">Left/Right Swipe</string>
 	<string name="prefValue_paletteActionMode_swipe">1</string>
 	<string name="prefValue_paletteActionMode_default">
 	    @string/prefValue_paletteActionMode_sidebutton</string>
-			
-	<string name="pref_screenOptions">Screen Options</string>
+	
 	<string name="prefCategory_screenOptions">Screen Options</string>
 	<string name="prefTitle_renderFormat">Rendering Format</string>
 	<string name="prefEntry_renderFormat_Html">Raw HTML</string>
@@ -98,5 +99,9 @@
 	<string name="prefEntry_renderFormat_MathmlHtmlCss">MathML (HTML/CSS)</string>
 	<string name="prefTitle_textSize">Text Size</string>
 	
-
+	<string name="prefCategory_meta">The Meta</string>
+	<string name="prefKey_donate">pref_donate</string>
+	<string name="prefTitle_donate">Donate with PayPal</string>
+	<string name="prefSummary_donate">Opens window in browser</string>
+	
 </resources>

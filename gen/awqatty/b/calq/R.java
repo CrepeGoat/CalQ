@@ -225,28 +225,32 @@ public final class R {
         public static final int palettemenu_trig=0x7f0a0039;
         public static final int palettemenu_trig_cond=0x7f0a003a;
         public static final int power=0x7f0a001b;
+        public static final int prefCategory_UiStyle=0x7f0a0042;
+        public static final int prefCategory_meta=0x7f0a0052;
         public static final int prefCategory_screenOptions=0x7f0a004c;
-        public static final int prefDialog_paletteActionMode=0x7f0a0045;
-        public static final int prefEntry_paletteActionMode_sidebutton=0x7f0a0046;
-        public static final int prefEntry_paletteActionMode_swipe=0x7f0a0048;
+        public static final int prefDialog_paletteActionMode=0x7f0a0046;
+        public static final int prefEntry_paletteActionMode_sidebutton=0x7f0a0047;
+        public static final int prefEntry_paletteActionMode_swipe=0x7f0a0049;
         public static final int prefEntry_renderFormat_Html=0x7f0a004e;
         public static final int prefEntry_renderFormat_MathmlHtmlCss=0x7f0a0050;
         public static final int prefEntry_renderFormat_MathmlSvg=0x7f0a004f;
+        public static final int prefKey_donate=0x7f0a0053;
         public static final int prefKey_paletteActionMode=0x7f0a0043;
+        /**  Preferences Strings 
+         */
+        public static final int prefKey_paletteIds_baseStr=0x7f0a003f;
+        public static final int prefSummary_donate=0x7f0a0055;
+        public static final int prefSummary_paletteActionMode=0x7f0a0045;
+        public static final int prefTitle_donate=0x7f0a0054;
         public static final int prefTitle_paletteActionMode=0x7f0a0044;
         public static final int prefTitle_renderFormat=0x7f0a004d;
         public static final int prefTitle_textSize=0x7f0a0051;
-        public static final int prefValue_paletteActionMode_default=0x7f0a004a;
-        public static final int prefValue_paletteActionMode_sidebutton=0x7f0a0047;
-        public static final int prefValue_paletteActionMode_swipe=0x7f0a0049;
-        public static final int pref_screenOptions=0x7f0a004b;
-        /**  Preferences Strings 
-         */
-        public static final int prefkey_paletteIds_basestr=0x7f0a003f;
+        public static final int prefValue_paletteActionMode_default=0x7f0a004b;
+        public static final int prefValue_paletteActionMode_sidebutton=0x7f0a0048;
+        public static final int prefValue_paletteActionMode_swipe=0x7f0a004a;
         public static final int product=0x7f0a0015;
         public static final int quotient=0x7f0a0016;
         public static final int removePalette_desc=0x7f0a0008;
-        public static final int settingsHeader_UiStyle=0x7f0a0042;
         public static final int shuffle=0x7f0a000b;
         public static final int shuffleDesc=0x7f0a000c;
         public static final int sine=0x7f0a0022;

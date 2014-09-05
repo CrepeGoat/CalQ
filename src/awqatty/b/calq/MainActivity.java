@@ -167,13 +167,13 @@ public final class MainActivity extends Activity  implements
 		 *********************************************************/
 		// Make new onChangeListeners
 		//		Collect listeners into one composite listener
-		final CompositeOnChangeListener comp_listener = 
+		final CompositeOnChangeListener change_listener = 
 				new CompositeOnChangeListener(2);
 		//		Set change listener
-		expression.setOnChangeListener(comp_listener);
+		expression.setOnChangeListener(change_listener);
 
 		//		Observer to refresh MathML screen
-		comp_listener.setOnChangeListener(new OnChangeListener() {
+		change_listener.setOnChangeListener(new OnChangeListener() {
 			@Override
 			public void onChange(ChangeEvent event) {
 				refreshMathmlScreen();
@@ -193,7 +193,7 @@ public final class MainActivity extends Activity  implements
 				});
 		switch_unsetShuffleButton = listener_unsetShuffleButton.getSwitch();
 		switch_unsetShuffleButton.disableListener();
-		comp_listener.setOnChangeListener(listener_unsetShuffleButton);
+		change_listener.setOnChangeListener(listener_unsetShuffleButton);
 		
 		//		Observer to Set Text To Equal
 		final SwitchOnChangeListener listener_setTextToEqual = 
@@ -205,7 +205,7 @@ public final class MainActivity extends Activity  implements
 			});
 		switch_setTextToEqual = listener_setTextToEqual.getSwitch();
 		switch_setTextToEqual.disableListener();		
-		comp_listener.setOnChangeListener(listener_setTextToEqual);
+		change_listener.setOnChangeListener(listener_setTextToEqual);
 		
 		// Create OnClickListeners
 		final CompositeOnClickListener
@@ -289,7 +289,7 @@ public final class MainActivity extends Activity  implements
 			});
 			switch_hideNumKeys = keys2_listener.getSwitch();
 			switch_hideNumKeys.disableListener();
-			comp_listener.setOnChangeListener(keys2_listener);
+			change_listener.setOnChangeListener(keys2_listener);
 			
 			trigger_showNumKeys.enableListener();
 		}
@@ -313,7 +313,7 @@ public final class MainActivity extends Activity  implements
 				this.getString(R.string.prefKey_paletteActionMode), null ));
 		
 		// Get old palette id's from preferences
-		final String keybase = getString(R.string.prefkey_paletteIds_basestr);
+		final String keybase = getString(R.string.prefKey_paletteIds_baseStr);
 		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
 		
 		// Collect old palette ids in list (use only basic palette if none exist)
@@ -432,7 +432,7 @@ public final class MainActivity extends Activity  implements
 		final SharedPreferences pref = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		final SharedPreferences.Editor pref_edit = pref.edit();
-		final String keybase = getString(R.string.prefkey_paletteIds_basestr);
+		final String keybase = getString(R.string.prefKey_paletteIds_baseStr);
 		// Gets current ids
 		List<Integer> ids = new ArrayList<Integer>();
 		for (View palette : (new ViewFinder()).findViewsByTag(
