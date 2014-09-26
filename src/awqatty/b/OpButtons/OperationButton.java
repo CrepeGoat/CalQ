@@ -81,7 +81,15 @@ public class OperationButton extends Button {
 			return FunctionType.NPK;
 		case R.id.buttonNCK:
 			return FunctionType.NCK;
-
+			
+		// Arithmetic Palette
+		case R.id.buttonRmdr:
+			return FunctionType.REMAINDER;
+		case R.id.buttonGCD:
+			return FunctionType.GCD;
+		case R.id.buttonLCM:
+			return FunctionType.LCM;
+		
 		// vvv Occurs only under improper use vvv
 		default:
 			return null;

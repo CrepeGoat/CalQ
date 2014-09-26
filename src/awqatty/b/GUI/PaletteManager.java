@@ -24,6 +24,8 @@ abstract public class PaletteManager {
 			return R.layout.palette_hyp;
 		case R.id.palette_perm:
 			return R.layout.palette_perm;
+		case R.id.palette_arith:
+			return R.layout.palette_arith;
 		// vvv Occurs only under improper use vvv
 		default:
 			return 0;

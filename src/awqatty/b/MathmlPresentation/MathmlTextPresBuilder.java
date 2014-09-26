@@ -266,6 +266,32 @@ public class MathmlTextPresBuilder implements TextPresBuilderForm {
 			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "<mo>(</mo>");
 			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "<mo>)</mo>");
 			break;
+		
+		// Integer Arithmetic
+		case REMAINDER:
+			strlist = new String[3];
+			strlist[0] = out_l + Tags.PARENTHESIS_L.getTag();
+			strlist[1] = "<mi>mod</mi>";
+			strlist[2] = Tags.PARENTHESIS_R.getTag() + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "<mo>(</mo>");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "<mo>)</mo>");
+			break;
+		case GCD:
+			strlist = new String[3];
+			strlist[0] = out_l + "<mi>gcd</mi><mo>(</mo>";
+			strlist[1] = "<mo>,</mo>";
+			strlist[2] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
+		case LCM:
+			strlist = new String[3];
+			strlist[0] = out_l + "<mi>lcm</mi><mo>(</mo>";
+			strlist[1] = "<mo>,</mo>";
+			strlist[2] = "<mo>)</mo>" + out_r;
+			childtaglist[0] = new StaticTagFill(Tags.PARENTHESIS_L.getTag(), "");
+			childtaglist[1] = new StaticTagFill(Tags.PARENTHESIS_R.getTag(), "");
+			break;
 
 		// Constants
 		case CONST_E:

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/palette_arith"
+    android:tag="@string/tag_plt"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:stretchColumns="@string/stretchPaletteCols"
+    >
+    
+	<TableRow>
+		<awqatty.b.OpButtons.OperationButton
+			android:id="@+id/buttonRmdr"
+			android:tag="@string/tag_op"
+			android:text="@string/remainder"
+			android:textSize="@dimen/button_textSize_M"
+			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
+			 />
+		<awqatty.b.OpButtons.OperationButton
+			android:id="@+id/buttonGCD"
+			android:tag="@string/tag_op"
+			android:text="@string/gcd"
+			android:textSize="@dimen/button_textSize_M"
+			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
+			 />
+		<awqatty.b.OpButtons.OperationButton
+			android:id="@+id/buttonLCM"
+			android:tag="@string/tag_op"
+			android:text="@string/lcm"
+			android:textSize="@dimen/button_textSize_M"
+			style="?android:attr/borderlessButtonStyle"
+			android:onClick="onClickOperator"
+			 />
+	</TableRow>
+</TableLayout>

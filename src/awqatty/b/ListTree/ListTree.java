@@ -10,7 +10,7 @@ import awqatty.b.CustomExceptions.CalculationException;
  * CLASS - ListTree
  * A tree-organized collection of elements, stored in a list. The list
  * is ordered depth-wise, such that one can find each child node of an 
- * element from the number of children each node has.
+ * element from the number of children each parent node has.
  */
 public class ListTree<N extends NodeBase> {
 
@@ -151,6 +151,22 @@ public class ListTree<N extends NodeBase> {
 		}
 		return indices;
 	}
+	
+	/*********************************************************************
+	 * METHOD - getNodeDepth
+	 *  Returns the number of branches separating the current node from 
+	 *  the root node. (i.e. for index=0, return=0)
+	 * 
+	 */
+	public int getNodeDepth(int index) {
+		int depth = -1;
+		while (index >= 0) {
+			index = getParentIndex(index);
+			++depth;
+		}
+		return depth;
+	}
+	
 	
 	//--------------------------------------------------------------------
 	// Basic Insertion Methods

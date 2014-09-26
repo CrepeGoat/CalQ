@@ -40,6 +40,10 @@ public enum FunctionType {
 	FACTORIAL,
 	NCK,
 	NPK,
+	
+	REMAINDER,
+	GCD,
+	LCM,
 	;
 	
 	// Property-Check Methods
@@ -59,6 +63,8 @@ public enum FunctionType {
 		switch (this) {
 		case ADD:
 		case MULTIPLY:
+		case GCD:
+		case LCM:
 			return true;
 		default:
 			return false;	

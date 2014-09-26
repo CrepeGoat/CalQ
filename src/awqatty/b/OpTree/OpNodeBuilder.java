@@ -217,6 +217,19 @@ public final class OpNodeBuilder {
 		case NCK:
 			return new FunctionNCK();
 			
+		// Integer Arithmetic
+		case REMAINDER:
+			return new FunctionForm() {
+				@Override
+				public Double calculate(List<Double> dlist) {
+					return dlist.get(0) % dlist.get(1);
+				}
+			};
+		case GCD:
+			return new FunctionGCD();
+		case LCM:
+			return new FunctionLCM();
+			
 		case CONST_E:
 			return new FunctionConstant(Math.E);
 		case CONST_PI:
@@ -249,6 +262,9 @@ public final class OpNodeBuilder {
 		case EXP_10:
 		case NCK:
 		case NPK:
+		case REMAINDER:
+		case GCD:
+		case LCM:
 			return 2;
 		case NEGATIVE:
 		case ABS:
@@ -283,6 +299,8 @@ public final class OpNodeBuilder {
 			return 0;
 		case ADD:
 		case MULTIPLY:
+		case GCD:
+		case LCM:
 			return Integer.MAX_VALUE;
 		case SUBTRACT:
 		case DIVIDE:
@@ -293,6 +311,7 @@ public final class OpNodeBuilder {
 		case EXP_10:
 		case NCK:
 		case NPK:
+		case REMAINDER:
 			return 2;
 		case NEGATIVE:
 		case ABS:
@@ -366,6 +385,9 @@ public final class OpNodeBuilder {
 		case POWER:
 		case NCK:
 		case NPK:
+		case REMAINDER:
+		case GCD:
+		case LCM:
 			subtree.addParent(0, build(ftype));
 			subtree.addChild(0, 1, build(FunctionType.BLANK));
 			break;

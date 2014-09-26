@@ -24,7 +24,11 @@
     <item
         android:id="@id/palette_perm"
         android:title="@string/palettemenu_perm"
-        android:titleCondensed="@string/palettemenu_hyp_cond"
+        android:titleCondensed="@string/palettemenu_perm_cond"
         />
-    
+    <item
+        android:id="@id/palette_arith"
+        android:title="@string/palettemenu_arith"
+        android:titleCondensed="@string/palettemenu_arith_cond"
+		/>
 </menu>

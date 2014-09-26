@@ -57,6 +57,10 @@
 	<string name="factorial">n!</string>
 	<string name="nCk">nCk</string>
 	<string name="nPk">nPk</string>
+	
+	<string name="remainder">rem</string>
+	<string name="gcd">gcd</string>
+	<string name="lcm">lcm</string>
 		
 	<string name="tag_op">operation button</string>
 	<string name="tag_plt">operation palette</string>
@@ -73,7 +77,9 @@
 	<string name="palettemenu_hyp_cond">Hyp.</string>
 	<string name="palettemenu_perm">Permutations</string>
 	<string name="palettemenu_perm_cond">Perm.</string>
-			
+	<string name="palettemenu_arith">Arithmetic</string>
+	<string name="palettemenu_arith_cond">Arith.</string>
+				
 	<!-- Preferences Strings -->
 	<string name="prefKey_paletteIds_baseStr">pref_palette_</string>
 	<string name="fragtag_retainOpTree">expression_data</string>
