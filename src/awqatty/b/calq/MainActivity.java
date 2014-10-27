@@ -11,7 +11,6 @@ import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -31,8 +30,8 @@ import awqatty.b.CustomEventListeners.CompositeSwitchEventListenerBase.ListenerB
 import awqatty.b.CustomEventListeners.OnChangeListener;
 import awqatty.b.CustomEventListeners.SwitchOnChangeListener;
 import awqatty.b.CustomEventListeners.SwitchedEventListenerBase;
-import awqatty.b.CustomExceptions.CalculationException;
 import awqatty.b.FunctionDictionary.FunctionType;
+import awqatty.b.FunctionDictionary.FunctionForms.CalculationException;
 import awqatty.b.GUI.NumberKeyboardListener;
 import awqatty.b.GUI.PaletteManager;
 import awqatty.b.GUI.PaletteboxAnimator;
@@ -78,7 +77,7 @@ import awqatty.b.ViewUtilities.ViewReplacer;
  * 
  * make sure numText contains result in one line
  * 
- * convert single-palette view to be swipe up/down (not scroll) list
+ * convert single-palette view to be swipe up/down (not scroll) stack
  * 
  * divide panels into fragments
  * 
@@ -316,7 +315,7 @@ public final class MainActivity extends Activity  implements
 		final String keybase = getString(R.string.prefKey_paletteIds_baseStr);
 		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
 		
-		// Collect old palette ids in list (use only basic palette if none exist)
+		// Collect old palette ids in stack (use only basic palette if none exist)
 		final List<Integer> palette_ids = new ArrayList<Integer>(max);
 		
 		for (int i=0; pref.contains(keybase+Integer.toString(i)) && i<max; ++i)

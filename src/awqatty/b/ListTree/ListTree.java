@@ -1,27 +1,81 @@
 package awqatty.b.ListTree;
 
+import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
-import awqatty.b.CustomExceptions.BranchCountException;
-import awqatty.b.CustomExceptions.CalculationException;
 
 /********************************************************************
  * CLASS - ListTree
- * A tree-organized collection of elements, stored in a list. The list
- * is ordered depth-wise, such that one can find each child node of an 
- * element from the number of children each parent node has.
+ * A tree-organized collection of elements, stored in a stack. The stack
+ * is ordered depth-wise, such that one can find each branch node of an 
+ * element from the number of branches each root node has.
  */
-public class ListTree<N extends NodeBase> {
+public class ListTree<E> implements Collection<E> {
+	
+	
+	/********************************************************************
+	 * CLASS - Node
+	 * Wraps each inserted element to provide branch-counting methods.
+	 */
+	protected static final class Node<E> {
 
-	protected final List<N> list;
+		// Local Members
+		private final E obj;
+		
+		private int branch_count;
+		public final int branch_min;
+		public final int branch_max;
+
+		// Constructors
+		public Node(E object, int min, int max) {
+			obj = object;
+			branch_count = 0;
+			branch_min = min;
+			branch_max = max;
+		}
+		public Node(E object) {
+			this(object, 0, Integer.MAX_VALUE);
+		}
+		
+		// Get Methods
+		public E getObject() {
+			return obj;
+		}
+		
+		public int getBranchCount() {
+			return branch_count;
+		}
+		// Increment/Decrement Operations
+		//		throws Exception on illegal child counts
+		public void incrementCount() throws BranchCountException {
+			if (branch_count >= branch_max)
+				throw new BranchCountException();
+			++branch_count;
+		}
+		public void decrementCount() throws BranchCountException {
+			if (branch_count <= branch_min)
+				throw new BranchCountException();
+			--branch_count;
+		}
+		// Checks count for validity
+		//		(When building a branch, no exception will be thrown
+		//		 while incrementing. Use this at end of build process
+		//		 to ensure end count complies with bounds.)
+		public void checkCount() throws BranchCountException {
+			if (branch_count <= branch_min || branch_count >= branch_max)
+				throw new BranchCountException();
+		}
+	}
 	
 	/********************************************************************
 	 * CLASS - FindParentAlgorithm
 	 * Used to run the parent-finder algorithm, and recover both the 
 	 * parent index and the child number concurrently.
 	 */
-	public class FindParentAlgorithm {
+	public final class FindParentAlgorithm {
 		private int index, count;
 		
 		public void run(int child_loc) {
@@ -41,43 +95,44 @@ public class ListTree<N extends NodeBase> {
 		}
 	}
 	
+	protected final List<Node<E>> list;
 	
 	public ListTree() {
-		list = new ArrayList<N>();
+		list = new ArrayList<Node<E>>();
 	}
-	protected ListTree(List<N> in) {
+	protected ListTree(List<Node<E>> in) {
 		list = in;
 	}
-	public ListTree(ListTree<N> tree) {
-		list = new ArrayList<N>(tree.list);
+	public ListTree(ListTree<E> tree) {
+		list = new ArrayList<Node<E>>(tree.list);
 	}
 		
 	//--------------------------------------------------------------------
 	// Access Methods
-	public N get(int index) {
-		return list.get(index);
+	public E get(int index) {
+		return list.get(index).getObject();
 	}
-	public int size() {
-		return list.size();
+	public int getBranchCount(int index) {
+		return list.get(index).getBranchCount();		
 	}
 	
 	/********************************************************************
 	 * METHOD - subTree
-	 * Returns a new tree object, with subList as base list
+	 * Returns a new tree object, with subList as base stack
 	 */
-	public ListTree<N> subTree(int index) {
-		return new ListTree<N>( list.subList(index, getEndOfBranchIndex(index)) );
+	public ListTree<E> subTree(int index) {
+		return new ListTree<E>( list.subList(index, getEndOfBranchIndex(index)) );
 	}
 	
 	//--------------------------------------------------------------------
 	//Navigation Methods
 	
 	/*********************************************************************
-	 * METHOD - getParentIndex
+	 * METHOD - getRootIndex
 	 * Returns ref. index of parent node to the given "index"
 	 * 
 	 */
-	public int getParentIndex(int index) {
+	public int getRootIndex(int index) {
 		int tmp=0; --index;
 		for (; index >= 0; --index) {
 			tmp += list.get(index).getBranchCount()-1;
@@ -87,7 +142,7 @@ public class ListTree<N extends NodeBase> {
 		return index;
 	}
 	/*********************************************************************
-	 * METHOD - getEndOfBranchIndex
+	 * METHOD - getEndLeafIndex
 	 *  Returns the index of next child node to "index"'s parent
 	 *	If "index" is the rightmost node in level, it returns the
 	 *	index at which the next child would be located
@@ -107,15 +162,16 @@ public class ListTree<N extends NodeBase> {
 	/*********************************************************************
 	 * METHOD - getNthBranchIndex
 	 *  Returns the index of the n-th child node of the given parent. 
-	 *  If the parent has less than n children, it returns the list size.
+	 *  If the parent has less than n children, it returns EndOfBranchIndex
 	 * 
 	 */
 	public int getNthBranchIndex(int parent_loc, int order) {
 		if (parent_loc != -1)
 			order = Math.min(order, list.get(parent_loc).getBranchCount());
+		
 		int branch_loc = parent_loc+1;
-
-		for (int index=0; index < order && branch_loc < list.size(); ++index)
+		final int length = list.size();
+		for (int index=0; index<order && branch_loc<length; ++index)
 			branch_loc = getEndOfBranchIndex(branch_loc);
 			
 		return branch_loc;
@@ -138,7 +194,7 @@ public class ListTree<N extends NodeBase> {
 	
 	/*********************************************************************
 	 * METHOD - getBranchIndices
-	 *  Returns a list of the indices for each child of the designated branch.
+	 *  Returns a stack of the indices for each child of the designated branch.
 	 * 
 	 */
 	public int[] getBranchIndices(int parent_loc) {
@@ -155,13 +211,13 @@ public class ListTree<N extends NodeBase> {
 	/*********************************************************************
 	 * METHOD - getNodeDepth
 	 *  Returns the number of branches separating the current node from 
-	 *  the root node. (i.e. for index=0, return=0)
+	 *  the root node. (index.e. for index=0, return=0)
 	 * 
 	 */
 	public int getNodeDepth(int index) {
 		int depth = -1;
 		while (index >= 0) {
-			index = getParentIndex(index);
+			index = getRootIndex(index);
 			++depth;
 		}
 		return depth;
@@ -175,7 +231,7 @@ public class ListTree<N extends NodeBase> {
 	//	from branch count errors manageable.
 	
 	/*********************************************************************
-	 * FUNCTION - addChild
+	 * FUNCTION - addBranch
 	 *	branch - object to insert
  	 *	parent_loc - the index of the parent under which to insert the new object
  	 *		domain values: 0 - array.size()-1
@@ -187,18 +243,28 @@ public class ListTree<N extends NodeBase> {
 	 * Set (parent_loc==-1) to create a new separate tree
 	 * 
 	 */
-	public int addChild(int parent_loc, int order, N branch)
+	public int addBranch(int parent_loc, int order,
+			E object, int min_leaves, int max_leaves)
+			throws BranchCountException {
+		return addBranch(parent_loc, order,
+				new Node<E>(object, min_leaves, max_leaves));
+	}
+	public int addBranch(int parent_loc, int order, E object)
+			throws BranchCountException {
+		return addBranch(parent_loc, order, new Node<E>(object));
+	}
+	private int addBranch(int parent_loc, int order, Node<E> node) 
 			throws BranchCountException {		
 		if (parent_loc != -1)
 			list.get(parent_loc).incrementCount();
 		
 		final int branch_loc = getNthBranchIndex(parent_loc, order);
 		
-		list.add(branch_loc, branch);
+		list.add(branch_loc, node);
 		return branch_loc;
 	}
 	
-	public int addChild(int parent_loc, int order, ListTree<N> branch) {
+	public int addBranch(int parent_loc, int order, ListTree<E> branch) {
 		if (parent_loc != -1)
 			list.get(parent_loc).incrementCount();
 		
@@ -209,7 +275,7 @@ public class ListTree<N extends NodeBase> {
 	}
 	
 	/*********************************************************************
-	 * FUNCTION - addParent
+	 * FUNCTION - addRoot
 	 * 
 	 * child_loc - the index used for insertion
 	 * branch - the object to use as the new parent
@@ -220,16 +286,24 @@ public class ListTree<N extends NodeBase> {
 	 * and sets the existing object as its child
 	 * 
 	 */
-	public int addParent(int child_loc, N branch) throws BranchCountException {
-		branch.incrementCount();
-		list.add(child_loc, branch);
+	public int addRoot(int child_loc, E object)
+			throws BranchCountException {
+		return addRoot(child_loc, new Node<E>(object));
+	}
+	public int addRoot(int child_loc, E object, int min_leaves, int max_leaves)
+			throws BranchCountException {
+		return addRoot(child_loc, new Node<E>(object, min_leaves, max_leaves));
+	}
+	private int addRoot(int child_loc, Node<E> node) throws BranchCountException {
+		node.incrementCount();
+		list.add(child_loc, node);
 		return child_loc+1;
 	}
 	
-	public int addParent(int child_loc, int order, ListTree<N> branch)
+	public int addRoot(int child_loc, int order, ListTree<E> branch)
 			throws BranchCountException  {
-		final int tmp = branch.addChild(0, order, this.subTree(child_loc));
-		setBranch(child_loc, branch.subTree(0));
+		final int tmp = branch.addBranch(0, order, this.subTree(child_loc));
+		setSubTree(child_loc, branch.subTree(0));
 		return child_loc+tmp;
 	}
 	
@@ -240,9 +314,9 @@ public class ListTree<N extends NodeBase> {
 	 * 
 	 */
 	public void swapBranches(int child1, int child2) {
-		final List<N> temp1 = list.subList(child1, getEndOfBranchIndex(child1));
-		final List<N> temp2 = list.subList(child2, getEndOfBranchIndex(child2));
-		final List<N> temp3 = new ArrayList<N>(temp1);
+		final List<Node<E>> temp1 = list.subList(child1, getEndOfBranchIndex(child1));
+		final List<Node<E>> temp2 = list.subList(child2, getEndOfBranchIndex(child2));
+		final List<Node<E>> temp3 = new ArrayList<Node<E>>(temp1);
 		
 		temp1.clear();
 		temp1.addAll(temp2);
@@ -271,9 +345,9 @@ public class ListTree<N extends NodeBase> {
 		
 		// Avoids redundant actions
 		if (new_order != alg.getBranchNumber()) {
-			final List<N>
+			final List<Node<E>>
 					sublist = list.subList(branch_loc, getEndOfBranchIndex(branch_loc)),
-					tmplist = new ArrayList<N>(sublist);
+					tmplist = new ArrayList<Node<E>>(sublist);
 			sublist.clear();
 			branch_loc = getNthBranchIndex(parent_loc, new_order);
 			list.addAll(branch_loc, tmplist);
@@ -285,28 +359,28 @@ public class ListTree<N extends NodeBase> {
 	 * 
 	 * Removes branch from tree. If the parent branch cannot have so few children,
 	 * an exception is thrown from the parent node. Is effectively the inverse
-	 * operation to "addChild".
+	 * operation to "addBranch".
 	 * 
 	 * branch_loc - the index of the branch to be deleted.
 	 * 
 	 */
-	public void deleteBranch(int branch_loc) throws BranchCountException {
-		if (getParentIndex(branch_loc) != -1)
-			list.get(getParentIndex(branch_loc)).decrementCount();
+	public void deleteSubTree(int branch_loc) throws BranchCountException {
+		if (getRootIndex(branch_loc) != -1)
+			list.get(getRootIndex(branch_loc)).decrementCount();
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
 	}
 	
 	/*********************************************************************
-	 * FUNCTION - deleteParent
+	 * FUNCTION - deleteRoot
 	 * 
 	 * Deletes the entire parent branch of the designated node, replacing it with
-	 * the designated branch itself. The inverse operation of "addParent".
+	 * the designated branch itself. The inverse operation of "addRoot".
 	 * 
 	 * branch_loc - the index of the designated branch
 	 * 
 	 */
-	public int deleteParent(int branch_loc) {
-		int parent_loc = getParentIndex(branch_loc);
+	public int deleteRoot(int branch_loc) {
+		int parent_loc = getRootIndex(branch_loc);
 		int parent_end;
 		if (parent_loc == -1) {
 			++parent_loc;
@@ -323,35 +397,135 @@ public class ListTree<N extends NodeBase> {
 	}
 	
 	/*********************************************************************
-	 * FUNCTION - setBranch
+	 * FUNCTION - setSubTree
 	 * 
 	 * Replaces a branch with a new node object, or an existing Tree.
 	 * Avoids child-count increments/decrements.
 	 * 
 	 */
-	public void setBranch(int branch_loc, N branch) {
+	public void setSubTree(int branch_loc, E object) {
+		setSubTree(branch_loc, new Node<E>(object));
+	}
+	public void setSubTree(int branch_loc, E object, int min_leaves, int max_leaves) {
+		setSubTree(branch_loc, new Node<E>(object, min_leaves, max_leaves));
+	}
+	private void setSubTree(int branch_loc, Node<E> node) {
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
-		list.add(branch_loc, branch);
+		list.add(branch_loc, node);
 	}
 
-	public void setBranch(int branch_loc, ListTree<N> branch) {
+	public void setSubTree(int branch_loc, ListTree<E> branch) {
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
 		list.addAll(branch_loc, branch.list);
 	}
-
-	//--------------------------------------------------------------------
-	//Calculation Methods
-	// TODO replace functionality by returning a reverse iterator
-	public <U> List<U> forAllInReverse(BranchFunctorForm<N,U> func) {
-		int i = list.size()-1;
-		try {
-			for (; i >= 0; --i)
-				func.excecuteInLoop(list.get(i));
-		} catch (CalculationException ce) {
-			ce.setCauseObject(Integer.valueOf(i));
-			throw ce;
+	
+	//--- Collection-Inherited Methods ---
+	@Override
+	public int size() {
+		return list.size();
+	}
+	@Override
+	public boolean add(E arg0) {
+		throw new UnsupportedOperationException();
+	}
+	@Override
+	public boolean addAll(Collection<? extends E> arg0) {
+		throw new UnsupportedOperationException();
+	}
+	@Override
+	public void clear() {
+		list.clear();
+	}
+	@Override
+	public boolean contains(Object obj) {
+		if (obj == null) {
+			for (Node<E> node : list) {
+				if (node.getObject() == null)
+					return true;
+			}
 		}
-		return func.returnValues();
+		else {
+			for (Node<E> node : list) {
+				if (obj.equals(node.getObject()))
+					return true;
+			}
+		}
+		return false;
+	}
+	@Override
+	public boolean containsAll(Collection<?> collection) {
+		for (Object obj : collection) {
+			if (!contains(obj))
+				return false;
+		}
+		return true;
+	}
+	@Override
+	public boolean isEmpty() {
+		return list.isEmpty();
+	}
+	
+	private class TreeIterator implements Iterator<E> {
+		private final Iterator<Node<E>> iter;
+		public TreeIterator(Iterator<Node<E>> it) {
+			iter = it;
+		}
+		@Override
+		public boolean hasNext() {
+			return iter.hasNext();
+		}
+
+		@Override
+		public E next() {
+			return iter.next().getObject();
+		}
+
+		@Override
+		public void remove() {
+			iter.remove();
+		}
+		
+	}
+	@Override
+	public Iterator<E> iterator() {
+		return new TreeIterator(list.iterator());
+	}
+	@Override
+	public boolean remove(Object arg0) {
+		throw new UnsupportedOperationException();
+	}
+	@Override
+	public boolean removeAll(Collection<?> arg0) {
+		throw new UnsupportedOperationException();
+	}
+	@Override
+	public boolean retainAll(Collection<?> arg0) {
+		throw new UnsupportedOperationException();
+	}
+	@Override
+	public Object[] toArray() {
+		Object[] array = new Object[list.size()];
+		for (int i=0; i<array.length; ++i) {
+			array[i] = get(i);
+		}
+		return array;
+	}
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T[] toArray(T[] array) {
+		final int length = list.size();
+		if (array.length < length) {
+			array = (T[]) Array.newInstance(
+					array.getClass().getComponentType(),
+					array.length );
+		}
+		int i=0;
+		for (; i<length; ++i) {
+			array[i] = (T)get(i);
+		}
+		if (i<array.length)
+			array[i] = null;
+		return array;
 	}
 
 }

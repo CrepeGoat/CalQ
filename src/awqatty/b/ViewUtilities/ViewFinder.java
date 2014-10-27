@@ -66,7 +66,7 @@ public class ViewFinder {
 		// Checks root view
 		if (matcher.viewIsAMatch(root))
 			views.add(root);
-		// Adds root to checking list, & starts loop
+		// Adds root to checking stack, & starts loop
 		if (isAValidViewGroup(root))
 			view_groups.add((ViewGroup)root);
 		
@@ -80,7 +80,7 @@ public class ViewFinder {
 				// Assigns child to local variable
 				temp_child = temp_group.getChildAt(i);
 				
-				// Adds valid views to results list
+				// Adds valid views to results stack
 				if (matcher.viewIsAMatch(temp_child))
 					views.add(temp_child);
 				// Adds any groups to future loops
