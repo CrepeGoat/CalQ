@@ -21,7 +21,7 @@ abstract public class AlignBase implements AlignForm {
 	}
 	
 	abstract protected Iterable<AlignForm> iterComps();
-	abstract protected Iterable<AlignForm> iterLocComps();
+	abstract protected Iterable<AlignForm> iterCompsWithLoc();
 	abstract protected Iterable<RectF> iterLocs();
 	
 	abstract protected void arrange();
@@ -51,7 +51,7 @@ abstract public class AlignBase implements AlignForm {
 	@Override
 	public void drawToCanvas(Canvas canvas, RectF dst) {
 		final Iterator<AlignForm> iter_comp = 
-				iterLocComps().iterator();
+				iterCompsWithLoc().iterator();
 		final Iterator<RectF> iter_loc = 
 				iterLocs().iterator();
 		
@@ -94,7 +94,7 @@ abstract public class AlignBase implements AlignForm {
 		// TODO change touch region type
 		if (!dst.isEmpty()) {
 			final Iterator<AlignForm> iter_comp = 
-					iterLocComps().iterator();
+					iterCompsWithLoc().iterator();
 			final Iterator<RectF> iter_loc = 
 					iterLocs().iterator();
 			final float

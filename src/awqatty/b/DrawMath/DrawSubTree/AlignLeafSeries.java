@@ -8,8 +8,8 @@ public class AlignLeafSeries extends AlignSeriesBase {
 	
 	@Override
 	public void clearCache() {
-		comps.subList(1, comps.size()).clear();
 		super.clearCache();
+		comps.subList(1, comps.size()).clear();
 	}
 	
 	// Constructor
@@ -31,7 +31,8 @@ public class AlignLeafSeries extends AlignSeriesBase {
 		}
 		else
 			comps.subList(length, old_length).clear();
-		
+		if (locs != null)
+			locs.clear();
 		super.setSuperLeafSizes(leaf_sizes);
 	}
 

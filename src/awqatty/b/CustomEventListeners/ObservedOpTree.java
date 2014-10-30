@@ -1,42 +1,33 @@
 package awqatty.b.CustomEventListeners;
 
+import android.content.Context;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.OpTree.OpTree;
-import awqatty.b.TextPresentation.TextPresBuilderForm;
 
 public class ObservedOpTree extends OpTree {
 
 	private OnChangeListener listener;
 	public static final byte
-			PRE_EVENT = 0,
-			POST_EVENT = 1,
-			EVENT_ANY = 0,
-			EVENT_TEXTPRES = 1,
-			EVENT_SELECTION = 2,
-			EVENT_ADDFUNCTION = 3,
-			EVENT_ADDNUMBER = 4,
-			EVENT_SHUFFLE = 5,
-			EVENT_DELETE = 6,
-			EVENT_DELETEPARENT = 7;
+			PRE_EVENT			= 0,
+			POST_EVENT			= 1;
+
+	public static final byte
+			EVENT_SELECTION		= 0,
+			EVENT_ADDFUNCTION	= 1,
+			EVENT_ADDNUMBER		= 2,
+			EVENT_SHUFFLE		= 3,
+			EVENT_DELETE		= 4,
+			EVENT_DELETEROOT	= 5;
 	
 	
-	public ObservedOpTree(TextPresBuilderForm tpb) {
-		super(tpb);
+	public ObservedOpTree(Context context) {
+		super(context);
 		listener = null;
 	}
 	public void setOnChangeListener(OnChangeListener on_change) {
 		listener = on_change;
 	}
-	
-	@Override
-	public void setTextPresBuilder(TextPresBuilderForm tpb) {
-		if (listener != null) listener.onChange(
-				new ChangeEvent(this, EVENT_TEXTPRES, PRE_EVENT) );
-		super.setTextPresBuilder(tpb);
-		if (listener != null) listener.onChange(
-				new ChangeEvent(this, EVENT_TEXTPRES, POST_EVENT) );
-	}
-	
+		
 	@Override
 	public void setSelection(int i) {
 		if (listener != null) listener.onChange(
@@ -86,9 +77,9 @@ public class ObservedOpTree extends OpTree {
 	@Override
 	public void deleteParent() {
 		if (listener != null) listener.onChange(
-				new ChangeEvent(this, EVENT_DELETEPARENT, PRE_EVENT) );
+				new ChangeEvent(this, EVENT_DELETEROOT, PRE_EVENT) );
 		super.deleteParent();
 		if (listener != null) listener.onChange(
-				new ChangeEvent(this, EVENT_DELETEPARENT, POST_EVENT) );
+				new ChangeEvent(this, EVENT_DELETEROOT, POST_EVENT) );
 	}
 }

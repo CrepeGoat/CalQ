@@ -7,7 +7,8 @@ import android.graphics.RectF;
 import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
 import awqatty.b.ListTree.DataLoopRootDown;
 
-public class LoopDrawMath extends DataLoopRootDown<DrawForm, RectF> {
+public class LoopDrawMath
+		extends DataLoopRootDown<DrawForm, RectF> {
 
 	private Canvas canvas;
 	public void setCanvas(Canvas canvas) {

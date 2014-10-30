@@ -18,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -32,16 +31,16 @@ import awqatty.b.CustomEventListeners.SwitchOnChangeListener;
 import awqatty.b.CustomEventListeners.SwitchedEventListenerBase;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.FunctionDictionary.FunctionForms.CalculationException;
+import awqatty.b.GUI.MathView;
 import awqatty.b.GUI.NumberKeyboardListener;
 import awqatty.b.GUI.PaletteManager;
 import awqatty.b.GUI.PaletteboxAnimator;
 import awqatty.b.GUI.SideButtonPaletteManager;
 import awqatty.b.GUI.SwipePaletteManager;
 import awqatty.b.GenericTextPresentation.NumberStringConverter;
-import awqatty.b.JSInterface.MathmlLinksViewClient;
-import awqatty.b.MathmlPresentation.MathmlTextPresBuilder;
 import awqatty.b.CustomEventListeners.ObservedOpTree;
 import awqatty.b.OpButtons.OperationButton;
+import awqatty.b.OpTree.OpTree;
 import awqatty.b.ViewUtilities.ViewFinder;
 import awqatty.b.ViewUtilities.ViewParentFinder;
 import awqatty.b.ViewUtilities.ViewReplacer;
@@ -86,8 +85,8 @@ import awqatty.b.ViewUtilities.ViewReplacer;
  *****************************************************************************************/
 
 
-public final class MainActivity extends Activity  implements
-	SharedPreferences.OnSharedPreferenceChangeListener {
+public final class MainActivity extends Activity
+		implements SharedPreferences.OnSharedPreferenceChangeListener {
 	
 	/*********************************************************
 	 * Private Fields
@@ -119,7 +118,6 @@ public final class MainActivity extends Activity  implements
 	private RetainDataFragment<ObservedOpTree> fragment_retainOpTree;
 	
 	// Local References (used for faster access of commonly-accessed views)
-	private WebView webview;
 	private TextView number_text;
 	
 	//---------------------------------------------------
@@ -131,7 +129,7 @@ public final class MainActivity extends Activity  implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		webview = (WebView) findViewById(R.id.webview);
+		final MathView mathview = (MathView) findViewById(R.id.mathview);
 		number_text = (TextView) findViewById(R.id.textNum);
 
 		/*********************************************************
@@ -151,7 +149,7 @@ public final class MainActivity extends Activity  implements
 					.commit();
 		}
 		if (fragment_retainOpTree.getData() == null) {
-			expression = new ObservedOpTree(new MathmlTextPresBuilder());
+			expression = new ObservedOpTree(this);
 			fragment_retainOpTree.setData(expression);
 		}
 		else
@@ -172,20 +170,15 @@ public final class MainActivity extends Activity  implements
 		expression.setOnChangeListener(change_listener);
 
 		//		Observer to refresh MathML screen
-		change_listener.setOnChangeListener(new OnChangeListener() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				refreshMathmlScreen();
-			}
-		});
+		change_listener.setOnChangeListener(mathview);
 		//		Observer to Unset Shuffle Button
 		final SwitchOnChangeListener listener_unsetShuffleButton = 
 				new SwitchOnChangeListener(new OnChangeListener() {
 					@Override
 					public void onChange(ChangeEvent event) {
-						if (event.getSourceObject() instanceof ObservedOpTree &&
-								event.getTimingCode() == ObservedOpTree.POST_EVENT &&
-								event.getTypeCode() != ObservedOpTree.EVENT_SHUFFLE) {
+						if (event.source_obj instanceof ObservedOpTree &&
+								event.timing_code == ObservedOpTree.POST_EVENT &&
+								event.changetype_code != ObservedOpTree.EVENT_SHUFFLE) {
 							unsetShuffleButton();
 						}
 					}
@@ -346,59 +339,7 @@ public final class MainActivity extends Activity  implements
 		/*********************************************************
 		 * Set local WebView object
 		 *********************************************************/
-		// Enable Javascript in Webview (warning suppressed)
-		webview.getSettings().setJavaScriptEnabled(true);
-
-		// Reroute "html-links" to MainActivity
-		//*
-		webview.setWebViewClient(new MathmlLinksViewClient());
-		//*/
-
-		// vvv Used for Javascript onclick methods vvv
-		/*
-		JSBinder binder = new JSBinder(webview);
-		binder.setOnClickListener(web_listener);
-		webview.addJavascriptInterface(binder, "Android");
-		//*/
-		
-		// Loads initial MathJax configuration
-		//	(https://github.com/leathrum/android-apps/blob/master
-		//		/MathJaxApp/mml-full/MainActivity.java)
-		String data = "<script type='text/x-mathjax-config'>"
-				+"MathJax.Hub.Config({ "
-					+"showMathMenu: false, "
-					+"jax: ['input/MathML','output/'], "
-					+"extensions: ['mml2jax.js'], "
-					+"TeX: { extensions: ['noErrors.js','noUndefined.js'] }, "
-					+"OUTPUT: { scale: 175 }, "
-					+"});</script>"
-				+"<script type='text/javascript' "
-					+"src='file:///android_asset/MathJax-2.3-trim/MathJax.js'>"
-					+"</script>"
-				/* Used for JavaScript binding
-				+"<script>function JSOnClickMathml(id_tag){"
-					+"Android.onClickMathml(id_tag);"
-					+"return false;"
-					+"}</script>"
-				//*/
-				+"<span id='math'></span>";
-		// Chooses HTML-CSS vs. SVG, based on android version
-		//		(disabled SVG, causes links to nest improperly)
-		/*
-		if (android.os.Build.VERSION.SDK_INT
-				>= android.os.Build.VERSION_CODES.HONEYCOMB ) {
-			base_url = base_url
-					.replaceFirst("output/", "output/SVG")
-					.replaceFirst("OUTPUT", "SVG");
-			Log.d(this.toString(), "SVG used!");
-		}
-		else //*/
-			data = data
-					.replaceFirst("output/", "output/HTML-CSS")
-					.replaceFirst("OUTPUT", "\"HTML-CSS\"");
-		
-		webview.loadDataWithBaseURL(
-				"http://bar", data, "text/html","utf-8",null );
+		expression.setMathViewToTree(mathview);
 
 		/*********************************************************
 		 * Set Number Keyboard
@@ -542,30 +483,6 @@ public final class MainActivity extends Activity  implements
 	//////////////////////////////////////////////////////////////////////
 	// INTERNAL FUNCTIONS
 	//////////////////////////////////////////////////////////////////////
-	private void loadMathmlToScreen(String mathml_exp) {
-		// Load a MathML example on-screen
-		//	(https://github.com/leathrum/android-apps/blob/master
-		//		/MathJaxApp/mml-full/MainActivity.java)
-		/* 								  vv green
-		 * TODO add color ( mathcolor='#000000')
-		 * 							red	^^	^^ blue
-		 */
-		webview.loadUrl("javascript:document.getElementById('math').innerHTML='"
-				+"<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\">"
-				+"<mstyle displaystyle=\"true\""
-				//+" mathcolor='#000000'"
-				//+ " mathsize=1.2em"
-				+">"
-				// Insert MathML code here
-				+ mathml_exp
-				//
-				+"</mstyle></math>';"
-				+"\njavascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);"
-				);
-	}
-	public void refreshMathmlScreen() {
-		loadMathmlToScreen(expression.getTextPres());
-	}
 
 	/*
 	private void refreshNumberText() {
@@ -637,7 +554,7 @@ public final class MainActivity extends Activity  implements
 				getApplicationContext(), str, Toast.LENGTH_SHORT );
 		// Sets toast position to bottom of WebView
 		t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0,
-				webview.getBottom() - 10 );
+				findViewById(R.id.mathview).getBottom() - 10 );
 		t.show();
 	}
 	
@@ -680,7 +597,7 @@ public final class MainActivity extends Activity  implements
 			// Calculate result (throws CalcEx)
 			result = expression.getCalculation();
 
-			expression.setSelection(0);
+			expression.setSelection(OpTree.null_index);
 
 			// Set text representation of result to view
 			((TextView) findViewById(R.id.textNum))
@@ -692,7 +609,7 @@ public final class MainActivity extends Activity  implements
 					.setHint(getString(R.string.textNum_blank));
 
 			// set failed index
-			blank_index = (Integer)ce.getCauseObject();
+			blank_index = (Integer) ce.getCauseObject();
 		}
 	}
 	// Called when the result text box is clicked
@@ -787,7 +704,7 @@ public final class MainActivity extends Activity  implements
 				//+ temp_count.toString() + "</mn>";
 		
 		// Load a MathML example on-screen
-		loadMathmlToScreen(temp_out);
+		//loadMathmlToScreen(temp_out);
 	}
 	//*/
 	/*

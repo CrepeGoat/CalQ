@@ -2,6 +2,9 @@ package awqatty.b.OpTree;
 
 import java.util.List;
 
+import android.content.Context;
+import awqatty.b.DrawMath.AlignDrawBuilder;
+import awqatty.b.DrawMath.DrawSubTree.AlignForm;
 import awqatty.b.FunctionDictionary.*;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionConstant;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionException;
@@ -12,23 +15,16 @@ import awqatty.b.FunctionDictionary.FunctionForms.FunctionLCM;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionNCK;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionNPK;
 import awqatty.b.ListTree.ListTree;
-import awqatty.b.TextPresentation.TextPresBuilderForm;
-import awqatty.b.TextPresentation.TextPresForm;
 
 public final class OperationBuilder {
 
 	double _number;
-	TextPresBuilderForm textbuilder;
+	AlignDrawBuilder textbuilder;
 	
-	public OperationBuilder(TextPresBuilderForm tpb) {
-		textbuilder = tpb;
+	public OperationBuilder(Context context) {
+		textbuilder = new AlignDrawBuilder(context);
 	}
-	
-	public void setTextPresBuilder(TextPresBuilderForm tpb) {
-		textbuilder = tpb;
-		tpb.number(_number);
-	}
-	
+		
 	/**************************************************************
 	 *** BUILDER METHODS ***
 	 **************************************************************/
@@ -248,7 +244,7 @@ public final class OperationBuilder {
 		}
 	}
 	
-	private TextPresForm buildTextPres(FunctionType ftype) {
+	private AlignForm buildTextPres(FunctionType ftype) {
 		return textbuilder.build(ftype);
 	}
 	
@@ -370,7 +366,7 @@ public final class OperationBuilder {
 		}
 		// Unexpected case
 		else
-			throw new RuntimeException("Cannot create source node instance");
+			throw new RuntimeException("Cannot create source_obj node instance");
 	}
 	
 	// Returns whether the args can be shuffled or not

@@ -12,7 +12,13 @@ public final class DrawBlank implements AlignForm, DrawForm {
 	private float w,h;
 	private float scale=1;
 	
-	public DrawBlank() {}
+	public DrawBlank() {
+		w=0; h=0;
+	}
+	public DrawBlank(float width, float height) {
+		w = width;
+		h = height;
+	}
 	public DrawBlank(RectF src) {
 		set(src);
 	}

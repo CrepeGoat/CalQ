@@ -26,7 +26,7 @@ import awqatty.b.DrawMath.DrawSubTree.AlignForm;
  * 	- reset canvas matrix
  * 
  */
-public class DrawAligned implements DrawForm{
+public class DrawAligned implements DrawForm {
 		
 	//--- Local Members ---
 	private float scale = 1;

@@ -34,7 +34,7 @@ public final class AlignBorder extends AlignAxisBase {
 	@Override
 	protected Iterable<AlignForm> iterComps()	{return comps;}
 	@Override
-	protected Iterable<AlignForm> iterLocComps(){return comps;}
+	protected Iterable<AlignForm> iterCompsWithLoc(){return comps;}
 
 	//--- AlignAxisBase Overrides ---
 	@Override

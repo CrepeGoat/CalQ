@@ -26,7 +26,7 @@ public class AlignSuperscript extends AlignBase {
 	@Override
 	protected Iterable<AlignForm> iterComps() {return comps;}
 	@Override
-	protected Iterable<AlignForm> iterLocComps() {return comps;}
+	protected Iterable<AlignForm> iterCompsWithLoc() {return comps;}
 	@Override
 	protected Iterable<RectF> iterLocs() {return locs;}
 

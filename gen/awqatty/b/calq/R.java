@@ -95,7 +95,7 @@ public final class R {
         public static final int buttonDel=0x7f0e0001;
         public static final int buttonDelParent=0x7f0e0002;
         public static final int buttonDiff=0x7f0e0014;
-        public static final int buttonEqual=0x7f0e000c;
+        public static final int buttonEqual=0x7f0e000b;
         public static final int buttonExp10=0x7f0e0025;
         public static final int buttonExpE=0x7f0e0024;
         public static final int buttonFact=0x7f0e002b;
@@ -111,7 +111,7 @@ public final class R {
         public static final int buttonNPK=0x7f0e002c;
         public static final int buttonNeg=0x7f0e0017;
         public static final int buttonNewPalette=0x7f0e003c;
-        public static final int buttonNum=0x7f0e0007;
+        public static final int buttonNum=0x7f0e0006;
         public static final int buttonPi=0x7f0e0032;
         public static final int buttonPow=0x7f0e0023;
         public static final int buttonProd=0x7f0e0015;
@@ -124,8 +124,9 @@ public final class R {
         public static final int buttonSum=0x7f0e0013;
         public static final int buttonSwapPalette=0x7f0e0038;
         public static final int buttonTan=0x7f0e0031;
-        public static final int context=0x7f0e000b;
-        public static final int keyboardNum=0x7f0e0008;
+        public static final int context=0x7f0e000a;
+        public static final int keyboardNum=0x7f0e0007;
+        public static final int mathview=0x7f0e000d;
         public static final int palette_arith=0x7f0e000e;
         public static final int palette_basic=0x7f0e0012;
         public static final int palette_hyp=0x7f0e001b;
@@ -135,14 +136,13 @@ public final class R {
         public static final int palettebox=0x7f0e0036;
         public static final int palettebox_leftCurtain=0x7f0e0039;
         public static final int palettebox_rightCurtain=0x7f0e003a;
-        public static final int panel=0x7f0e0005;
-        public static final int panelCoreFunctions=0x7f0e0009;
-        public static final int panelNum=0x7f0e000a;
-        public static final int panelOps=0x7f0e0006;
+        public static final int panel=0x7f0e0004;
+        public static final int panelCoreFunctions=0x7f0e0008;
+        public static final int panelNum=0x7f0e0009;
+        public static final int panelOps=0x7f0e0005;
         public static final int switchEqText=0x7f0e0003;
-        public static final int textNum=0x7f0e000d;
+        public static final int textNum=0x7f0e000c;
         public static final int tmp_palette=0x7f0e003b;
-        public static final int webview=0x7f0e0004;
     }
     public static final class integer {
         public static final int maxPaletteQuantity=0x7f0b0000;
@@ -150,27 +150,28 @@ public final class R {
     public static final class layout {
         public static final int button_shuffle=0x7f030000;
         public static final int buttons_edits=0x7f030001;
-        public static final int main=0x7f030014;
+        public static final int main=0x7f030015;
         public static final int main_land=0x7f030002;
         public static final int main_land_long=0x7f030003;
         public static final int main_port=0x7f030004;
         public static final int main_port_thinlong=0x7f030005;
         public static final int main_portwide=0x7f030006;
-        public static final int palette_arith=0x7f030007;
-        public static final int palette_basic=0x7f030008;
-        public static final int palette_hyp=0x7f030009;
-        public static final int palette_log=0x7f03000a;
-        public static final int palette_perm=0x7f03000b;
-        public static final int palette_trig=0x7f03000c;
-        public static final int palettebox=0x7f030016;
-        public static final int palettebox_button_swapdelright=0x7f03000d;
-        public static final int palettebox_button_swapright=0x7f03000e;
-        public static final int palettebox_swipe_swapleft_delright=0x7f03000f;
-        public static final int palettebox_swipe_swapleftright=0x7f030010;
-        public static final int panelpalette=0x7f030015;
-        public static final int panelpalette_scroll=0x7f030011;
-        public static final int panelpalette_single=0x7f030012;
-        public static final int textnum_buttonequal=0x7f030013;
+        public static final int mathview=0x7f030007;
+        public static final int palette_arith=0x7f030008;
+        public static final int palette_basic=0x7f030009;
+        public static final int palette_hyp=0x7f03000a;
+        public static final int palette_log=0x7f03000b;
+        public static final int palette_perm=0x7f03000c;
+        public static final int palette_trig=0x7f03000d;
+        public static final int palettebox=0x7f030017;
+        public static final int palettebox_button_swapdelright=0x7f03000e;
+        public static final int palettebox_button_swapright=0x7f03000f;
+        public static final int palettebox_swipe_swapleft_delright=0x7f030010;
+        public static final int palettebox_swipe_swapleftright=0x7f030011;
+        public static final int panelpalette=0x7f030016;
+        public static final int panelpalette_scroll=0x7f030012;
+        public static final int panelpalette_single=0x7f030013;
+        public static final int textnum_buttonequal=0x7f030014;
     }
     public static final class menu {
         public static final int menu_main=0x7f0d0000;

@@ -17,7 +17,7 @@ abstract public class DataLoopRootDown<E, T> {
 	public void runLoop(ListTree<E> tree) {
 		runLoop(tree, null);
 	}
-	public void runLoop(ListTree<E> tree, T init_data) {
+	public void runLoop(ListTree<? extends E> tree, T init_data) {
 		stack.clear();
 		index=0;
 		final int length=tree.size();

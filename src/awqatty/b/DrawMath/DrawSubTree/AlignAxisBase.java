@@ -63,6 +63,8 @@ public abstract class AlignAxisBase extends AlignBase {
 		orient = (orientation == HORIZONTAL
 				? OrientForm.horiz : OrientForm.vert);
 				
+		// Clear previous lists
+		locs.clear();
 		// Arrange Components
 		addCompsToSeries();
 		

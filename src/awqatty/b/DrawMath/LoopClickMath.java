@@ -9,7 +9,8 @@ import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
 import awqatty.b.ListTree.DataLoopRootDown;
 import awqatty.b.ListTree.ListTree;
 
-public class LoopClickMath extends DataLoopRootDown<DrawForm, RectF> {
+public class LoopClickMath
+		extends DataLoopRootDown<DrawForm, RectF> {
 
 	// Input - Click coordinates
 	private float px, py;
@@ -27,7 +28,7 @@ public class LoopClickMath extends DataLoopRootDown<DrawForm, RectF> {
 	
 	// Loop Function
 	@Override
-	public void runLoop(ListTree<DrawForm> tree, RectF init_data) {
+	public void runLoop(ListTree<? extends DrawForm> tree, RectF init_data) {
 		indices.clear();
 		super.runLoop(tree, init_data);
 	}

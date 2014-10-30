@@ -6,7 +6,8 @@ import android.graphics.RectF;
 import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
 import awqatty.b.ListTree.DataLoopLeafUp;
 
-public class LoopSizingMath extends DataLoopLeafUp<DrawForm, RectF> {
+public class LoopSizingMath
+		extends DataLoopLeafUp<DrawForm, RectF> {
 
 	@Override
 	protected RectF loopAtNode(DrawForm node, List<RectF> stack) {

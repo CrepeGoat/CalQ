@@ -28,6 +28,7 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 		super.loadAlignTools();
 		if (comps_ordered == null)
 			comps_ordered = new ArrayList<AlignForm>();
+		else comps_ordered.clear();
 	}
 	@Override
 	protected void addCompToSeries(AlignForm comp, byte stretch_type) {
@@ -36,7 +37,7 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 	}
 	
 	@Override
-	protected void addCompsToSeries() {
+	protected void addCompsToSeries() {		
 		max_girth = 0;
 		// Gets max girth of components
 		for (AlignForm draw : comps.subList(1,comps.size())) {
@@ -46,8 +47,16 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 						orient.getGirth(rectf) );
 			}
 		}
-		// Sets max_girth based on bound components
-		if (comps.get(0) != null) {
+		
+		// Proceed based on whether or not bounds are used
+		if (comps.get(0) == null) {
+			// Arrange components in series
+			for (AlignForm comp : comps.subList(1,comps.size()))
+				addCompToSeries(comp, STRETCH_NONE);
+		}
+		
+		else {
+			// Sets max_girth based on bound components
 			if (stretch_divider == STRETCH_NONE) {
 					comps.get(0).getSize(rectf);
 					max_girth = Math.max(max_girth, orient.getGirth(rectf));
@@ -55,14 +64,8 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 			else /*if (stretch_divider == STRETCH_FULL
 				|| stretch_divider == STRETCH_GIRTH) */
 				max_girth += 3*whtspc;
-			}
-		
-		// Arrange components in series
-		if (comps.get(0) == null) {
-			for (AlignForm comp : comps.subList(1,comps.size()))
-				addCompToSeries(comp, STRETCH_NONE);
-		}
-		else {
+			
+			// Arrange components in series
 			if (comps.size() > 1)
 				addCompToSeries(comps.get(1), STRETCH_NONE);
 			for (AlignForm comp : comps.subList(2,comps.size())) {
@@ -76,6 +79,6 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 	@Override
 	public Iterable<AlignForm> iterComps() {return comps;}
 	@Override
-	public Iterable<AlignForm> iterLocComps() {return comps_ordered;}
+	public Iterable<AlignForm> iterCompsWithLoc() {return comps_ordered;}
 	
 }
