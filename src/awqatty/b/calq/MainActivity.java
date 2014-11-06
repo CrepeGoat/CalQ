@@ -55,16 +55,11 @@ import awqatty.b.ViewUtilities.ViewReplacer;
  * 
  * TODO
  * 
- * Fix highlighting, or shift to pure html display
- * 
  * Fix number-to-text conversion
  * 
  * Add _ftype values to buttons (to avoid switch table for OnPressOperator & addFunction)
  * 
  * GUI Scheme (colors, custom buttons, TextView borders)
- * 
- * Add code to allow for a "blank-click" on-screen, & allow for SVG output
- * 		(i.e. at each link, add "stopPropogation" functionality)
  * 
  * Add larger device support
  * (also change drawables to be API specific)
@@ -72,13 +67,16 @@ import awqatty.b.ViewUtilities.ViewReplacer;
  * Shift textNum TextView to be constantly in view,
  * 		remove equals button
  * 
- * improve parentheses
+ * add parentheses support
  * 
  * make sure numText contains result in one line
  * 
  * convert single-palette view to be swipe up/down (not scroll) stack
  * 
- * divide panels into fragments
+ * divide panels into fragments (?)
+ * 
+ * change numkeys to normal buttons
+ * 	- more uniform appearance
  * 
  * TODO Bugs
  * 
@@ -165,12 +163,13 @@ public final class MainActivity extends Activity
 		// Make new onChangeListeners
 		//		Collect listeners into one composite listener
 		final CompositeOnChangeListener change_listener = 
-				new CompositeOnChangeListener(2);
+				new CompositeOnChangeListener(4);
 		//		Set change listener
 		expression.setOnChangeListener(change_listener);
-
+		
 		//		Observer to refresh MathML screen
 		change_listener.setOnChangeListener(mathview);
+		
 		//		Observer to Unset Shuffle Button
 		final SwitchOnChangeListener listener_unsetShuffleButton = 
 				new SwitchOnChangeListener(new OnChangeListener() {
@@ -187,7 +186,7 @@ public final class MainActivity extends Activity
 		switch_unsetShuffleButton.disableListener();
 		change_listener.setOnChangeListener(listener_unsetShuffleButton);
 		
-		//		Observer to Set Text To Equal
+		//		Observer to SetTextToEqual
 		final SwitchOnChangeListener listener_setTextToEqual = 
 			new SwitchOnChangeListener(new OnChangeListener() {
 				@Override
@@ -246,8 +245,9 @@ public final class MainActivity extends Activity
 		};
 		
 				
-		// Accommodates large screens that do not hide the number keyboard
+		// Platform-dependent logic
 		final View button_num = findViewById(R.id.buttonNum);
+		// For smaller screens which hide the number keyboard
 		if (button_num != null) {
 			// Set listeners to _number-keyboard button
 			final CompositeOnClickListener
@@ -278,13 +278,14 @@ public final class MainActivity extends Activity
 						public void onChange(ChangeEvent event) {
 							hideNumKeys();
 						}
-			});
+					});
 			switch_hideNumKeys = keys2_listener.getSwitch();
 			switch_hideNumKeys.disableListener();
 			change_listener.setOnChangeListener(keys2_listener);
 			
 			trigger_showNumKeys.enableListener();
 		}
+		// For larger screens which leave the number keyboard on-screen
 		else {
 			keys1_listener.addSwitchListener(trigger_setEqualToText);
 			switch_hideNumKeys = null;
@@ -669,12 +670,24 @@ public final class MainActivity extends Activity
 		if (number_text.getText() == "")
 			number_text.setText(getString(R.string.textNum_default));
 	}
-	public void onNumKeyboardResult(double d) {
-		expression.addNumber(d);
+	public void onNumKeyboardResult() {
+		String str = number_text.getText().toString();
+		if (!str.isEmpty()) {
+			try {expression.addNumber(Double.valueOf(str));}
+			catch (NumberFormatException e) {
+				// Raise toast to alert user that expression is incomplete
+				raiseToast("Error: Invalid Number Format");
+			}
+			number_text.setText("");
+		}
+		// Set state components
 		//refreshNumberText();
 	}
 	public void onNumKeyboardCancel() {
-		expression.setSelection(0);
+		number_text.setText("");
+		onNumKeyboardResult();
+		// TODO make numkeys hide in some other way (this is kinda dumb)
+		expression.setSelection(expression.selection);
 	}
 	
 	public void onClickDeletePalette(View v) {

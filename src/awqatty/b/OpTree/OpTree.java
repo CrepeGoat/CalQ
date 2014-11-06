@@ -34,30 +34,43 @@ public class OpTree {
 		for (Operation op : tree.subTree(selection))
 			op.setColor(Color.BLACK);
 		tree.get(selection).setScale(1);
-		/* TODO uncomment method
-		tree.get(selection).disableTagFlag(TagFlags.HIGHLIGHT);
-		//*/
 	}
 	private void setHighlight() {
 		for (Operation op : tree.subTree(selection))
 			op.setColor(highlight);
 		tree.get(selection).setScale(high_scale);
-		/* TODO uncomment method
-		if (selection != 0)		// highlighting everything == highlighting nothing
-			tree.get(selection).enableTagFlag(TagFlags.HIGHLIGHT); 
-		//*/
 	}
-		
+	private void assignParentheses(int root_index) {
+		// If first element, unset parentheses
+		if (root_index == -1)
+			tree.get(0).setParentheses(false);
+		else {
+			int[] branches = tree.getBranchIndices(root_index);
+			
+			Operation[] ops = new Operation[branches.length];
+			for (int i=0; i < branches.length; ++i) {
+				ops[i] = tree.get(branches[i]);
+			}
+			tree.get(root_index).assignBranchParentheses(ops);
+		}
+	}
+	
 	//---------------------------------------------------------------
 	// Manipulation Methods
 	public static final int null_index = -1;
 	public void setSelection(int index) {
-		unsetHighlight();
-		if (index == null_index)
-			selection = 0;
+		if (index == selection) {
+			if (selection == 0)
+				setHighlight();
+		}
 		else {
-			selection = index;
-			setHighlight();
+			unsetHighlight();
+			if (index == null_index)
+				selection = 0;
+			else {
+				selection = index;
+				setHighlight();
+			}
 		}
 	}
 	
@@ -73,11 +86,13 @@ public class OpTree {
 		if (ftype.isCommutative()) {
 			if (ftype == tree.get(selection).ftype) {
 				final boolean can_shuffle = tree.getBranchCount(selection)>1;
+				i = selection;
 				selection = tree.addBranch(
 						selection,
 						tree.getBranchCount(selection),
 						node_builder.build(FunctionType.BLANK) );
-				// Set ID numbers for all elements in new locations
+				// Set parentheses for all elements in new locations
+				assignParentheses(i);
 				return can_shuffle;
 			}
 			else {
@@ -88,34 +103,37 @@ public class OpTree {
 				if (alg.getParentIndex() >= 0
 						&& ftype == tree.get(alg.getParentIndex()).ftype) {
 					unsetHighlight();
-					i = selection = tree.addBranch(
+					selection = tree.addBranch(
 							alg.getParentIndex(),
 							alg.getBranchNumber()+1,
 							node_builder.build(FunctionType.BLANK) );
 					setHighlight();
-					// Set ID numbers for all elements in new locations
+					// Set parentheses for all elements in new locations
+					assignParentheses(alg.getParentIndex());
+					
 					return tree.getBranchCount(alg.getParentIndex())>1;
 				}
 			}
 		}
 		unsetHighlight();
-		i = selection;
 		// Set new function elements into place
+		// TODO remove boolean return, make function return initial branch's
+		//		new location (relative in subtree)
 		final boolean can_shuffle = 
 				node_builder.buildInSubtree(tree.subTree(selection), ftype);
 		
-		int last_index = tree.size();
-		// Set ID numbers for all elements in new locations
-		
+		// Set parentheses for all elements in new locations
+		assignParentheses(selection);
+		assignParentheses(tree.getRootIndex(selection));
 		// Set selection index to new location (i.e. first blank element)
 		int[] indices = tree.getBranchIndices(selection);
-		last_index = tree.getBranchCount(selection);
-		for (i=0; i<last_index; ++i) {
+		for (i=0; i<indices.length; ++i) {
 			if (tree.get(indices[i]).ftype == FunctionType.BLANK) {
 				selection = indices[i];
 				break;
 			}
 		}
+		
 		setHighlight();
 		
 		// Returns whether shuffle operation is valid or not
@@ -129,11 +147,11 @@ public class OpTree {
 		ListTree<Operation>.FindParentAlgorithm alg = tree.new FindParentAlgorithm();
 		alg.run(selection);
 		
-		final int parent_loc = alg.getParentIndex();
 		selection = tree.shiftBranchOrder(selection,
-				(alg.getBranchNumber()+1) % tree.getBranchCount(parent_loc) );
+				(alg.getBranchNumber()+1) % tree.getBranchCount(alg.getParentIndex()) );
 		
-		// Set ID numbers for all elements in new locations
+		// Set parentheses for all elements in new locations
+		assignParentheses(alg.getParentIndex());
 		// No need to reset highlight, selection shifts w/ object movement
 	}
 
@@ -145,6 +163,7 @@ public class OpTree {
 					.buildInSubtree(tree.subTree(selection), FunctionType.NUMBER);
 		
 		// Set ID numbers for all elements in new locations
+		assignParentheses(tree.getRootIndex(selection));
 		setHighlight();
 	}
 	
@@ -159,35 +178,36 @@ public class OpTree {
 					node_builder.build(FunctionType.BLANK) );
 			
 			setHighlight();
-			// Set ID numbers for all elements in new locations
+			// Set parentheses for all elements in new locations
+			assignParentheses(tree.getRootIndex(selection));
 		}
 		else if (selection != 0) {
 		/* Deletes blank node from parent's branch stack
 		 * if this puts parent below min. branch count,
 		 * 		delete parent, leave non-blank branch in its place
 		 */
-			int i;
+			int i = selection;
+			selection = tree.getRootIndex(selection);
+			// TODO replace exception logic with bounds-check
 			try {
-				i = selection;
-				selection = tree.getRootIndex(selection);
-				tree.deleteSubTree(i);
-				
+				tree.deleteSubTree(i);				
 				setHighlight();
-				// Set ID numbers for all elements in new locations
+				// Set parentheses for all elements in new locations
+				assignParentheses(selection);
 			}
 			catch (BranchCountException bce) {
 				// Replace parent with last non-BLANK branch of parent
-				int[] indices = tree.getBranchIndices(selection);
+				final int[] indices = tree.getBranchIndices(selection);
 				for (i=indices.length-1; i > 0 ; --i) {
 					if (tree.get(indices[i]).ftype != FunctionType.BLANK) {
 						break;
 					}
 				}
-				tree.setSubTree(selection,
-						new ListTree<Operation>(tree.subTree(indices[i])) );
+				tree.deleteRoot(indices[i]);
 				
 				setHighlight();
-				// Set ID numbers for all elements in new locations
+				// Set parentheses for all elements in new locations
+				assignParentheses(tree.getRootIndex(selection));
 			}
 		}
 	}
@@ -195,7 +215,8 @@ public class OpTree {
 	public void deleteParent() {
 		selection = tree.deleteRoot(selection);
 		
-		// Reset ID tags
+		// Set parentheses for all elements in new locations
+		assignParentheses(tree.getRootIndex(selection));
 	}
 	
 	//-----------------------------------------------------------------

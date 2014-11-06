@@ -5,6 +5,7 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.SparseArray;
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 
 public class AlignLeaf implements AlignForm {
 
@@ -16,15 +17,15 @@ public class AlignLeaf implements AlignForm {
 	}
 	
 	// Local Members
-	private int leaf_num;
+	public final int leaf_number;
 	private float scale=1;
 	
 	// Constructors
 	public AlignLeaf(int index) {
-		leaf_num = index;
+		leaf_number = index;
 	}
 	public AlignLeaf(int index, float scale_factor) {
-		leaf_num = index;
+		leaf_number = index;
 		scale = scale_factor;
 	}
 	
@@ -35,8 +36,8 @@ public class AlignLeaf implements AlignForm {
 	@Override
 	public void setSuperLeafSizes(List<RectF> leaf_sizes) {
 		if (dim == null)
-			dim = new RectF(leaf_sizes.get(leaf_num));
-		else dim.set(leaf_sizes.get(leaf_num));
+			dim = new RectF(leaf_sizes.get(leaf_number));
+		else dim.set(leaf_sizes.get(leaf_number));
 		dim.left *= scale;
 		dim.top *= scale;
 		dim.right *= scale;
@@ -54,7 +55,7 @@ public class AlignLeaf implements AlignForm {
 	}
 	@Override
 	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs) {
-		leaf_locs.put(leaf_num, dim);
+		leaf_locs.put(leaf_number, dim);
 	}
 	@Override
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {
@@ -62,5 +63,10 @@ public class AlignLeaf implements AlignForm {
 		//	Returns false to allow for the loop to proceed.
 		return false;
 	}
+	//--- Manage Parentheses ---
+	@Override
+	public void assignParentheses(ClosureType[] ctypes, boolean[] pars_active) {}
+	@Override
+	public ClosureType getClosureType() {return ClosureType.OTHER;}
 
 }

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-/********************************************************************
+/**
  * CLASS - ListTree
  * A tree-organized collection of elements, stored in a stack. The stack
  * is ordered depth-wise, such that one can find each branch node of an 
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class ListTree<E> implements Collection<E> {
 	
 	
-	/********************************************************************
+	/**
 	 * CLASS - Node
 	 * Wraps each inserted element to provide branch-counting methods.
 	 */
@@ -70,7 +70,7 @@ public class ListTree<E> implements Collection<E> {
 		}
 	}
 	
-	/********************************************************************
+	/**
 	 * CLASS - FindParentAlgorithm
 	 * Used to run the parent-finder algorithm, and recover both the 
 	 * parent index and the child number concurrently.
@@ -107,8 +107,9 @@ public class ListTree<E> implements Collection<E> {
 		list = new ArrayList<Node<E>>(tree.list);
 	}
 		
-	//--------------------------------------------------------------------
-	// Access Methods
+	/**********************************************************
+	 * Access Methods
+	 **********************************************************/
 	public E get(int index) {
 		return list.get(index).getObject();
 	}
@@ -116,7 +117,7 @@ public class ListTree<E> implements Collection<E> {
 		return list.get(index).getBranchCount();		
 	}
 	
-	/********************************************************************
+	/**
 	 * METHOD - subTree
 	 * Returns a new tree object, with subList as base stack
 	 */
@@ -124,10 +125,11 @@ public class ListTree<E> implements Collection<E> {
 		return new ListTree<E>( list.subList(index, getEndOfBranchIndex(index)) );
 	}
 	
-	//--------------------------------------------------------------------
-	//Navigation Methods
+	/**********************************************************
+	 * Navigation Methods
+	 **********************************************************/
 	
-	/*********************************************************************
+	/**
 	 * METHOD - getRootIndex
 	 * Returns ref. index of parent node to the given "index"
 	 * 
@@ -141,7 +143,7 @@ public class ListTree<E> implements Collection<E> {
 		}
 		return index;
 	}
-	/*********************************************************************
+	/**
 	 * METHOD - getEndLeafIndex
 	 *  Returns the index of next child node to "index"'s parent
 	 *	If "index" is the rightmost node in level, it returns the
@@ -159,7 +161,7 @@ public class ListTree<E> implements Collection<E> {
 		return index;
 	}
 	
-	/*********************************************************************
+	/**
 	 * METHOD - getNthBranchIndex
 	 *  Returns the index of the n-th child node of the given parent. 
 	 *  If the parent has less than n children, it returns EndOfBranchIndex
@@ -176,7 +178,7 @@ public class ListTree<E> implements Collection<E> {
 			
 		return branch_loc;
 	}
-	/*********************************************************************
+	/**
 	 * METHOD - getBranchNumber
 	 *  Returns the child number of this branch in its parent.
 	 *  (Algorithm is identical to that of FindParentAlgorithm.)
@@ -192,7 +194,7 @@ public class ListTree<E> implements Collection<E> {
 		return list.get(index).getBranchCount()-1 - tmp;
 	}
 	
-	/*********************************************************************
+	/**
 	 * METHOD - getBranchIndices
 	 *  Returns a stack of the indices for each child of the designated branch.
 	 * 
@@ -208,7 +210,7 @@ public class ListTree<E> implements Collection<E> {
 		return indices;
 	}
 	
-	/*********************************************************************
+	/**
 	 * METHOD - getNodeDepth
 	 *  Returns the number of branches separating the current node from 
 	 *  the root node. (index.e. for index=0, return=0)
@@ -223,14 +225,15 @@ public class ListTree<E> implements Collection<E> {
 		return depth;
 	}
 	
-	
-	//--------------------------------------------------------------------
-	// Basic Insertion Methods
-	// NOTE - in all insertion/deletion methods, branch counts must be altered first,
-	//	before any other significant changes are made. This makes recovery
-	//	from branch count errors manageable.
-	
-	/*********************************************************************
+	/**********************************************************
+	 * Basic Insertion Methods
+	 * 
+	 * NOTE - in all insertion/deletion methods, branch counts must be altered first,
+	 *	before any other significant changes are made. This makes recovery
+	 *	from branch count errors manageable.
+	 **********************************************************/
+
+	/**
 	 * FUNCTION - addBranch
 	 *	branch - object to insert
  	 *	parent_loc - the index of the parent under which to insert the new object
@@ -274,7 +277,7 @@ public class ListTree<E> implements Collection<E> {
 		return branch_loc;
 	}
 	
-	/*********************************************************************
+	/**
 	 * FUNCTION - addRoot
 	 * 
 	 * child_loc - the index used for insertion
@@ -307,7 +310,7 @@ public class ListTree<E> implements Collection<E> {
 		return child_loc+tmp;
 	}
 	
-	/*********************************************************************
+	/**
 	 * FUNCTION - swapBranches
 	 * 
 	 * Swaps the locations of two children under the same parent node.
@@ -324,7 +327,7 @@ public class ListTree<E> implements Collection<E> {
 		temp2.addAll(temp3);
 	}
 	
-	/*********************************************************************
+	/**
 	 * FUNCTION - shiftBranchOrder
 	 * 
 	 * Moves a child node from its current ordered location to a new order.
@@ -354,7 +357,7 @@ public class ListTree<E> implements Collection<E> {
 		}
 		return branch_loc;
 	}
-	/*********************************************************************
+	/**
 	 * FUNCTION - deleteBranch
 	 * 
 	 * Removes branch from tree. If the parent branch cannot have so few children,
@@ -370,7 +373,7 @@ public class ListTree<E> implements Collection<E> {
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
 	}
 	
-	/*********************************************************************
+	/**
 	 * FUNCTION - deleteRoot
 	 * 
 	 * Deletes the entire parent branch of the designated node, replacing it with
@@ -396,7 +399,7 @@ public class ListTree<E> implements Collection<E> {
 		return parent_loc;
 	}
 	
-	/*********************************************************************
+	/**
 	 * FUNCTION - setSubTree
 	 * 
 	 * Replaces a branch with a new node object, or an existing Tree.
@@ -419,7 +422,9 @@ public class ListTree<E> implements Collection<E> {
 		list.addAll(branch_loc, branch.list);
 	}
 	
-	//--- Collection-Inherited Methods ---
+	/**********************************************************
+	 * Collection-Inherited Methods
+	 **********************************************************/
 	@Override
 	public int size() {
 		return list.size();

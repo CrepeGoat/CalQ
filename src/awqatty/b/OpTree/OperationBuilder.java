@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.content.Context;
 import awqatty.b.DrawMath.AlignDrawBuilder;
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 import awqatty.b.DrawMath.DrawSubTree.AlignForm;
 import awqatty.b.FunctionDictionary.*;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionConstant;
@@ -19,10 +20,10 @@ import awqatty.b.ListTree.ListTree;
 public final class OperationBuilder {
 
 	double _number;
-	AlignDrawBuilder textbuilder;
+	AlignDrawBuilder align_builder;
 	
 	public OperationBuilder(Context context) {
-		textbuilder = new AlignDrawBuilder(context);
+		align_builder = new AlignDrawBuilder(context);
 	}
 		
 	/**************************************************************
@@ -30,7 +31,7 @@ public final class OperationBuilder {
 	 **************************************************************/
 	public OperationBuilder number(double n) {
 		_number = n;
-		textbuilder.number(n);
+		align_builder.number(n);
 		return this;
 	}
 	
@@ -244,8 +245,24 @@ public final class OperationBuilder {
 		}
 	}
 	
-	private AlignForm buildTextPres(FunctionType ftype) {
-		return textbuilder.build(ftype);
+	private AlignForm buildDisplay(FunctionType ftype) {
+		return align_builder.build(ftype);
+	}
+	public ClosureType buildClosureType(FunctionType ftype) {
+		return (ftype != FunctionType.NUMBER ? null :
+			(_number < 0 ? ClosureType.TEXT_NUMERIC_NEG
+					: ClosureType.TEXT_NUMERIC_POS ));
+		/*
+		switch (ftype) {
+		case BLANK:
+			return ClosureType.OTHER;
+		case NUMBER:
+			return (_number < 0 ? ClosureType.TEXT_NUMERIC_NEG
+					: ClosureType.TEXT_NUMERIC_POS );
+		default:
+			return null;
+		}
+		*/
 	}
 	
 	private static int getMinLeaves(FunctionType ftype) {
@@ -345,6 +362,7 @@ public final class OperationBuilder {
 	// Used to ensure functions have appropriate ftypes
 	//	i.e. SQUARE differs from POWER only by default values,
 	//		should be treated as POWER function (esp. when args change from defaults)
+	// TODO create new enum for only pure functions, and use current for compound
 	private static FunctionType getImplementingType(FunctionType ftype) {
 		switch(ftype){
 		case SQUARE:
@@ -362,7 +380,8 @@ public final class OperationBuilder {
 			return new Operation(
 					getImplementingType(ftype),
 					buildFunction(ftype),
-					buildTextPres(ftype) );
+					buildDisplay(ftype),
+					buildClosureType(ftype) );
 		}
 		// Unexpected case
 		else

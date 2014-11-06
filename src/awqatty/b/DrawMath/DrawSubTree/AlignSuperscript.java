@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.graphics.RectF;
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 
 public class AlignSuperscript extends AlignBase {
 
@@ -53,6 +54,25 @@ public class AlignSuperscript extends AlignBase {
 				exp.height()-(base.height()/4),
 				exp.height()/2 ));
 		valid_area.set(0,0, exp.right, base.bottom);
+	}
+	
+	//--- Manage Parentheses ---
+	@Override
+	public ClosureType getClosureType() {
+		return ClosureType.SUBSUPERSCRIPT;
+	}
+	@Override
+	protected void decideParentheses(ClosureType[] ctypes, boolean[] pars_active) {
+		if (comps.get(INDEX_BASE) instanceof AlignLeaf) {
+			int leaf_num = ((AlignLeaf)comps.get(INDEX_BASE)).leaf_number;
+			pars_active[leaf_num] =
+					!(ctypes[leaf_num] == ClosureType.TEXT_ALPHA ||
+					ctypes[leaf_num] == ClosureType.TEXT_NUMERIC_POS ||
+					ctypes[leaf_num] == ClosureType.BOUNDED );
+		}
+		if (comps.get(INDEX_EXP) instanceof AlignLeaf) {
+			pars_active[((AlignLeaf)comps.get(INDEX_EXP)).leaf_number] = false;
+		}
 	}
 
 }

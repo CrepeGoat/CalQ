@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.SparseArray;
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 import awqatty.b.DrawMath.DrawSubTree.AlignForm;
 
 public class DrawPath extends RawDrawBase implements AlignForm {
@@ -61,6 +62,12 @@ public class DrawPath extends RawDrawBase implements AlignForm {
 	public void setSuperLeafSizes(List<RectF> leaf_sizes) {}
 	@Override
 	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs) {}
+	
+	//--- Manage Parentheses ---
+	@Override
+	public void assignParentheses(ClosureType[] ctypes, boolean[] pars_active) {}
+	@Override
+	public ClosureType getClosureType() {return ClosureType.OTHER;}
 
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.graphics.RectF;
 import awqatty.b.DrawMath.AlignCommands.OrientForm;
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 
 public abstract class AlignAxisBase extends AlignBase {
 
@@ -21,7 +22,7 @@ public abstract class AlignAxisBase extends AlignBase {
 		public static final byte STRETCH_GIRTH	=1;
 		public static final byte STRETCH_FULL	=2;
 
-	protected final boolean orientation;
+	protected final OrientForm orient;
 		public static final boolean HORIZONTAL	=OrientForm.HORIZONTAL;
 		public static final boolean VERTICAL	=OrientForm.VERTICAL;
 	
@@ -40,9 +41,21 @@ public abstract class AlignAxisBase extends AlignBase {
 			boolean orientation,
 			float whitespace,
 			byte aligned_edges) {
-		this.orientation = orientation;
+		orient = (orientation == HORIZONTAL
+				? OrientForm.horiz : OrientForm.vert);
 		whtspc = whitespace;
 		align = aligned_edges;
+	}
+	
+	//--- Get Methods ---
+	public boolean getOrientation() {
+		return orient.getOrientation();
+	}
+	
+	@Override
+	public ClosureType getClosureType() {
+		return orient.getOrientation() == HORIZONTAL
+				? ClosureType.SERIES_HORIZ : ClosureType.SERIES_VERT;
 	}
 	
 	//--- AlignBase Overrides ---
@@ -50,7 +63,6 @@ public abstract class AlignAxisBase extends AlignBase {
 	public Iterable<RectF> iterLocs() {return locs;}
 	
 	protected RectF rectf = null;
-	protected OrientForm orient;
 	protected float max_girth;
 	// Use in loop
 	private float last_edge;
@@ -58,10 +70,7 @@ public abstract class AlignAxisBase extends AlignBase {
 	protected void arrange() {
 		// TODO Auto-generated method stub
 		loadAlignTools();
-		
 		last_edge=0;
-		orient = (orientation == HORIZONTAL
-				? OrientForm.horiz : OrientForm.vert);
 				
 		// Clear previous lists
 		locs.clear();

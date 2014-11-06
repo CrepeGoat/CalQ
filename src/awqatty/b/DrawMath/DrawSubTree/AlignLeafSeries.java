@@ -3,6 +3,7 @@ package awqatty.b.DrawMath.DrawSubTree;
 import java.util.List;
 
 import android.graphics.RectF;
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 
 public class AlignLeafSeries extends AlignSeriesBase {
 	
@@ -34,6 +35,14 @@ public class AlignLeafSeries extends AlignSeriesBase {
 		if (locs != null)
 			locs.clear();
 		super.setSuperLeafSizes(leaf_sizes);
+	}
+	@Override
+	protected void decideParentheses(ClosureType[] ctypes, boolean[] pars_active) {
+		ClosureType ctype_last=null;
+		for (int i=0; i<ctypes.length; ++i) {
+			pars_active[i] = decideSingleParentheses(ctypes[i],	ctype_last);
+			ctype_last = ctypes[i];
+		}
 	}
 
 }

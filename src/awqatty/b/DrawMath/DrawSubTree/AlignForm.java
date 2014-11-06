@@ -5,6 +5,7 @@ import java.util.List;
 import android.graphics.RectF;
 import android.util.SparseArray;
 import awqatty.b.DrawMath.DrawFormBase;
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 
 /*
  * Provides functionality for use as a alignment subtree within
@@ -19,5 +20,7 @@ public interface AlignForm extends DrawFormBase {
 	// Adds original values to array, not copies. Do not edit in use!
 	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs);
 
-
+	//--- Assign Parentheses ---
+	public void assignParentheses(ClosureType[] branch_ctypes, boolean[] pars_active);
+	public ClosureType getClosureType();
 }

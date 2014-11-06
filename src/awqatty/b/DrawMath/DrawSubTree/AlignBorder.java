@@ -3,6 +3,8 @@ package awqatty.b.DrawMath.DrawSubTree;
 import java.util.Arrays;
 import java.util.List;
 
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
+
 public final class AlignBorder extends AlignAxisBase {
 
 	// Contains only three elements: component, start bound, end bound
@@ -30,11 +32,34 @@ public final class AlignBorder extends AlignAxisBase {
 		stretch_bounds = stretch_type;
 	}
 	
+	//--- Get/Set Method ---
+	public AlignForm getComponent() {
+		return comps.get(INDEX_COMP);
+	}
+	public void setComponent(AlignForm comp) {
+		comps.set(INDEX_COMP, comp);
+	}
+	
+	@Override
+	public ClosureType getClosureType() {
+		return stretch_bounds != STRETCH_NONE
+				? ClosureType.BOUNDED : super.getClosureType();
+	}
+	
 	//--- AlignBase Overrides ---
 	@Override
 	protected Iterable<AlignForm> iterComps()	{return comps;}
 	@Override
 	protected Iterable<AlignForm> iterCompsWithLoc(){return comps;}
+	@Override
+	protected void decideParentheses(
+			ClosureType[] ctypes, boolean[] pars_active) {
+		// If the leaf is contained in a border, there is no need
+		//		for use of parentheses
+		if (comps.get(INDEX_COMP) instanceof AlignLeaf) {
+			pars_active[((AlignLeaf) comps.get(INDEX_COMP)).leaf_number] = false;
+		}
+	}
 
 	//--- AlignAxisBase Overrides ---
 	@Override

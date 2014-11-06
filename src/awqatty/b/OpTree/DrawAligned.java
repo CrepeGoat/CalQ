@@ -1,11 +1,16 @@
-package awqatty.b.DrawMath.DrawToCanvas;
+package awqatty.b.OpTree;
 
 import java.util.List;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.util.Log;
 import android.util.SparseArray;
+import awqatty.b.DrawMath.AlignDrawBuilder;
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
+import awqatty.b.DrawMath.DrawSubTree.AlignBorder;
 import awqatty.b.DrawMath.DrawSubTree.AlignForm;
+import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
 
 /*
  * Two Loops:
@@ -30,13 +35,28 @@ public class DrawAligned implements DrawForm {
 		
 	//--- Local Members ---
 	private float scale = 1;
-	private final AlignForm comp;
+	
+	private final AlignForm base_comp;
+	private AlignBorder comp_par=null;
+	private AlignForm comp;
+	
+	private final ClosureType ctype;
 	
 	//
 	private static SparseArray<RectF> leaf_holder = null;
 
+	// Constructors
 	public DrawAligned(AlignForm component) {
+		base_comp = component;
 		comp = component;
+		ctype = component.getClosureType();
+		Log.d("DrawAligned", "ClosureType=" + ctype.toString());
+	}
+	public DrawAligned(AlignForm component, ClosureType closure) {
+		base_comp = component;
+		comp = component;
+		ctype = (closure!=null ? closure : component.getClosureType());
+		Log.d("DrawAligned", "ClosureType=" + ctype.toString());
 	}
 		
 	//--- Set Methods ---
@@ -46,6 +66,32 @@ public class DrawAligned implements DrawForm {
 	@Override
 	public void setColor(int color) {
 		comp.setColor(color);
+	}
+	
+	
+	//--- Manage Parentheses ---
+	public void setParentheses(boolean b) {
+		if (b) {
+			comp_par = (AlignBorder) // TODO implement w/o casting (interface?)
+					AlignDrawBuilder.buildParentheses(base_comp);
+			comp = comp_par;
+		} else {
+			comp_par = null;
+			comp = base_comp;
+		}
+	}
+	public <T extends DrawAligned> void assignBranchParentheses(T[] branches) {
+		int i;
+		ClosureType[] branch_ctypes = new ClosureType[branches.length];
+		boolean[] pars_active = new boolean[branches.length];
+		
+		for (i=0; i<branches.length; ++i) {
+			branch_ctypes[i] = branches[i].ctype;
+		}
+		base_comp.assignParentheses(branch_ctypes, pars_active);		
+		
+		for (i=0; i<pars_active.length; ++i)
+			branches[i].setParentheses(pars_active[i]);
 	}
 	
 	//--- Loop Methods ---

@@ -5,6 +5,7 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.SparseArray;
+import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 import awqatty.b.DrawMath.DrawSubTree.AlignForm;
 
 public final class DrawBlank implements AlignForm, DrawForm {
@@ -59,5 +60,11 @@ public final class DrawBlank implements AlignForm, DrawForm {
 	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs) {}
 	@Override
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {return false;}
+	
+	//--- Manage Parentheses ---
+	@Override
+	public void assignParentheses(ClosureType[] ctypes, boolean[] pars_active) {}
+	@Override
+	public ClosureType getClosureType() {return ClosureType.OTHER;}
 
 }
