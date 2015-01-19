@@ -6,7 +6,6 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.SparseArray;
-import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 
 abstract public class AlignBase implements AlignForm {
 
@@ -26,17 +25,6 @@ abstract public class AlignBase implements AlignForm {
 	abstract protected Iterable<RectF> iterLocs();
 	
 	abstract protected void arrange();
-	
-	//--- Determine Parentheses ---
-	@Override
-	public void assignParentheses(ClosureType[] ctypes, boolean[] pars_active) {
-		decideParentheses(ctypes, pars_active);
-		for (AlignForm comp : iterComps())
-			if (comp != null)
-				comp.assignParentheses(ctypes, pars_active);
-	}
-	abstract protected void decideParentheses(
-			ClosureType[] ctypes, boolean[] pars_active);
 	
 	//--- Set Methods ---
 	@Override

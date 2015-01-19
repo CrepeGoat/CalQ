@@ -18,6 +18,7 @@ public class TextPresObject implements TextPresForm {
 		flags = new TagFlags(TagFlags.NONE);
 	}
 	
+	@Override
 	public void setIdValue(int id) {
 		// Assumes taglist is not empty, and ID TagFill is ALWAYS the first entry
 		/*
@@ -28,13 +29,16 @@ public class TextPresObject implements TextPresForm {
 		((BiTagFill)taglist[0]).inserts[0]
 				= Integer.toString(id);
 	}
+	@Override
 	public void enableTagFlag(int f) {
 		flags.enableFlag(f);
 	}
+	@Override
 	public void disableTagFlag(int f) {
 		flags.disableFlag(f);
 	}
 	
+	@Override
 	public String getTextPres(List<String> str_list) {
 		int i;
 		for (i=0; i<str_list.size(); ++i)

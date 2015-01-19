@@ -2,6 +2,7 @@ package awqatty.b.OpTree;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.FunctionDictionary.FunctionForms.CalculationException;
 import awqatty.b.GUI.MathView;
@@ -44,7 +45,8 @@ public class OpTree {
 		// If first element, unset parentheses
 		if (root_index == -1)
 			tree.get(0).setParentheses(false);
-		else {
+		else if (tree.getBranchCount(root_index) > 0) {
+			/*
 			int[] branches = tree.getBranchIndices(root_index);
 			
 			Operation[] ops = new Operation[branches.length];
@@ -52,6 +54,17 @@ public class OpTree {
 				ops[i] = tree.get(branches[i]);
 			}
 			tree.get(root_index).assignBranchParentheses(ops);
+			/*/
+			final int[] branch_indices = tree.getBranchIndices(root_index);
+			final boolean[] pars_active = tree.get(root_index)
+					.assignBranchParentheses(tree, branch_indices);
+			for (int i=0; i<branch_indices.length; ++i) {
+				Log.d("AlignSeriesBase::subBranchShouldUsePars",
+						"Decision " + Integer.toString(branch_indices[i]) + ": "
+						+ Boolean.toString(pars_active[i]));
+				tree.get(branch_indices[i]).setParentheses(pars_active[i]);
+			}
+			//*/
 		}
 	}
 	
@@ -117,8 +130,6 @@ public class OpTree {
 		}
 		unsetHighlight();
 		// Set new function elements into place
-		// TODO remove boolean return, make function return initial branch's
-		//		new location (relative in subtree)
 		final boolean can_shuffle = 
 				node_builder.buildInSubtree(tree.subTree(selection), ftype);
 		
@@ -127,13 +138,11 @@ public class OpTree {
 		assignParentheses(tree.getRootIndex(selection));
 		// Set selection index to new location (i.e. first blank element)
 		int[] indices = tree.getBranchIndices(selection);
-		for (i=0; i<indices.length; ++i) {
-			if (tree.get(indices[i]).ftype == FunctionType.BLANK) {
-				selection = indices[i];
-				break;
-			}
+		for (i=0; i<indices.length; ++i)
+				if (tree.get(indices[i]).ftype == FunctionType.BLANK) {
+			selection = indices[i];
+			break;
 		}
-		
 		setHighlight();
 		
 		// Returns whether shuffle operation is valid or not

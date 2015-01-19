@@ -5,8 +5,9 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.SparseArray;
-import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 import awqatty.b.DrawMath.DrawSubTree.AlignForm;
+import awqatty.b.DrawMath.DrawSubTree.DrawAligned;
+import awqatty.b.ListTree.ListTree;
 
 public final class DrawBlank implements AlignForm, DrawForm {
 
@@ -63,8 +64,13 @@ public final class DrawBlank implements AlignForm, DrawForm {
 	
 	//--- Manage Parentheses ---
 	@Override
-	public void assignParentheses(ClosureType[] ctypes, boolean[] pars_active) {}
+	public <T extends DrawAligned> void subBranchShouldUsePars(
+			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {}
 	@Override
-	public ClosureType getClosureType() {return ClosureType.OTHER;}
+	public <T extends DrawAligned> AlignForm getFirstInSeries(
+			boolean orientation, ListTree<T>.Navigator nav) {return this;}
+	@Override
+	public <T extends DrawAligned> AlignForm getLastInSeries(
+			boolean orientation, ListTree<T>.Navigator nav) {return this;}
 
 }

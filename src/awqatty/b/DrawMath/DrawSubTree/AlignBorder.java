@@ -3,7 +3,7 @@ package awqatty.b.DrawMath.DrawSubTree;
 import java.util.Arrays;
 import java.util.List;
 
-import awqatty.b.DrawMath.AssignParentheses.ClosureType;
+import awqatty.b.ListTree.ListTree;
 
 public final class AlignBorder extends AlignAxisBase {
 
@@ -39,54 +39,80 @@ public final class AlignBorder extends AlignAxisBase {
 	public void setComponent(AlignForm comp) {
 		comps.set(INDEX_COMP, comp);
 	}
-	
-	@Override
-	public ClosureType getClosureType() {
-		return stretch_bounds != STRETCH_NONE
-				? ClosureType.BOUNDED : super.getClosureType();
-	}
-	
+		
 	//--- AlignBase Overrides ---
 	@Override
 	protected Iterable<AlignForm> iterComps()	{return comps;}
 	@Override
 	protected Iterable<AlignForm> iterCompsWithLoc(){return comps;}
-	@Override
-	protected void decideParentheses(
-			ClosureType[] ctypes, boolean[] pars_active) {
-		// If the leaf is contained in a border, there is no need
-		//		for use of parentheses
-		if (comps.get(INDEX_COMP) instanceof AlignLeaf) {
-			pars_active[((AlignLeaf) comps.get(INDEX_COMP)).leaf_number] = false;
-		}
-	}
 
 	//--- AlignAxisBase Overrides ---
 	@Override
 	protected void addCompsToSeries() {
-		// Gets girth of component
+		// Gets girth of components
+		//if (align == EDGE_ORIGIN) {
 		comps.get(INDEX_COMP).getSize(rectf);
-		max_girth = orient.getGirth(rectf);
-		// Sets max_girth based on bound components
-		if (stretch_bounds == STRETCH_NONE) {
-			if (comps.get(INDEX_BOUND1) != null)
-				comps.get(INDEX_BOUND1).getSize(rectf);
-			max_girth = Math.max(max_girth, orient.getGirth(rectf));
-			if (comps.get(INDEX_BOUND2) != null)
-				comps.get(INDEX_BOUND2).getSize(rectf);
-			max_girth = Math.max(max_girth, orient.getGirth(rectf));
-		}
-		else /*if (stretch_bounds == STRETCH_FULL
-				|| stretch_bounds == STRETCH_GIRTH) */ {
-			if (comps.get(INDEX_BOUND1) != null
-					|| comps.get(INDEX_BOUND2) != null) {
-				max_girth += 2*whtspc;
-			}
-		}
+		min_girth_start = orient.getGirthStart(rectf);
+		max_girth_end = orient.getGirthEnd(rectf);
 		
+		// Expand girth for bounds
+		if (stretch_bounds == STRETCH_NONE) {
+			if (comps.get(INDEX_BOUND1) != null) {
+				comps.get(INDEX_BOUND1).getSize(rectf);
+				min_girth_start = Math.min(min_girth_start, orient.getGirthStart(rectf));
+				max_girth_end = Math.max(max_girth_end, orient.getGirthEnd(rectf));
+			}
+			if (comps.get(INDEX_BOUND2) != null) {
+				comps.get(INDEX_BOUND2).getSize(rectf);
+				min_girth_start = Math.min(min_girth_start, orient.getGirthStart(rectf));
+				max_girth_end = Math.max(max_girth_end, orient.getGirthEnd(rectf));
+			}				
+		} else if (comps.get(INDEX_BOUND1) != null
+				|| comps.get(INDEX_BOUND2) != null) {
+			min_girth_start -= 1.5*whtspc;
+			max_girth_end += 1.5*whtspc;				
+		}
+		/* TODO ...what?
+		} else {
+		
+			if (stretch_bounds == STRETCH_NONE) {
+				max_girth_end = 0;
+				for (AlignForm comp : comps) if (comp != null) {
+					comp.getSize(rectf);
+					max_girth_end = Math.max(max_girth_end, orient.getGirth(rectf)/2);
+				}
+			} else {
+				comps.get(INDEX_COMP).getSize(rectf);
+				max_girth_end = orient.getGirth(rectf)/2;
+				if (comps.get(INDEX_BOUND1) != null
+						|| comps.get(INDEX_BOUND2) != null) {
+					max_girth_end += 1.5*whtspc;
+				}
+			}
+			min_girth_start = -max_girth_end;
+		}//*/
+				
 		// Arrange Components
 		addCompToSeries(comps.get(INDEX_BOUND1), stretch_bounds);
 		addCompToSeries(comps.get(INDEX_COMP), STRETCH_NONE);
 		addCompToSeries(comps.get(INDEX_BOUND2), stretch_bounds);
+	}
+
+	@Override
+	public <T extends DrawAligned> void subBranchShouldUsePars(
+			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {
+		comps.get(INDEX_COMP).subBranchShouldUsePars(tree, branch_indices, pars_active);
+	}
+	@Override
+	public <T extends DrawAligned> AlignForm getFirstInSeries(
+			boolean orientation, ListTree<T>.Navigator nav) {
+		if (orientation != getOrientation()) return this;
+		return comps.get(INDEX_BOUND1).getFirstInSeries(orientation, nav);
+	}	
+	@Override
+	public <T extends DrawAligned> AlignForm getLastInSeries(
+			boolean orientation, ListTree<T>.Navigator nav) {
+		if (orientation != getOrientation()) return this;
+		return comps.get(INDEX_BOUND2).getLastInSeries(orientation, nav);
 	}	
 }

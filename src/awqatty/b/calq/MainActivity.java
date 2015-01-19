@@ -303,7 +303,7 @@ public final class MainActivity extends Activity
 						
 		// Get palette action mode preferences		
 		pltmanager = initPaletteManager(pref.getString(
-				this.getString(R.string.prefKey_paletteActionMode), null ));
+				getString(R.string.prefKey_paletteActionMode), null ));
 		
 		// Get old palette id's from preferences
 		final String keybase = getString(R.string.prefKey_paletteIds_baseStr);
@@ -560,23 +560,21 @@ public final class MainActivity extends Activity
 	}
 	
 	private PaletteManager initPaletteManager(String plt_actionmode) {
-		if (plt_actionmode.equals(getString(
-				R.string.prefValue_paletteActionMode_sidebutton ))) {
+		if (plt_actionmode != null && plt_actionmode.equals(getString(
+				R.string.prefValue_paletteActionMode_sidebutton )))
 			return new SideButtonPaletteManager(this,
 					(getResources().getBoolean(R.bool.canDeletePalette)
 							? R.layout.palettebox_button_swapdelright
 							: R.layout.palettebox_button_swapright ),
 					swapplt_listener, delplt_listener);
-		}
-		else if (plt_actionmode.equals(getString(
-				R.string.prefValue_paletteActionMode_swipe ))) {
+		else
+			//if (plt_actionmode.equals(getString(
+			//	R.string.prefValue_paletteActionMode_swipe )))
 			return new SwipePaletteManager(this,
 					(getResources().getBoolean(R.bool.canDeletePalette)
 							? R.layout.palettebox_swipe_swapleft_delright
 							: R.layout.palettebox_swipe_swapleftright ),
 					swapplt_listener, delplt_listener);
-		}
-		else return null;
 	}
 	
 //	private static FunctionType getFtypeFromViewId(int id) {}

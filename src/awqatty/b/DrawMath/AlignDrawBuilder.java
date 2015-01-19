@@ -1,44 +1,46 @@
 package awqatty.b.DrawMath;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import awqatty.b.DrawMath.DrawSubTree.AlignAxisBase;
+import awqatty.b.DrawMath.DrawSubTree.AlignNumberSegments;
 import awqatty.b.DrawMath.DrawSubTree.AlignSuperscript;
 import awqatty.b.DrawMath.DrawSubTree.AlignLeaf;
 import awqatty.b.DrawMath.DrawSubTree.AlignForm;
 import awqatty.b.DrawMath.DrawSubTree.Builders.AlignBorderBuilder;
 import awqatty.b.DrawMath.DrawSubTree.Builders.AlignLeafSeriesBuilder;
 import awqatty.b.DrawMath.DrawSubTree.Builders.AlignSeriesBuilder;
-import awqatty.b.DrawMath.DrawToCanvas.DrawBlank;
 import awqatty.b.DrawMath.DrawToCanvas.DrawPath;
 import awqatty.b.DrawMath.DrawToCanvas.DrawText;
 import awqatty.b.DrawMath.DrawToCanvas.DrawTextCap;
 import awqatty.b.FunctionDictionary.FunctionType;
-import awqatty.b.GenericTextPresentation.NumberStringConverter;
 
 public class AlignDrawBuilder {
 	
-	private static float group_spacing;
-	private static float letter_spacing;
-	private static int line_thickness;
+	public static final String bracketsOpen = "([{|";
+	public static final String bracketsClose = ")]}|";
+	public static final String mathOperators = "+-\u2212\u2715";
+
+	
+	private static float GROUP_SPACING;
+	private static float LETTER_SPACING;
+	private static int LINE_THICKNESS;
 	
 	// Initializes all static values dependent on screen density
 	//		(called in constructor of every instance)
 	public static final void setDensity(Context context) {
 		float density = context.getResources().getDisplayMetrics().density;
-		DrawText.setDensity(density);
-		
 		synchronized(AlignDrawBuilder.class) {
-			group_spacing = 15 * density;
-			letter_spacing = 4.5f * density;
-			line_thickness = (int) (3 * density);
+			GROUP_SPACING = 15 * density;
+			LETTER_SPACING = 4.5f * density;
+			LINE_THICKNESS = (int) (3 * density);
 		}
+		DrawText.setDensity(density);
+		AlignNumberSegments.setSpacing(LETTER_SPACING);
 	}
 	
 	public AlignDrawBuilder(Context context) {
@@ -51,32 +53,19 @@ public class AlignDrawBuilder {
 		return this;
 	}
 	
-	/**************************************************
-	 * Draw Numbers in Grouped Scale
-	 */
-	private static final float scale = 0.6f;
-	private static final float min_scale = (float) (1/Math.sqrt(2));
-											// -> Area2 = (1/2)*Area1
-	private static void getDrawNumText(
-			List<DrawText> series, 
-			List<String> list_num) 
-	{
-		final int length = list_num.size();
-		int i;
-		DrawText comp;
-		for (i=0; i<length; ++i) {
-			comp = new DrawText(list_num.get(i));
-			comp.setScale((float)
-					(min_scale + (1-min_scale)*Math.pow(scale,i)) );
-			series.add(comp);
-		}
-	}
 	
+	/*
+	 * Build-Number Helper Methods
+	 * 
+	 */
+	/*
+	private static final float scale_decay = 0.6f;
+	private static final float min_scale = (float) (1/Math.sqrt(2));
+											// -> Area2 = (1/2)*Area1	
 	private static void getNumberDraw(
 			double number, 
 			List<DrawText> series_sigFig,
-			List<DrawText> series_mag ) 
-	{
+			List<DrawText> series_mag ) {
 		final String str_num = NumberStringConverter.toString(number);
 		final int str_length = str_num.length();
 		final ArrayList<String> list = new ArrayList<String>();
@@ -104,6 +93,20 @@ public class AlignDrawBuilder {
 		}
 		getDrawNumText(series_mag, list);
 	}
+	private static void getDrawNumText(
+			List<DrawText> series, 
+			List<String> list_num) 
+	{
+		final int length = list_num.size();
+		int i;
+		DrawText comp;
+		for (i=0; i<length; ++i) {
+			comp = new DrawText(list_num.get(i));
+			comp.setScale((float)
+					(min_scale + (1-min_scale)*Math.pow(scale_decay,i)) );
+			series.add(comp);
+		}
+	}
 	private static void groupWholeNum(String str, List<String> list) {
 		final int length = str.length();
 		
@@ -130,11 +133,11 @@ public class AlignDrawBuilder {
 			list.add(0, str.substring(index, index+3));
 		}
 	}
+	//*/
 	
 	/**
 	 * Build Method
 	 */	
-	@SuppressWarnings("unchecked")
 	public AlignForm build(FunctionType ftype) {
 		Path path;
 		String text=null;
@@ -149,98 +152,105 @@ public class AlignDrawBuilder {
 		case NUMBER:
 			// Case for infinite values
 			if (_number == Double.POSITIVE_INFINITY) {
-				return new DrawText("\u221E");
+				return new DrawTextCap("\u221E");
 			}
 			else if (_number == Double.NEGATIVE_INFINITY) {
-				return new DrawText("-\u221E");
+				return new DrawTextCap("-\u221E");
 			}
 			// Case for finite values
-			List<DrawText> series_sigFig = new ArrayList<DrawText>();
-			List<DrawText> series_mag = new ArrayList<DrawText>();
-			getNumberDraw(_number, series_sigFig, series_mag);
+			/*
+			List<DrawText> seriesSigFig = new ArrayList<DrawText>();
+			List<DrawText> seriesMag = new ArrayList<DrawText>();
+			getNumberDraw(_number, seriesSigFig, seriesMag);
 			
-			if (series_sigFig.size() == 1 && series_mag.isEmpty())
-				return series_sigFig.get(0);
-			else {
-				List<AlignForm> tmp = new ArrayList<AlignForm>();
-				tmp.add(new AlignSeriesBuilder(series_sigFig)
-						.aligned_edge(AlignAxisBase.EDGE_BOTTOM)
-						.whitespace(letter_spacing)
-						.build() );
-				
-				if (series_mag.isEmpty())
-					return tmp.get(0);
-				else {
-					tmp.add(new AlignSeriesBuilder(series_mag)
-							.aligned_edge(AlignAxisBase.EDGE_TOP)
-							.whitespace(letter_spacing)
-							.build() );
-					return new AlignSeriesBuilder(tmp)
-							.aligned_edge(AlignAxisBase.EDGE_CENTER)
-							.whitespace(letter_spacing)
-							.build();
-				}
+			if (seriesMag.isEmpty()) {
+				if (seriesSigFig.size() == 1)
+					return seriesSigFig.get(0);
+				else return new AlignSeriesBuilder(seriesSigFig)
+				.orientation(AlignSeries.HORIZONTAL)
+				.aligned_edge(AlignSeries.EDGE_BOTTOM)
+				.whitespace(LETTER_SPACING)
+				.build();
 			}
-			
+			else return new AlignSeriesBuilder(Arrays.asList(
+					new AlignSeriesBuilder(seriesSigFig)
+					.orientation(AlignSeries.HORIZONTAL)
+					.aligned_edge(AlignSeries.EDGE_BOTTOM)
+					.whitespace(LETTER_SPACING)
+					.build(),
+					new AlignSeriesBuilder(seriesMag)
+					.orientation(AlignSeries.HORIZONTAL)
+					.aligned_edge(AlignSeries.EDGE_TOP)
+					.whitespace(LETTER_SPACING)
+					.build()
+			))
+			.orientation(AlignSeries.HORIZONTAL)
+			.whitespace(LETTER_SPACING)
+			.build();
+			/*/
+			return AlignNumberSegments.buildDrawNumber(_number);
+			//*/
+
 		// Standard Functions
 		case ADD:
 			return new AlignLeafSeriesBuilder()
-					.divider(new DrawTextCap("+"))
-					.stretch_divider(AlignAxisBase.STRETCH_NONE)
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(group_spacing)
-					.build();
+			.divider(new DrawTextCap("+"))
+			.stretch_divider(AlignAxisBase.STRETCH_NONE)
+			.aligned_edge(AlignAxisBase.EDGE_ORIGIN)
+			.whitespace(GROUP_SPACING)
+			.build();
 		case SUBTRACT:
 			return new AlignLeafSeriesBuilder()
-					.divider(new DrawTextCap("\u2212"))
-					.stretch_divider(AlignAxisBase.STRETCH_NONE)
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(group_spacing)
-					.build();
+			.divider(new DrawTextCap("\u2212"))
+			.stretch_divider(AlignAxisBase.STRETCH_NONE)
+			.aligned_edge(AlignAxisBase.EDGE_ORIGIN)
+			.whitespace(GROUP_SPACING)
+			.build();
 		case MULTIPLY:
 			return new AlignLeafSeriesBuilder()
-					//* Explicit multiplication symbols (best for simple clicking)
-					.divider(new DrawTextCap("\u2715"))
-					.stretch_divider(AlignAxisBase.STRETCH_NONE)
-					.whitespace(group_spacing)
-					/*/// Implicit adjacency multiplication (works w/ with drag select)
-					.whitespace(letter_spacing)
-					//*/
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.build();
+			/* Explicit multiplication symbols (best for simple clicking)
+			.divider(new DrawTextCap("\u2715"))
+			.stretch_divider(AlignAxisBase.STRETCH_NONE)
+			.whitespace(GROUP_SPACING)
+			/*/// Implicit adjacency multiplication (works w/ drag select)
+			.whitespace(LETTER_SPACING)
+			//*/
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			.build();
 		case DIVIDE:
 			path = new Path();
-			path.addRect(new RectF(0,0,1,line_thickness),
+			path.addRect(new RectF(0,0,1,LINE_THICKNESS),
 					Path.Direction.CCW );
-			return new AlignLeafSeriesBuilder()
-					.divider(new DrawPath(path,new Paint(Paint.ANTI_ALIAS_FLAG),
-							new RectF(0,-group_spacing/2f,
-									1, line_thickness+(group_spacing/2f) )))
-					//.divider(new DrawText("."))
-					.stretch_divider(AlignAxisBase.STRETCH_GIRTH)
-					.orientation(AlignAxisBase.VERTICAL)
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(group_spacing/2f)
-					.build();
+			return new AlignSeriesBuilder(Arrays.asList(
+					new AlignLeaf(0), new AlignLeaf(1)))
+			.divider(new DrawPath(path,new Paint(Paint.ANTI_ALIAS_FLAG),
+					new RectF(0,-GROUP_SPACING/2f,
+							1, LINE_THICKNESS+(GROUP_SPACING/2f) )))
+			//.divider(new DrawText("."))
+			.stretch_divider(AlignAxisBase.STRETCH_GIRTH)
+			.orientation(AlignAxisBase.VERTICAL)
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			.whitespace(GROUP_SPACING/2f)
+			.build();
 			
 		case NEGATIVE:
 			return new AlignSeriesBuilder(Arrays.asList(
-					new DrawTextCap("-"), new AlignLeaf(0) ))
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(letter_spacing)
-					.build();
+			new DrawTextCap("-"), new AlignLeaf(0) ))
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			.whitespace(LETTER_SPACING)
+			.build();
 		case ABS:
 			path = new Path();
-			path.addRect(new RectF(0,0,line_thickness,line_thickness),
+			path.addRect(new RectF(0,0,LINE_THICKNESS,LINE_THICKNESS),
 					Path.Direction.CCW );
 			nested_comp = new DrawPath(path, new Paint(Paint.ANTI_ALIAS_FLAG));
 			return new AlignBorderBuilder(new AlignLeaf(0))
-					.start_bound(nested_comp)
-					.end_bound(nested_comp)
-					.bound_stretch(AlignAxisBase.STRETCH_GIRTH)
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(letter_spacing)
-					.build();
+			.start_bound(nested_comp)
+			.end_bound(nested_comp)
+			.bound_stretch(AlignAxisBase.STRETCH_GIRTH)
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			.whitespace(LETTER_SPACING)
+			.build();
 
 		// Power Functions
 		case POWER:
@@ -252,26 +262,26 @@ public class AlignDrawBuilder {
 					new AlignLeaf(0), new AlignLeaf(1));
 		case SQRT:
 			path = new Path();
-			path.addRect(new RectF(0,0,line_thickness,line_thickness),
+			path.addRect(new RectF(0,0,LINE_THICKNESS,LINE_THICKNESS),
 					Path.Direction.CCW );
 			DrawText draw = new DrawText("\u221A");	//sqrt
 			draw.setScale(2);
 			return new AlignBorderBuilder(
 					new AlignBorderBuilder(new AlignLeaf(0))
-							.start_bound(new DrawPath(path,
-									new Paint(Paint.ANTI_ALIAS_FLAG) ))
-							//.end_bound(new DrawBlank())
-							.bound_stretch(AlignAxisBase.STRETCH_GIRTH)
-							.orientation(AlignAxisBase.VERTICAL)
-							.aligned_edge(AlignAxisBase.EDGE_CENTER)
-							.whitespace(group_spacing)
-							.build())
-					.start_bound(draw)
+					.start_bound(new DrawPath(path,
+							new Paint(Paint.ANTI_ALIAS_FLAG) ))
+					//.end_bound(new DrawBlank())
 					.bound_stretch(AlignAxisBase.STRETCH_GIRTH)
-					.orientation(AlignAxisBase.HORIZONTAL)
+					.orientation(AlignAxisBase.VERTICAL)
 					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					//.whitespace(-letter_spacing)
-					.build();
+					.whitespace(GROUP_SPACING)
+					.build())
+			.start_bound(draw)
+			.bound_stretch(AlignAxisBase.STRETCH_GIRTH)
+			.orientation(AlignAxisBase.HORIZONTAL)
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			//.whitespace(-letter_spacing)
+			.build();
 			
 		
 		// Text-Represented Functions
@@ -338,57 +348,55 @@ public class AlignDrawBuilder {
 		// Probability
 		case FACTORIAL:
 			return new AlignBorderBuilder(new AlignLeaf(0))
-					.end_bound(new DrawText("!"))
-					.bound_stretch(AlignAxisBase.STRETCH_NONE)
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(letter_spacing)
-					.build();
+			.end_bound(new DrawTextCap("!"))
+			.bound_stretch(AlignAxisBase.STRETCH_NONE)
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			.whitespace(LETTER_SPACING)
+			.build();
 		case NCK:
 			return buildParentheses(
 					new AlignLeafSeriesBuilder()
-							.orientation(AlignAxisBase.VERTICAL)
-							.aligned_edge(AlignAxisBase.EDGE_CENTER)
-							.whitespace(group_spacing)
-							.build() );
+					.orientation(AlignAxisBase.VERTICAL)
+					.aligned_edge(AlignAxisBase.EDGE_CENTER)
+					.whitespace(GROUP_SPACING)
+					.build() );
 		case NPK:
 			return new AlignLeafSeriesBuilder()
-					.divider(new DrawText("P"))
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(letter_spacing)
-					.build();
+			.divider(new DrawTextCap("P"))
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			.whitespace(LETTER_SPACING)
+			.build();
 		
 		// Integer Arithmetic
 		case REMAINDER:
 			return new AlignLeafSeriesBuilder()
-					.divider(new DrawTextCap("mod"))
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(letter_spacing)
-					.build();
+			.divider(new DrawTextCap("mod"))
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			.whitespace(LETTER_SPACING)
+			.build();
 		case GCD:
 			text = "gcd";
 			nested_comp = new AlignLeafSeriesBuilder()
-					.divider(new AlignSeriesBuilder(Arrays.asList(
-							new DrawTextCap(","),
-							new DrawBlank() ))
-							.orientation(AlignAxisBase.HORIZONTAL)
-							.whitespace(letter_spacing)
-							.build() )
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(letter_spacing)
-					.build();
+			.divider(new AlignSeriesBuilder(Arrays.asList(
+					new DrawTextCap(",") ))
+					.orientation(AlignAxisBase.HORIZONTAL)
+					.whitespace(GROUP_SPACING)
+					.build() )
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			.whitespace(LETTER_SPACING)
+			.build();
 			break;
 		case LCM:
 			text = "lcm";
 			nested_comp = new AlignLeafSeriesBuilder()
-					.divider(new AlignSeriesBuilder(Arrays.asList(
-							new DrawTextCap(","),
-							new DrawBlank() ))
-							.orientation(AlignAxisBase.HORIZONTAL)
-							.whitespace(letter_spacing)
-							.build() )
-					.aligned_edge(AlignAxisBase.EDGE_CENTER)
-					.whitespace(letter_spacing)
-					.build();
+			.divider(new AlignSeriesBuilder(Arrays.asList(
+					new DrawTextCap(",") ))
+					.orientation(AlignAxisBase.HORIZONTAL)
+					.whitespace(GROUP_SPACING)
+					.build() )
+			.aligned_edge(AlignAxisBase.EDGE_CENTER)
+			.whitespace(LETTER_SPACING)
+			.build();
 			break;
 
 		// Constants
@@ -402,23 +410,23 @@ public class AlignDrawBuilder {
 		
 		// Use below logic for common text-parentheses-styled representations
 		return new AlignBorderBuilder(buildParentheses(nested_comp))
-				.start_bound(new DrawTextCap(text))
-				.bound_stretch(AlignAxisBase.STRETCH_NONE)
-				.aligned_edge(AlignAxisBase.EDGE_CENTER)
-				.whitespace(letter_spacing)
-				.build();
+		.start_bound(new DrawTextCap(text))
+		.bound_stretch(AlignAxisBase.STRETCH_NONE)
+		.aligned_edge(AlignAxisBase.EDGE_CENTER)
+		.whitespace(LETTER_SPACING)
+		.build();
 	}
 	
 	// TODO make parentheses not look like garbage
 	public static AlignForm buildParentheses(AlignForm core) {
 		return new AlignBorderBuilder(core)
-				.start_bound(new DrawText("("))
-				.end_bound(new DrawText(")"))
-				.bound_stretch(AlignAxisBase.STRETCH_GIRTH)
-				.orientation(AlignAxisBase.HORIZONTAL)
-				.aligned_edge(AlignAxisBase.EDGE_CENTER)
-				.whitespace(letter_spacing)
-				.build();
+		.start_bound(new DrawTextCap("("))
+		.end_bound(new DrawTextCap(")"))
+		.bound_stretch(AlignAxisBase.STRETCH_GIRTH)
+		.orientation(AlignAxisBase.HORIZONTAL)
+		.aligned_edge(AlignAxisBase.EDGE_CENTER)
+		.whitespace(LETTER_SPACING)
+		.build();
 	}
 
 }

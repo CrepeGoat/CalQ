@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import android.graphics.RectF;
-import awqatty.b.DrawMath.AssignParentheses.ClosureType;
+import awqatty.b.ListTree.ListTree;
 
-public class AlignSuperscript extends AlignBase {
+public final class AlignSuperscript extends AlignBase {
 
 	public static final float EXP_SCALE = 0.75f;
 	
@@ -47,32 +47,44 @@ public class AlignSuperscript extends AlignBase {
 		comps.get(INDEX_BASE).getSize(base);
 		comps.get(INDEX_EXP).getSize(exp);
 		
-		exp.set(base.width(), 0,
-				exp.width()*EXP_SCALE + base.width(),
-				exp.height()*EXP_SCALE );
-		base.offsetTo(0, Math.max(
-				exp.height()-(base.height()/4),
-				exp.height()/2 ));
-		valid_area.set(0,0, exp.right, base.bottom);
+		if (exp.height()*EXP_SCALE > base.height()) {
+			// Sets bottom of exp to base centerline (change to 3/4line?)
+			exp.set(base.right,
+					(base.top+base.bottom)/2f - (exp.height()*EXP_SCALE),
+					base.right + (exp.width()*EXP_SCALE),
+					(base.top+base.bottom)/2f );
+		} else {
+			// Centers exp on base.top line
+			exp.set(base.right,
+					base.top - (exp.height()*EXP_SCALE/2f),
+					base.right + (exp.width()*EXP_SCALE),
+					base.top + (exp.height()*EXP_SCALE/2f) );
+		}
+		valid_area.set(base.left, exp.top, exp.right, base.bottom);
 	}
 	
 	//--- Manage Parentheses ---
 	@Override
-	public ClosureType getClosureType() {
-		return ClosureType.SUBSUPERSCRIPT;
+	public <T extends DrawAligned> void subBranchShouldUsePars(
+			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {
+		pars_active[INDEX_BASE] = (tree.get(branch_indices[INDEX_BASE])
+				.base_comp instanceof AlignSeriesBase);
+		pars_active[INDEX_EXP] = (tree.get(branch_indices[INDEX_EXP])
+				.base_comp instanceof AlignSuperscript);
 	}
+
 	@Override
-	protected void decideParentheses(ClosureType[] ctypes, boolean[] pars_active) {
-		if (comps.get(INDEX_BASE) instanceof AlignLeaf) {
-			int leaf_num = ((AlignLeaf)comps.get(INDEX_BASE)).leaf_number;
-			pars_active[leaf_num] =
-					!(ctypes[leaf_num] == ClosureType.TEXT_ALPHA ||
-					ctypes[leaf_num] == ClosureType.TEXT_NUMERIC_POS ||
-					ctypes[leaf_num] == ClosureType.BOUNDED );
-		}
-		if (comps.get(INDEX_EXP) instanceof AlignLeaf) {
-			pars_active[((AlignLeaf)comps.get(INDEX_EXP)).leaf_number] = false;
-		}
+	public <T extends DrawAligned> AlignForm getFirstInSeries(
+			boolean orientation, ListTree<T>.Navigator nav) {
+		if (orientation == AlignAxisBase.VERTICAL) return this;
+		else return comps.get(INDEX_BASE).getFirstInSeries(orientation,nav);
+	}
+
+	@Override
+	public <T extends DrawAligned> AlignForm getLastInSeries(
+			boolean orientation, ListTree<T>.Navigator nav) {
+		if (orientation == AlignAxisBase.HORIZONTAL) return this;
+		else return comps.get(INDEX_BASE).getLastInSeries(orientation,nav);
 	}
 
 }

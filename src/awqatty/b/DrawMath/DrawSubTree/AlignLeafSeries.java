@@ -3,9 +3,9 @@ package awqatty.b.DrawMath.DrawSubTree;
 import java.util.List;
 
 import android.graphics.RectF;
-import awqatty.b.DrawMath.AssignParentheses.ClosureType;
+import awqatty.b.ListTree.ListTree;
 
-public class AlignLeafSeries extends AlignSeriesBase {
+public final class AlignLeafSeries extends AlignSeriesBase {
 	
 	@Override
 	public void clearCache() {
@@ -19,30 +19,30 @@ public class AlignLeafSeries extends AlignSeriesBase {
 		super(divider, stretch_type, orientation, whitespace, aligned_edges);
 	}
 	
+	//--- Private Methods ---
+	private void setLeafCount(int length) {
+		final int old_length = comps.size()-1;
+		if (length > old_length) {
+			for (int i=old_length; i<length; ++i)
+				comps.add(new AlignLeaf(i));
+		} else
+			comps.subList(length+1, old_length+1).clear();
+	}
+
 	//--- AlignBase Override Methods ---
 	@Override
 	public void setSuperLeafSizes(List<RectF> leaf_sizes) {
-		int i;
-		final int length = leaf_sizes.size()+1,
-				old_length = comps.size();
-		
-		if (length > old_length) {
-			for (i=old_length; i<length; ++i)
-				comps.add(new AlignLeaf(i-1));
-		}
-		else
-			comps.subList(length, old_length).clear();
+		setLeafCount(leaf_sizes.size());		
 		if (locs != null)
 			locs.clear();
 		super.setSuperLeafSizes(leaf_sizes);
 	}
 	@Override
-	protected void decideParentheses(ClosureType[] ctypes, boolean[] pars_active) {
-		ClosureType ctype_last=null;
-		for (int i=0; i<ctypes.length; ++i) {
-			pars_active[i] = decideSingleParentheses(ctypes[i],	ctype_last);
-			ctype_last = ctypes[i];
-		}
+	public <T extends DrawAligned> void subBranchShouldUsePars(
+			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {
+		setLeafCount(branch_indices.length);
+		super.subBranchShouldUsePars(tree, branch_indices, pars_active);
 	}
+
 
 }

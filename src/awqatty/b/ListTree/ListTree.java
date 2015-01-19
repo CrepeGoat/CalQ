@@ -70,6 +70,37 @@ public class ListTree<E> implements Collection<E> {
 		}
 	}
 	
+	public final class Navigator {
+		private int index;
+		
+		public Navigator(int start) {
+			index = start;
+		}
+		
+		public int getIndex() {
+			return index;
+		}
+		public int getNumberOfBranches() {
+			return getBranchCount(index);
+		}
+		public E getObject() {
+			return get(index);
+		}
+		
+		public Navigator toRoot() {
+			index = getRootIndex(index);
+			return this;
+		}
+		public Navigator toNthBranch(int branch_order) {
+			index = getNthBranchIndex(index, branch_order);
+			return this;
+		}
+		public Navigator toEnd() {
+			index = getEndOfBranchIndex(index);
+			return this;
+		}
+	}
+	
 	/**
 	 * CLASS - FindParentAlgorithm
 	 * Used to run the parent-finder algorithm, and recover both the 
@@ -200,10 +231,10 @@ public class ListTree<E> implements Collection<E> {
 	 * 
 	 */
 	public int[] getBranchIndices(int parent_loc) {
-		int[] indices = new int[list.get(parent_loc).getBranchCount()];
+		final int[] indices = new int[list.get(parent_loc).getBranchCount()];
 		if (indices.length > 0) {
 			indices[0] = parent_loc+1;
-			for (int i=1; i < indices.length; ++i) {
+			for (int i=1; i<indices.length; ++i) {
 				indices[i] = getEndOfBranchIndex(indices[i-1]);
 			}
 		}
@@ -368,8 +399,9 @@ public class ListTree<E> implements Collection<E> {
 	 * 
 	 */
 	public void deleteSubTree(int branch_loc) throws BranchCountException {
-		if (getRootIndex(branch_loc) != -1)
+		if (getRootIndex(branch_loc) != -1) {
 			list.get(getRootIndex(branch_loc)).decrementCount();
+		}
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
 	}
 	

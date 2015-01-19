@@ -9,8 +9,9 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.SparseArray;
-import awqatty.b.DrawMath.AssignParentheses.ClosureType;
 import awqatty.b.DrawMath.DrawSubTree.AlignForm;
+import awqatty.b.DrawMath.DrawSubTree.DrawAligned;
+import awqatty.b.ListTree.ListTree;
 
 public class DrawText implements DrawForm, AlignForm {
 	
@@ -43,6 +44,8 @@ public class DrawText implements DrawForm, AlignForm {
 	public void getSize(RectF dst) {
 		loadDrawTools();
 		dst.set(valid_area);
+		dst.offsetTo(0,-dst.height()/2);
+			// used for EDGE_ORIGIN alignment
 	}
 		
 	//--- Overrides ---
@@ -87,8 +90,9 @@ public class DrawText implements DrawForm, AlignForm {
 		// Creates paint object
 		loadPaint();
 		// Initializes size
-		if (valid_area == null)
+		if (valid_area == null) {
 			valid_area = new Rect();
+		}
 		paint.getTextBounds(text, 0, text.length(), valid_area);
 	}
 	private void loadPaint() {
@@ -124,8 +128,14 @@ public class DrawText implements DrawForm, AlignForm {
 	
 	//--- Manage Parentheses ---
 	@Override
-	public void assignParentheses(ClosureType[] ctypes, boolean[] pars_active) {}
+	public <T extends DrawAligned> void subBranchShouldUsePars(
+			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {}
+
 	@Override
-	public ClosureType getClosureType() {return ClosureType.TEXT_ALPHA;}
+	public <T extends DrawAligned> AlignForm getFirstInSeries(
+			boolean orientation, ListTree<T>.Navigator nav) {return this;}
+	@Override
+	public <T extends DrawAligned> AlignForm getLastInSeries(
+			boolean orientation, ListTree<T>.Navigator nav) {return this;}
 
 }

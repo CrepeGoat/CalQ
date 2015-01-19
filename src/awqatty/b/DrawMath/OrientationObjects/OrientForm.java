@@ -1,4 +1,4 @@
-package awqatty.b.DrawMath.AlignCommands;
+package awqatty.b.DrawMath.OrientationObjects;
 
 import android.graphics.RectF;
 
@@ -14,6 +14,7 @@ public interface OrientForm {
 	
 	public float getLength(RectF rect);
 	public float getGirth(RectF rect);
+	public void set(RectF rect, float len1, float gir1, float len2, float gir2);
 
 	public float getLengthStart(RectF rect);
 	public void	 setLengthStart(RectF rect, float dim);

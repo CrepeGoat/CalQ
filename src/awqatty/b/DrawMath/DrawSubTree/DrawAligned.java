@@ -1,16 +1,14 @@
-package awqatty.b.OpTree;
+package awqatty.b.DrawMath.DrawSubTree;
 
 import java.util.List;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.RectF;
-import android.util.Log;
 import android.util.SparseArray;
 import awqatty.b.DrawMath.AlignDrawBuilder;
-import awqatty.b.DrawMath.AssignParentheses.ClosureType;
-import awqatty.b.DrawMath.DrawSubTree.AlignBorder;
-import awqatty.b.DrawMath.DrawSubTree.AlignForm;
 import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
+import awqatty.b.ListTree.ListTree;
 
 /*
  * Two Loops:
@@ -35,12 +33,11 @@ public class DrawAligned implements DrawForm {
 		
 	//--- Local Members ---
 	private float scale = 1;
+	private int color = Color.BLACK;
 	
-	private final AlignForm base_comp;
+	final AlignForm base_comp;
 	private AlignBorder comp_par=null;
 	private AlignForm comp;
-	
-	private final ClosureType ctype;
 	
 	//
 	private static SparseArray<RectF> leaf_holder = null;
@@ -49,23 +46,17 @@ public class DrawAligned implements DrawForm {
 	public DrawAligned(AlignForm component) {
 		base_comp = component;
 		comp = component;
-		ctype = component.getClosureType();
-		Log.d("DrawAligned", "ClosureType=" + ctype.toString());
-	}
-	public DrawAligned(AlignForm component, ClosureType closure) {
-		base_comp = component;
-		comp = component;
-		ctype = (closure!=null ? closure : component.getClosureType());
-		Log.d("DrawAligned", "ClosureType=" + ctype.toString());
 	}
 		
 	//--- Set Methods ---
+	@Override
 	public void setScale(float scale_factor) {
 		scale = scale_factor;
 	}
 	@Override
 	public void setColor(int color) {
 		comp.setColor(color);
+		this.color = color;
 	}
 	
 	
@@ -74,24 +65,21 @@ public class DrawAligned implements DrawForm {
 		if (b) {
 			comp_par = (AlignBorder) // TODO implement w/o casting (interface?)
 					AlignDrawBuilder.buildParentheses(base_comp);
+			comp_par.setColor(color);
 			comp = comp_par;
 		} else {
 			comp_par = null;
 			comp = base_comp;
 		}
 	}
-	public <T extends DrawAligned> void assignBranchParentheses(T[] branches) {
-		int i;
-		ClosureType[] branch_ctypes = new ClosureType[branches.length];
-		boolean[] pars_active = new boolean[branches.length];
-		
-		for (i=0; i<branches.length; ++i) {
-			branch_ctypes[i] = branches[i].ctype;
-		}
-		base_comp.assignParentheses(branch_ctypes, pars_active);		
-		
-		for (i=0; i<pars_active.length; ++i)
-			branches[i].setParentheses(pars_active[i]);
+	public <T extends DrawAligned> boolean[] assignBranchParentheses(
+			ListTree<T> tree, int[] indices) {
+		// decisions for each branch
+		boolean[] pars_active = new boolean[indices.length];
+		// gets decisions
+		base_comp.subBranchShouldUsePars(tree, indices, pars_active);
+		// sets decisions
+		return pars_active;
 	}
 	
 	//--- Loop Methods ---

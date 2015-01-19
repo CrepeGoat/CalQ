@@ -16,14 +16,18 @@ public abstract class SwitchTagFillBase extends TagFillBase {
 		flags_active = act;
 	}
 	
+	@Override
 	public void setActivity(int flags) {
 		activity = (flags_active & flags) == (flags_active & flags_pattern);
 	}
+	@Override
 	public void setActivity(TagFlags flags) {
 		setActivity(flags.get());
 	}
 	
+	@Override
 	abstract public boolean isActive();	
+	@Override
 	abstract public String replaceTagsIn(String str);
 	
 }

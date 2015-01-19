@@ -4,6 +4,9 @@ public enum FunctionType {
 	SOURCE,		// denotes ListTree container (remove?)
 	BLANK,
 	NUMBER,
+
+	CONST_E,
+	CONST_PI,
 	
 	ADD,
 	SUBTRACT,
@@ -16,13 +19,11 @@ public enum FunctionType {
 	
 	POWER,
 	SQRT,
-	CONST_E,
 	EXP_E,
 	EXP_10,
 	LN,
 	LOG10,
 	
-	CONST_PI,
 	SINE,
 	COSINE,
 	TANGENT,
@@ -55,8 +56,9 @@ public enum FunctionType {
 		case CONST_PI:
 		case CONST_E:
 			return false;
-		default:
-			return true;
+			
+			default:
+				return true;
 		}
 	}
 	public boolean isCommutative() {
@@ -66,8 +68,22 @@ public enum FunctionType {
 		case GCD:
 		case LCM:
 			return true;
-		default:
-			return false;	
+
+			default:
+				return false;	
+		}
+	}
+	
+	public boolean isCoreType() {
+		switch (this) {
+		case SQUARE:
+		case MULT_INVERSE:
+		case EXP_E:
+		case EXP_10:
+			return false;
+			
+			default:
+				return true;
 		}
 	}
 	
