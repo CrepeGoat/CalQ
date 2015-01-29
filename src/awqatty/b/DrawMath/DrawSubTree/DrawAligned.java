@@ -123,6 +123,11 @@ public class DrawAligned implements DrawForm {
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {
 		return comp.intersectsTouchRegion(dst, px, py);
 	}
+	@Override
+	public boolean intersectsTouchRegion(RectF dst, float p1_x, float p1_y,
+			float p2_x, float p2_y) {
+		return comp.intersectsTouchRegion(dst, p1_x, p1_y, p2_x, p2_y);
+	}
 	
 	// Other Methods
 	@Override
@@ -132,6 +137,5 @@ public class DrawAligned implements DrawForm {
 		}
 		if (comp != null)
 			comp.clearCache();
-	}
-	
+	}	
 }

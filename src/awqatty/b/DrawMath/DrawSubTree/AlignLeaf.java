@@ -63,6 +63,13 @@ public final class AlignLeaf implements AlignForm {
 		//	Returns false to allow for the loop to proceed.
 		return false;
 	}
+	@Override
+	public boolean intersectsTouchRegion(RectF dst, float p1_x, float p1_y,
+			float p2_x, float p2_y) {
+		// Intersection of a leaf's region is tested when the loop reaches it.
+		//	Returns false to allow for the loop to proceed.
+		return false;
+	}
 	//--- Manage Parentheses ---
 	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(

@@ -27,12 +27,37 @@ public class ObservedOpTree extends OpTree {
 	public void setOnChangeListener(OnChangeListener on_change) {
 		listener = on_change;
 	}
-		
+	
+	// TODO give select functions unique identifiers
 	@Override
-	public void setSelection(int i) {
+	public void resetSelection(int... i) {
 		if (listener != null) listener.onChange(
 				new ChangeEvent(this, EVENT_SELECTION, PRE_EVENT) );
-		super.setSelection(i);
+		super.resetSelection(i);
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, POST_EVENT) );
+	}
+	@Override
+	public void addToSelection(int... i) {
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, PRE_EVENT) );
+		super.addToSelection(i);
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, POST_EVENT) );
+	}
+	@Override
+	public void finalizeSelection() {
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, PRE_EVENT) );
+		super.finalizeSelection();
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, POST_EVENT) );
+	}
+	@Override
+	public void selectNone() {
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, PRE_EVENT) );
+		super.selectNone();
 		if (listener != null) listener.onChange(
 				new ChangeEvent(this, EVENT_SELECTION, POST_EVENT) );
 	}

@@ -1,4 +1,4 @@
-package awqatty.b.DrawMath;
+package awqatty.b.GUI.MathTreeLoop;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import android.graphics.RectF;
 import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
 import awqatty.b.ListTree.DataLoopLeafUp;
 
-public class LoopSizingMath
+public class LoopSizeMath
 		extends DataLoopLeafUp<DrawForm, RectF> {
 
 	@Override

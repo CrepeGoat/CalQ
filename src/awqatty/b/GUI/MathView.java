@@ -1,73 +1,50 @@
 package awqatty.b.GUI;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
-import android.view.MotionEvent;
 import android.view.View;
-import awqatty.b.CustomEventListeners.ChangeEvent;
-import awqatty.b.CustomEventListeners.ObservedOpTree;
-import awqatty.b.CustomEventListeners.OnChangeListener;
-import awqatty.b.DrawMath.LoopSizingMath;
-import awqatty.b.DrawMath.LoopClickMath;
-import awqatty.b.DrawMath.LoopDrawMath;
 import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
+import awqatty.b.GUI.MathTreeLoop.LoopDrawMath;
+import awqatty.b.GUI.MathTreeLoop.LoopSizeMath;
 import awqatty.b.ListTree.ListTree;
-import awqatty.b.OpTree.OpTree;
-import awqatty.b.calq.MainActivity;
 
-public final class MathView
-		extends View implements OnGestureListener, OnChangeListener {
-
-	private ListTree<? extends DrawForm> tree;
+public class MathView extends View {
 	
-	private final LoopSizingMath loop_sizing = new LoopSizingMath();
+	protected ListTree<? extends DrawForm> tree;
+	
+	private final LoopSizeMath loop_sizing = new LoopSizeMath();
 	private final LoopDrawMath loop_draw = new LoopDrawMath();
-	private final LoopClickMath loop_click = new LoopClickMath();
+	private float minScaleForFit = 1;
 	
-	private GestureDetector gesture;
-	
-	private RectF math_loc;
-	private boolean should_scale_down = true;
+	protected RectF math_loc;
 	
 	// Constructors
 	public MathView(Context context) {
 		super(context);
-		gesture = new GestureDetector(context, this);
 	}
 	public MathView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		gesture = new GestureDetector(context, this);
 	}
 	public MathView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		gesture = new GestureDetector(context, this);
 	}
 	
 	// ListTree Interface Methods
 	public void setListTree(ListTree<? extends DrawForm> list_tree) {
 		tree = list_tree;
+		refresh();
 	}
-	@Override
-	public void onChange(ChangeEvent event) {
-		// TODO
-		if (event.source_obj instanceof ObservedOpTree &&
-				event.timing_code == ObservedOpTree.POST_EVENT) {
-			requestLayout();
-			invalidate();
-		}
+	public void refresh() {
+		requestLayout();
+		invalidate();
 	}
 	
 	//--- View Override Methods ---
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		
 	}
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -97,21 +74,21 @@ public final class MathView
 		
 		// Logic for auto-scaling expression to available dimensions
 		// TODO should make a custom attribute to trigger auto-scale
-		if (should_scale_down) {
-			float scale = Math.min(
-					draw_width / math_loc.width(),
-					draw_height / math_loc.height() );
-			if (scale < 1) {
-				// Scale down expression size
-				math_loc.right = math_loc.left + math_loc.width()*scale;
-				math_loc.bottom = math_loc.top + math_loc.height()*scale;
-				// Scale down boundary size if necessary
-				if (wMode != View.MeasureSpec.EXACTLY) {
-					draw_width = math_loc.width();
-				}
-				if (hMode != View.MeasureSpec.EXACTLY) {
-					draw_height = math_loc.height();
-				}
+		float scale = Math.min(
+				draw_width / math_loc.width(),
+				draw_height / math_loc.height() );
+		if (scale < 1) {
+			// Match scale to constraints (NOTE: minScale MUST be <= 1)
+			scale = Math.max(scale, minScaleForFit);
+			// Scale down expression size
+			math_loc.right = math_loc.left + math_loc.width()*scale;
+			math_loc.bottom = math_loc.top + math_loc.height()*scale;
+			// Scale down boundary size if necessary
+			if (wMode != View.MeasureSpec.EXACTLY) {
+				draw_width = math_loc.width();
+			}
+			if (hMode != View.MeasureSpec.EXACTLY) {
+				draw_height = math_loc.height();
 			}
 		}
 		
@@ -132,53 +109,5 @@ public final class MathView
 		loop_draw.runLoop(tree, math_loc);
 	}
 	
-	// OnTouchListener Methods	
-	@SuppressLint("ClickableViewAccessibility")
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		if (gesture.onTouchEvent(event))
-			return true;
-		return super.onTouchEvent(event);
-	}
-	
-	@Override
-	public boolean onDown(MotionEvent arg0) {
-		/* TODO change this to check clicked region:
-		 * 
-		 * Contains expression -> select-math mode
-		 * Does not contain expression:
-		 * 		- single click -> deselect all
-		 * 		- drag -> scroll mode
-		 */
-		Log.d("MathView", "Pressed down: x=" + Float.toString(arg0.getX())
-				+ "; y=" + Float.toString(arg0.getY())
-				);
-		// Sets touch region clicked
-		loop_click.setTouchRegion(arg0.getX(), arg0.getY());
-		// Checks region (result saved for later reference, based on touch action)
-		loop_click.runLoop(tree, math_loc);
-		return true;
-	}
-	@Override
-	public boolean onFling(MotionEvent arg0, MotionEvent arg1, float arg2,
-			float arg3) {return false;}
-	@Override
-	public void onLongPress(MotionEvent arg0) {}
-	@Override
-	public boolean onScroll(MotionEvent arg0, MotionEvent arg1, float arg2,
-			float arg3) {return false;}
-	@Override
-	public void onShowPress(MotionEvent arg0) {}
-	
-	@Override
-	public boolean onSingleTapUp(MotionEvent arg0) {
-		Log.d("MathView", "Press released");
 
-		// Send result to OpTree
-		((MainActivity) this.getContext()).onClickMathml(
-				(loop_click.getNodesInTouchRegion().isEmpty() ? OpTree.null_index
-				: loop_click.getNodesInTouchRegion().get(0)) );
-		return true;
-	}
-	
 }

@@ -26,15 +26,15 @@ public class ListTree<E> implements Collection<E> {
 		private final E obj;
 		
 		private int branch_count;
-		public final int branch_min;
-		public final int branch_max;
+		public final int minBranchCount;
+		public final int maxBranchCount;
 
 		// Constructors
 		public Node(E object, int min, int max) {
 			obj = object;
 			branch_count = 0;
-			branch_min = min;
-			branch_max = max;
+			minBranchCount = min;
+			maxBranchCount = max;
 		}
 		public Node(E object) {
 			this(object, 0, Integer.MAX_VALUE);
@@ -51,21 +51,27 @@ public class ListTree<E> implements Collection<E> {
 		// Increment/Decrement Operations
 		//		throws Exception on illegal child counts
 		public void incrementCount() throws BranchCountException {
-			if (branch_count >= branch_max)
+			if (branch_count >= maxBranchCount)
 				throw new BranchCountException();
 			++branch_count;
 		}
 		public void decrementCount() throws BranchCountException {
-			if (branch_count <= branch_min)
+			if (branch_count <= minBranchCount)
 				throw new BranchCountException();
 			--branch_count;
+		}
+		public void incrementCountBy(int diff) {
+			if (minBranchCount > branch_count+diff
+					|| maxBranchCount < branch_count+diff)
+				throw new BranchCountException();
+			branch_count += diff;
 		}
 		// Checks count for validity
 		//		(When building a branch, no exception will be thrown
 		//		 while incrementing. Use this at end of build process
 		//		 to ensure end count complies with bounds.)
 		public void checkCount() throws BranchCountException {
-			if (branch_count <= branch_min || branch_count >= branch_max)
+			if (branch_count <= minBranchCount || branch_count >= maxBranchCount)
 				throw new BranchCountException();
 		}
 	}
@@ -147,6 +153,12 @@ public class ListTree<E> implements Collection<E> {
 	public int getBranchCount(int index) {
 		return list.get(index).getBranchCount();		
 	}
+	public int getMinBranchCount(int index) {
+		return list.get(index).minBranchCount;		
+	}
+	public int getMaxBranchCount(int index) {
+		return list.get(index).maxBranchCount;		
+	}
 	
 	/**
 	 * METHOD - subTree
@@ -184,9 +196,9 @@ public class ListTree<E> implements Collection<E> {
 	 */
 	public int getEndOfBranchIndex(int index) {
 		if (index < list.size()) {
-			int tmp=list.get(index++).getBranchCount();
+			int tmp = list.get(index++).getBranchCount();
 			while (tmp > 0) {
-				tmp += list.get(index++).getBranchCount() - 1;
+				tmp += list.get(index++).getBranchCount()-1;
 			}
 		}
 		return index;
@@ -254,6 +266,44 @@ public class ListTree<E> implements Collection<E> {
 			++depth;
 		}
 		return depth;
+	}
+	
+	/**
+	 * METHOD - getDeepestCommonRoot
+	 * 
+	 */
+	public int getDeepestCommonRoot(int... indices) {
+		// Sets potential return index to lowest provided index
+		int return_index = Integer.MAX_VALUE;
+		for (int index : indices)
+			return_index = Math.min(return_index, index);
+		int end_index = getEndOfBranchIndex(return_index);
+		
+		int index_count = 0;
+		// Check return index for containment of other nodes
+		// (Pre-check can avoid instantiation of FPAlg)
+		while (end_index > indices[index_count]) {
+			if (++index_count >= indices.length)
+				return return_index;
+		}
+		
+		FindParentAlgorithm fp_alg = new FindParentAlgorithm();
+		int loop_end;
+		while (true) {
+			// Move return_index to its root
+			fp_alg.run(return_index);
+			return_index = fp_alg.getParentIndex();
+			// Moves end_index to end of new root branch
+			loop_end = list.get(return_index).getBranchCount();
+			for (int i=fp_alg.getBranchNumber()+1; i<loop_end; ++i ) {
+				end_index = getEndOfBranchIndex(end_index);
+			}
+			// Check return index for containment of other nodes
+			while (end_index > indices[index_count]) {
+				if (++index_count >= indices.length)
+					return return_index;
+			}
+		}
 	}
 	
 	/**********************************************************
@@ -403,6 +453,25 @@ public class ListTree<E> implements Collection<E> {
 			list.get(getRootIndex(branch_loc)).decrementCount();
 		}
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
+	}
+	/**
+	 * FUNCTION - deleteBranches
+	 */
+	public void deleteBranches(int root_loc, int order_first, int range) {
+		if (range == 0) return;
+		range = Math.min(range, list.get(root_loc).getBranchCount()-order_first);
+		// First Validity Check
+		if (range <= 0) throw new RuntimeException();
+		// Last Validity Check (after check, method makes changes)
+		list.get(root_loc).incrementCountBy(-range);
+		
+		// Rest of operation
+		final int index_first = getNthBranchIndex(root_loc, order_first);
+		int index_last = index_first;
+		for (int i=0; i<range; ++i) {
+			index_last = getEndOfBranchIndex(index_last);
+		}
+		list.subList(index_first, index_last).clear();
 	}
 	
 	/**

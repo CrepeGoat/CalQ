@@ -20,19 +20,21 @@ public final class AlignLeafSeries extends AlignSeriesBase {
 	}
 	
 	//--- Private Methods ---
-	private void setLeafCount(int length) {
-		final int old_length = comps.size()-1;
-		if (length > old_length) {
-			for (int i=old_length; i<length; ++i)
+	private void refreshLeaves(int leaf_count) {
+		final int old_leaf_count = comps.size()-1;
+		if (leaf_count > old_leaf_count) {
+			for (int i=old_leaf_count; i<leaf_count; ++i)
 				comps.add(new AlignLeaf(i));
 		} else
-			comps.subList(length+1, old_length+1).clear();
+			comps.subList(
+					leaf_count+INDEX_FIRST,
+					old_leaf_count+INDEX_FIRST ).clear();
 	}
 
 	//--- AlignBase Override Methods ---
 	@Override
 	public void setSuperLeafSizes(List<RectF> leaf_sizes) {
-		setLeafCount(leaf_sizes.size());		
+		refreshLeaves(leaf_sizes.size());		
 		if (locs != null)
 			locs.clear();
 		super.setSuperLeafSizes(leaf_sizes);
@@ -40,7 +42,7 @@ public final class AlignLeafSeries extends AlignSeriesBase {
 	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(
 			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {
-		setLeafCount(branch_indices.length);
+		refreshLeaves(branch_indices.length);
 		super.subBranchShouldUsePars(tree, branch_indices, pars_active);
 	}
 

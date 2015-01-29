@@ -31,7 +31,7 @@ import awqatty.b.CustomEventListeners.SwitchOnChangeListener;
 import awqatty.b.CustomEventListeners.SwitchedEventListenerBase;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.FunctionDictionary.FunctionForms.CalculationException;
-import awqatty.b.GUI.MathView;
+import awqatty.b.GUI.TouchMathView;
 import awqatty.b.GUI.NumberKeyboardListener;
 import awqatty.b.GUI.PaletteManager;
 import awqatty.b.GUI.PaletteboxAnimator;
@@ -40,7 +40,6 @@ import awqatty.b.GUI.SwipePaletteManager;
 import awqatty.b.GenericTextPresentation.NumberStringConverter;
 import awqatty.b.CustomEventListeners.ObservedOpTree;
 import awqatty.b.OpButtons.OperationButton;
-import awqatty.b.OpTree.OpTree;
 import awqatty.b.ViewUtilities.ViewFinder;
 import awqatty.b.ViewUtilities.ViewParentFinder;
 import awqatty.b.ViewUtilities.ViewReplacer;
@@ -127,7 +126,7 @@ public final class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		final MathView mathview = (MathView) findViewById(R.id.mathview);
+		final TouchMathView mathview = (TouchMathView) findViewById(R.id.mathview);
 		number_text = (TextView) findViewById(R.id.textNum);
 
 		/*********************************************************
@@ -340,7 +339,7 @@ public final class MainActivity extends Activity
 		/*********************************************************
 		 * Set local WebView object
 		 *********************************************************/
-		expression.setMathViewToTree(mathview);
+		mathview.setOpTree(expression);
 
 		/*********************************************************
 		 * Set Number Keyboard
@@ -584,10 +583,10 @@ public final class MainActivity extends Activity
 	//////////////////////////////////////////////////////////////////////
 	
 	// Called when a MathML element is clicked in the WebView
-	public void onClickMathml(int index) {
+	public void onClickMathView(int index) {
 		// TODO (?) if clicked element is a child element of the current selection,
 		//		set selector to the index of its parent
-		expression.setSelection(index);
+		expression.addToSelection(index);
 		//refreshNumberText();
 	}
 	
@@ -596,7 +595,7 @@ public final class MainActivity extends Activity
 			// Calculate result (throws CalcEx)
 			result = expression.getCalculation();
 
-			expression.setSelection(OpTree.null_index);
+			expression.selectNone();
 
 			// Set text representation of result to view
 			((TextView) findViewById(R.id.textNum))
@@ -615,7 +614,7 @@ public final class MainActivity extends Activity
 	public void onClickNumberText(View v) {		
 		if (number_text.getHint() == getString(R.string.textNum_blank)) {
 			switch_setTextToEqual.disableListener();
-			expression.setSelection(blank_index);
+			expression.addToSelection(blank_index);
 			switch_setTextToEqual.enableListener();
 			number_text.setText(getString(R.string.textNum_default));
 		}
@@ -685,7 +684,7 @@ public final class MainActivity extends Activity
 		number_text.setText("");
 		onNumKeyboardResult();
 		// TODO make numkeys hide in some other way (this is kinda dumb)
-		expression.setSelection(expression.selection);
+		expression.addToSelection(expression.getSelectionIndex());
 	}
 	
 	public void onClickDeletePalette(View v) {
