@@ -122,13 +122,14 @@ public class DrawText implements DrawForm, AlignForm {
 	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs) {}
 	@Override
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {
-		return dst.contains(px, py);
+		return RawDrawBase.contains(dst, px,py, RawDrawBase.TOUCH_PADDING);
 	}
 	@Override
 	public boolean intersectsTouchRegion(RectF dst,
 			float p1_x, float p1_y,
 			float p2_x, float p2_y) {
-		return RawDrawBase.containsLineSegment(dst, p1_x, p1_y, p2_x, p2_y);
+		return RawDrawBase.containsLineSegment(dst, p1_x,p1_y, p2_x,p2_y,
+				RawDrawBase.TOUCH_PADDING);
 	}
 	
 	//--- Manage Parentheses ---

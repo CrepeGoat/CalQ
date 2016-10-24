@@ -17,6 +17,7 @@ import awqatty.b.DrawMath.DrawSubTree.Builders.AlignSeriesBuilder;
 import awqatty.b.DrawMath.DrawToCanvas.DrawPath;
 import awqatty.b.DrawMath.DrawToCanvas.DrawText;
 import awqatty.b.DrawMath.DrawToCanvas.DrawTextCap;
+import awqatty.b.DrawMath.DrawToCanvas.RawDrawBase;
 import awqatty.b.FunctionDictionary.FunctionType;
 
 public class AlignDrawBuilder {
@@ -41,6 +42,7 @@ public class AlignDrawBuilder {
 		}
 		DrawText.setDensity(density);
 		AlignNumberSegments.setSpacing(LETTER_SPACING);
+		//RawDrawBase.TOUCH_PADDING = LETTER_SPACING;
 	}
 	
 	public AlignDrawBuilder(Context context) {
@@ -409,9 +411,8 @@ public class AlignDrawBuilder {
 		}
 		
 		// Use below logic for common text-parentheses-styled representations
-		return new AlignBorderBuilder(buildParentheses(nested_comp))
-		.start_bound(new DrawTextCap(text))
-		.bound_stretch(AlignAxisBase.STRETCH_NONE)
+		return new AlignSeriesBuilder(Arrays.asList(
+				new DrawTextCap(text), buildParentheses(nested_comp) ))
 		.aligned_edge(AlignAxisBase.EDGE_CENTER)
 		.whitespace(LETTER_SPACING)
 		.build();

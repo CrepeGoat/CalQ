@@ -10,6 +10,13 @@ import android.graphics.RectF;
 public abstract class RawDrawBase implements DrawForm {
 	
 	//--- Static Methods ---
+	static public float TOUCH_PADDING = 0f;
+	static public boolean contains(RectF dst, float px, float py, float padding) {
+		dst.inset(-padding, -padding);
+		final boolean ret_val = dst.contains(px,py);
+		dst.inset(padding, padding);
+		return ret_val;
+	}
 	static public boolean containsLineSegment(RectF dst,
 			float p1_x, float p1_y,
 			float p2_x, float p2_y) {
@@ -59,6 +66,16 @@ public abstract class RawDrawBase implements DrawForm {
 		// Return result
 		return (a_min<=a_max);
 	}
+	static public boolean containsLineSegment(RectF dst,
+			float p1_x, float p1_y,
+			float p2_x, float p2_y,
+			float padding) {
+		dst.inset(-padding, -padding);
+		final boolean ret_val = containsLineSegment(dst, p1_x, p1_y, p2_x, p2_y);
+		dst.inset(padding, padding);
+		return ret_val;
+	}
+	
 	
 	//--- Local Members ---
 	protected int color=Color.BLACK;
@@ -123,12 +140,13 @@ public abstract class RawDrawBase implements DrawForm {
 	public boolean intersectsTouchRegion(RectF dst,
 			float p1_x, float p1_y,
 			float p2_x, float p2_y) {
-		return containsLineSegment(dst, p1_x, p1_y, p2_x, p2_y);
+		return containsLineSegment(dst, p1_x, p1_y, p2_x, p2_y,
+				TOUCH_PADDING);
 	}
 	@Override
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {
 		//return intersectsTouchRegion(dst,px,py,px,py);
-		return dst.contains(px, py);
+		return contains(dst, px,py, TOUCH_PADDING);
 	}
 	
 	// Methods to Override

@@ -77,6 +77,8 @@ import awqatty.b.ViewUtilities.ViewReplacer;
  * change numkeys to normal buttons
  * 	- more uniform appearance
  * 
+ * make adding calculated result to equation screen a swipe action
+ * 
  * TODO Bugs
  * 
  *****************************************************************************************/
