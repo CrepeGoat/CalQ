@@ -1,4 +1,4 @@
-package awqatty.b.GenericTextPresentation;
+package awqatty.b.GUI;
 
 
 //import java.text.DecimalFormat;
@@ -12,20 +12,20 @@ public final class NumberStringConverter {
 	public static short numOfDigits(double d) {
 		return (short)Math.log10(Math.abs(d));
 	}
-	//*/
-	
+
 	public static String toString(double d) {
 		if (d == (int)d)
 			return Integer.toString((int)d);
 		else
 			return Float.toString((float)d);
 	}
-	
-	public static String toStringOfLength(double d, int length) {
-		if (d == (int)d)
-			return Integer.toString((int)d);
+	//*/
+
+	public static String toReducedString(double d) {
+		if (Math.round(d) == d)
+			return Long.toString((long)d);
 		else
-			return Float.toString((float)d);
+			return Double.toString(d);
 		/*
 		String tmp = toString(d);
 		

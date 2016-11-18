@@ -21,10 +21,8 @@ public interface AlignForm extends DrawFormBase {
 	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs);
 
 	//--- Assign Parentheses ---
+	public void assignParentheses(int[] branch_ctypes, boolean[] pars_active);
 	public <T extends DrawAligned> void subBranchShouldUsePars(
-			ListTree<T> tree, int[] branch_indices, boolean[] pars_active);
-	public <T extends DrawAligned> AlignForm getFirstInSeries(
-			boolean orientation, ListTree<T>.Navigator nav);
-	public <T extends DrawAligned> AlignForm getLastInSeries(
-			boolean orientation, ListTree<T>.Navigator nav);
+			ListTree<T>.Navigator nav, boolean[] pars_active);
+	public int getClosureFlags();
 }

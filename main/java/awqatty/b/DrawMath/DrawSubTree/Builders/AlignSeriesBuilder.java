@@ -11,7 +11,6 @@ public class AlignSeriesBuilder extends AlignSeriesBaseBuilder {
 	private final List<? extends AlignForm> comps;
 	
 	public AlignSeriesBuilder(List<? extends AlignForm> components) {
-		super();
 		comps = components;
 	}
 	

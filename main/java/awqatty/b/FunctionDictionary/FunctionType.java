@@ -3,6 +3,7 @@ package awqatty.b.FunctionDictionary;
 public enum FunctionType {
 	SOURCE,		// denotes ListTree container (remove?)
 	BLANK,
+	RAW_TEXT,
 	NUMBER,
 
 	CONST_E,

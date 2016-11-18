@@ -1,3 +1,4 @@
+<!-- NOTE: other old layout versions are on GitHub -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:id="@+id/context"
@@ -11,17 +12,13 @@
 		android:layout_height="0dp"
 		android:layout_weight="1"
 		android:layout_gravity="center_horizontal" />
-	
-	<include layout="@layout/textnum_buttonequal" />
-	
+
 	<LinearLayout
 		android:id="@+id/panelOps"
 		android:orientation="vertical"
 		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:divider="?android:attr/dividerHorizontal"
-		android:showDividers="middle" >
-				
+		android:layout_height="wrap_content" >
+
 		<LinearLayout
 			android:orientation="horizontal"
 			android:layout_width="match_parent"
@@ -32,30 +29,20 @@
 			android:showDividers="middle" >
 
 			<include layout="@layout/buttons_edits"/>
-			
-			<Button
-				android:id="@+id/buttonNum"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:text="@string/number"
-				android:textSize="@dimen/button_textSize_M"
-				style="?android:attr/buttonBarButtonStyle" />
-			
+
 		</LinearLayout>
-		
-   		<include layout="@layout/panelpalette"
-   		    android:layout_width="match_parent"
-   		    android:layout_height="wrap_content" />
-		
+
+		<include layout="@layout/panelpalette"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<android.inputmethodservice.KeyboardView
+			android:id="@+id/keyboardNum"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal|bottom"
+			android:focusable="true"
+			android:focusableInTouchMode="true" />
+
 	</LinearLayout>
-	
-	<android.inputmethodservice.KeyboardView
-		android:id="@+id/keyboardNum"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center_horizontal|bottom"
-		android:focusable="true"
-		android:focusableInTouchMode="true"
-		android:visibility="gone" />
-   	
 </LinearLayout>

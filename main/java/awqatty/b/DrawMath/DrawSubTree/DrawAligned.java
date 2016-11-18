@@ -5,8 +5,10 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.RectF;
+import android.util.Log;
 import android.util.SparseArray;
 import awqatty.b.DrawMath.AlignDrawBuilder;
+import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
 import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
 import awqatty.b.ListTree.ListTree;
 
@@ -35,17 +37,26 @@ public class DrawAligned implements DrawForm {
 	private float scale = 1;
 	private int color = Color.BLACK;
 	
-	final AlignForm base_comp;
+	protected AlignForm base_comp;
+	protected AlignForm comp;
 	private AlignBorder comp_par=null;
-	private AlignForm comp;
-	
-	//
+
+	final int cflags;
+
 	private static SparseArray<RectF> leaf_holder = null;
 
 	// Constructors
 	public DrawAligned(AlignForm component) {
 		base_comp = component;
 		comp = component;
+		cflags = component.getClosureFlags();
+		Log.d("DrawAligned", "ClosureType=" + Integer.toString(cflags));
+	}
+	public DrawAligned(AlignForm component, int closure) {
+		base_comp = component;
+		comp = component;
+		cflags = (closure!=ClosureFlags.NONE ? closure : component.getClosureFlags());
+		Log.d("DrawAligned", "ClosureType=" + Integer.toString(cflags));
 	}
 		
 	//--- Set Methods ---
@@ -72,14 +83,31 @@ public class DrawAligned implements DrawForm {
 			comp = base_comp;
 		}
 	}
-	public <T extends DrawAligned> boolean[] assignBranchParentheses(
-			ListTree<T> tree, int[] indices) {
+	public <T extends DrawAligned> void assignBranchParentheses(T[] branches) {
+		int i;
+		int[] branch_ctypes = new int[branches.length];
+		boolean[] pars_active = new boolean[branches.length];
+		
+		for (i=0; i<branches.length; ++i)
+			branch_ctypes[i] = branches[i].cflags;
+		base_comp.assignParentheses(branch_ctypes, pars_active);		
+		
+		for (i=0; i<pars_active.length; ++i)
+			branches[i].setParentheses(pars_active[i]);
+	}
+	public <T extends DrawAligned> void assignBranchParentheses(
+			ListTree<T>.Navigator nav) {
 		// decisions for each branch
-		boolean[] pars_active = new boolean[indices.length];
+		boolean[] pars_active = new boolean[nav.getNumberOfBranches()];
+		// moves nav to first branch
+		nav.toNthBranch(0);
+		final ListTree<T>.Navigator nav2 = nav.new_copy();
 		// gets decisions
-		base_comp.subBranchShouldUsePars(tree, indices, pars_active);
+		base_comp.subBranchShouldUsePars(nav, pars_active);
 		// sets decisions
-		return pars_active;
+		for (int i=0; i<pars_active.length; ++i) {
+			nav2.getObject().setParentheses(pars_active[i]);
+		}
 	}
 	
 	//--- Loop Methods ---
@@ -123,11 +151,6 @@ public class DrawAligned implements DrawForm {
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {
 		return comp.intersectsTouchRegion(dst, px, py);
 	}
-	@Override
-	public boolean intersectsTouchRegion(RectF dst, float p1_x, float p1_y,
-			float p2_x, float p2_y) {
-		return comp.intersectsTouchRegion(dst, p1_x, p1_y, p2_x, p2_y);
-	}
 	
 	// Other Methods
 	@Override
@@ -137,5 +160,6 @@ public class DrawAligned implements DrawForm {
 		}
 		if (comp != null)
 			comp.clearCache();
-	}	
+	}
+	
 }

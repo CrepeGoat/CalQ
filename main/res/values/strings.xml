@@ -17,7 +17,7 @@
 	<string name="shuffleDesc">Shift operation order</string>
 	<string name="example">Example MathML</string>
 	<string name="numkeyboard_hint">0.0</string>
-	<string name="textNum_blank">[?]</string>
+	<string name="textNum_blank">(Incomplete expression)</string>
 	<string name="textNum_default">0</string>
 	<string name="arrowUp">↑</string>
 	<string name="circle">&#9675;</string>
@@ -108,6 +108,6 @@
 	<string name="prefCategory_meta">The Meta</string>
 	<string name="prefKey_donate">pref_donate</string>
 	<string name="prefTitle_donate">Donate with PayPal</string>
-	<string name="prefSummary_donate">Opens window in browser</string>
+	<string name="prefSummary_donate">Opens new window in browser</string>
 	
 </resources>

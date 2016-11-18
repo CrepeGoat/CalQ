@@ -24,8 +24,11 @@ abstract public class DataLoopLeafUp<E, T>{
 			// TODO change to make insertions/deletions at end
 			if (branch_count > 0) {
 				stack.set(branch_count-1,
-						loopAtNode(tree.get(index), 
-								stack.subList(0, branch_count) ));
+						loopAtNode(
+								tree.get(index),
+								stack.subList(0, branch_count)
+						)
+				);
 				stack.subList(0, branch_count-1).clear();
 			}
 			else

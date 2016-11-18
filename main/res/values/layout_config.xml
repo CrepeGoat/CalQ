@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- TODO change main layouts -->
 <resources>
-    <item name="main" 			type="layout"	>@layout/main_port</item>
+    <item name="main" 			type="layout"	>@layout/main_port_new</item>
     <item name="panelpalette" 	type="layout"	>@layout/panelpalette_single</item>
     <item name="palettebox" 	type="layout"	>@layout/palettebox_swipe_swapleftright</item>
     <item name="panelpalettes_weight" type="fraction">0</item>
-    
+    <item name="numkeys" 		type="xml"		>@xml/numkeys_3x5_right</item>
+
     <bool name="canDeletePalette">false</bool>
     <string name="stretchPaletteCols">*</string>
     <integer name="maxPaletteQuantity">1</integer>
     
-    <item name="numkeys" 		type="xml"		>@xml/numkeys_4x4_right_hideable</item>
-    
+
 </resources>

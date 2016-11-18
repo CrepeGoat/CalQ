@@ -9,6 +9,7 @@ import android.widget.Button;
 import awqatty.b.ViewUtilities.ViewParentFinder;
 import awqatty.b.calq.R;
 
+
 public class PaletteSwipeListener extends OnSwipeListener implements
 		PaletteboxAnimator {
 

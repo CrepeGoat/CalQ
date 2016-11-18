@@ -1,4 +1,4 @@
-package awqatty.b.GUI.MathTreeLoop;
+package awqatty.b.DrawMath;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class LoopDrawMath
 	
 	private final RectF tmp = new RectF();
 	@Override
-	protected LoopControl loopAtNode(DrawForm node, RectF data,
+	protected byte loopAtNode(DrawForm node, RectF data,
 			List<RectF> sublist) {
 		
 		/* TODO Test code. Remove
@@ -31,7 +31,7 @@ public class LoopDrawMath
 		tmp.set(data);
 		node.drawToCanvas(canvas, tmp);
 		node.getLeafLocations(sublist);
-		return LoopControl.CONTINUE;
+		return CONTINUE;
 	}
 
 

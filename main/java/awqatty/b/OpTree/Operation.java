@@ -7,9 +7,8 @@ import awqatty.b.FunctionDictionary.FunctionForms.FunctionForm;
 
 public class Operation extends DrawAligned {
 
-	public final FunctionType ftype;
-	
-	public final FunctionForm func;
+	public final FunctionType ftype; // stores enum identifying the operation
+	public final FunctionForm func; // stores the object that performs the operation calculations
 	
 	public Operation(FunctionType function_type,
 			FunctionForm function,
@@ -18,4 +17,15 @@ public class Operation extends DrawAligned {
 		func = function;
 		ftype = function_type;
 	}
+	//*
+	public Operation(FunctionType function_type,
+			FunctionForm function,
+			AlignForm component,
+			int cflags) {
+		super(component, cflags);
+		func = function;
+		ftype = function_type;
+	}
+	//*/
+
 }

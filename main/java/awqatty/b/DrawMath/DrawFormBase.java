@@ -10,10 +10,11 @@ public interface DrawFormBase {
 	public void drawToCanvas(Canvas canvas, RectF dst);
 	// On Touch Loop
 	public boolean intersectsTouchRegion(RectF dst, float px, float py);
-	public boolean intersectsTouchRegion(RectF dst,
-			float p1_x, float p1_y,
-			float p2_x, float p2_y);
-	
+ 	public boolean intersectsTouchRegion(RectF dst,
+ 			float p1_x, float p1_y,
+ 			float p2_x, float p2_y
+	);
+
 	// Other
 	public void setColor(int color);
 	public void clearCache();

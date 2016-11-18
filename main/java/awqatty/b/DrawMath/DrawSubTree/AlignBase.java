@@ -25,7 +25,20 @@ abstract public class AlignBase implements AlignForm {
 	abstract protected Iterable<RectF> iterLocs();
 	
 	abstract protected void arrange();
-	
+
+	///////////////////////////////// v REMOVE? v /////////////////////////////////////
+	//--- Determine Parentheses ---
+	@Override
+	public void assignParentheses(int[] cflags, boolean[] pars_active) {
+		decideParentheses(cflags, pars_active);
+		for (AlignForm comp : iterComps())
+			if (comp != null)
+				comp.assignParentheses(cflags, pars_active);
+	}
+	abstract protected void decideParentheses(
+			int[] cflags, boolean[] pars_active);
+	///////////////////////////////// ^ REMOVE? ^ /////////////////////////////////////
+
 	//--- Set Methods ---
 	@Override
 	public void setColor(int color) {
@@ -87,7 +100,7 @@ abstract public class AlignBase implements AlignForm {
 			if (draw != null) draw.getSuperLeafLocations(leaf_locs);
 	}
 	
-	// TODO merge code with drawToCanvas method
+	// TODO merge code with drawToCanvas
 	// Note - this method overwrites dst value
 	@Override
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {
@@ -119,36 +132,38 @@ abstract public class AlignBase implements AlignForm {
 		}
 		return false;
 	}
-	@Override
-	public boolean intersectsTouchRegion(RectF dst, float p1_x, float p1_y,
-			float p2_x, float p2_y) {
-		if (!dst.isEmpty()) {
-			final Iterator<AlignForm> iter_comp = 
-					iterCompsWithLoc().iterator();
-			final Iterator<RectF> iter_loc = 
-					iterLocs().iterator();
-			final float
-					dx = dst.left - valid_area.left,
-					dy = dst.top - valid_area.top,
-					sx = dst.width() / valid_area.width(),
-					sy = dst.height() / valid_area.height();
-			
-			//dst = new RectF();
-			while (iter_comp.hasNext() && iter_loc.hasNext()) {
-				dst.set(iter_loc.next());
-				dst.set(
-						(dst.left	-valid_area.left)*sx +valid_area.left+dx,
-						(dst.top	-valid_area.top)*sy +valid_area.top+dy,
-						(dst.right	-valid_area.left)*sx +valid_area.left+dx,
-						(dst.bottom	-valid_area.top)*sy +valid_area.top+dy
-						);
-				// If any RawDraw objects intersect the touch region,
-				//	so does the branch.
-				if (iter_comp.next().intersectsTouchRegion(dst, p1_x,p1_y, p2_x,p2_y))
-					return true;
-			}
-		}
-		return false;
-	}
+ 	@Override
+ 	public boolean intersectsTouchRegion(
+			RectF dst,
+			float p1_x, float p1_y,
+			float p2_x, float p2_y
+	) {
+ 		if (!dst.isEmpty()) {
+ 			final Iterator<AlignForm> iter_comp =
+ 					iterCompsWithLoc().iterator();
+ 			final Iterator<RectF> iter_loc =
+ 					iterLocs().iterator();
+ 			final float
+ 					dx = dst.left - valid_area.left,
+ 					dy = dst.top - valid_area.top,
+ 					sx = dst.width() / valid_area.width(),
+ 					sy = dst.height() / valid_area.height();
 
+ 			//dst = new RectF();
+ 			while (iter_comp.hasNext() && iter_loc.hasNext()) {
+ 				dst.set(iter_loc.next());
+ 				dst.set(
+ 						(dst.left	-valid_area.left)*sx +valid_area.left+dx,
+ 						(dst.top	-valid_area.top)*sy +valid_area.top+dy,
+ 						(dst.right	-valid_area.left)*sx +valid_area.left+dx,
+ 						(dst.bottom	-valid_area.top)*sy +valid_area.top+dy
+ 						);
+ 				// If any RawDraw objects intersect the touch region,
+ 				//	so does the branch.
+ 				if (iter_comp.next().intersectsTouchRegion(dst, p1_x,p1_y, p2_x,p2_y))
+ 					return true;
+ 			}
+ 		}
+ 		return false;
+ 	}
 }

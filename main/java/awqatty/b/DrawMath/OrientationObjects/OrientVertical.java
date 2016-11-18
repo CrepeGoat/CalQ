@@ -17,10 +17,6 @@ public final class OrientVertical implements OrientForm {
 	public float getGirth(RectF rect) {
 		return rect.width();
 	}
-	@Override
-	public void set(RectF rect, float len1, float gir1, float len2, float gir2) {
-		rect.set(gir1, len1, gir2, len2);
-	}
 
 	// ------------
 	@Override

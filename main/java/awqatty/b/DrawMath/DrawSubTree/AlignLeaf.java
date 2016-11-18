@@ -5,6 +5,7 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.SparseArray;
+import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
 import awqatty.b.ListTree.ListTree;
 
 public final class AlignLeaf implements AlignForm {
@@ -63,29 +64,13 @@ public final class AlignLeaf implements AlignForm {
 		//	Returns false to allow for the loop to proceed.
 		return false;
 	}
-	@Override
-	public boolean intersectsTouchRegion(RectF dst, float p1_x, float p1_y,
-			float p2_x, float p2_y) {
-		// Intersection of a leaf's region is tested when the loop reaches it.
-		//	Returns false to allow for the loop to proceed.
-		return false;
-	}
 	//--- Manage Parentheses ---
 	@Override
+	public void assignParentheses(int[] ctypes, boolean[] pars_active) {}
+	@Override
+	public int getClosureFlags() {return ClosureFlags.NONE;}
+	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(
-			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {}
-
-	@Override
-	public <T extends DrawAligned> AlignForm getFirstInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {
-		nav.toNthBranch(leaf_number);
-		return nav.getObject().base_comp.getFirstInSeries(orientation, nav);
-	}	
-	@Override
-	public <T extends DrawAligned> AlignForm getLastInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {
-		nav.toNthBranch(leaf_number);
-		return nav.getObject().base_comp.getLastInSeries(orientation, nav);
-	}	
+			ListTree<T>.Navigator nav, boolean[] pars_active) {}
 
 }

@@ -3,15 +3,12 @@ package awqatty.b.DrawMath.DrawSubTree;
 import java.util.ArrayList;
 import java.util.List;
 
-import awqatty.b.DrawMath.AlignDrawBuilder;
-import awqatty.b.DrawMath.DrawToCanvas.DrawText;
-import awqatty.b.ListTree.ListTree;
+import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
 
 abstract public class AlignSeriesBase extends AlignAxisBase {
 
 	protected final List<AlignForm> comps = new ArrayList<AlignForm>();
-	protected static final int INDEX_DIVIDER = 0;
-	protected static final int INDEX_FIRST = 1;
+	protected final int INDEX_DIVIDER = 0;
 
 	protected final byte stretch_divider;
 		
@@ -48,55 +45,38 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 	}
 	
 	@Override
-	protected void addCompsToSeries() {
+	protected void addCompsToSeries() {		
+		max_girth = 0;
 		// Gets max girth of components
-		//if (align == EDGE_ORIGIN) {
-		if (comps.size() > 1 && comps.get(INDEX_FIRST) != null) {
-			comps.get(INDEX_FIRST).getSize(rectf);
-			min_girth_start = orient.getGirthStart(rectf);
-			max_girth_end = orient.getGirthEnd(rectf);
-		}
-		for (AlignForm comp : comps.subList(INDEX_FIRST+1,comps.size())) 
-				if (comp != null) {
-			comp.getSize(rectf);
-			min_girth_start = Math.min(min_girth_start, orient.getGirthStart(rectf));
-			max_girth_end = Math.max(max_girth_end, orient.getGirthEnd(rectf));
-		}
-		/* TODO ...what?
-		} else {
-			max_girth_end = 0;
-			for (AlignForm comp : comps.subList(INDEX_FIRST,comps.size())) 
-					if (comp != null) {
-				comp.getSize(rectf);
-				max_girth_end = Math.max(max_girth_end, orient.getGirth(rectf)/2);
+		for (AlignForm draw : comps.subList(1,comps.size())) {
+			if (draw != null) {
+				draw.getSize(rectf);
+				max_girth = Math.max(max_girth,
+						orient.getGirth(rectf) );
 			}
-			min_girth_start = -max_girth_end;
-		}//*/
+		}
 		
 		// Proceed based on whether or not bounds are used
-		if (!hasDivider()) {
+		if (comps.get(INDEX_DIVIDER) == null) {
 			// Arrange components in series
-			for (AlignForm comp : comps.subList(INDEX_FIRST,comps.size()))
+			for (AlignForm comp : comps.subList(1,comps.size()))
 				addCompToSeries(comp, STRETCH_NONE);
 		}
 		
 		else {
 			// Sets max_girth based on bound components
 			if (stretch_divider == STRETCH_NONE) {
-				comps.get(INDEX_DIVIDER).getSize(rectf);
-				min_girth_start = Math.min(min_girth_start, orient.getGirthStart(rectf));
-				max_girth_end = Math.max(max_girth_end, orient.getGirthEnd(rectf));
-			}
-			else {/*if (stretch_divider == STRETCH_FULL
+					comps.get(INDEX_DIVIDER).getSize(rectf);
+					max_girth = Math.max(max_girth, orient.getGirth(rectf));
+				}
+			else /*if (stretch_divider == STRETCH_FULL
 				|| stretch_divider == STRETCH_GIRTH) */
-				min_girth_start -= 1.5*whtspc;
-				max_girth_end += 1.5*whtspc;
-			}
+				max_girth += 3*whtspc;
 			
 			// Arrange components in series
 			if (comps.size() > 1)
-				addCompToSeries(comps.get(INDEX_FIRST), STRETCH_NONE);
-			for (AlignForm comp : comps.subList(INDEX_FIRST+1,comps.size())) {
+				addCompToSeries(comps.get(1), STRETCH_NONE);
+			for (AlignForm comp : comps.subList(2,comps.size())) {
 				addCompToSeries(comps.get(INDEX_DIVIDER), stretch_divider);
 				addCompToSeries(comp, STRETCH_NONE);
 			}
@@ -109,83 +89,30 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 	@Override
 	public Iterable<AlignForm> iterCompsWithLoc() {return comps_ordered;}
 	
-	// Manage Parentheses	
-	@Override
-	public <T extends DrawAligned> void subBranchShouldUsePars(
-			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {
-		final int length = comps.size();
-		
-		AlignForm subcomp;
-		int leaf_number;
-		if (getOrientation() == AlignAxisBase.VERTICAL) {
-			// Vertical series comps need parentheses if:
-			//	- has divider, comp is vertical series w/ divider,
-			//		& neither divider stretches
-			//	- has no divider & comp is vertical series w/o divider
-			// (no need for separate cases for numbers, since there is no
-			// ambiguity in vertical alignment)
-			for (int i=INDEX_FIRST; i<length; ++i) {
-				if (comps.get(i) instanceof AlignLeaf) {
-					leaf_number = ((AlignLeaf)comps.get(i)).leaf_number;
-					subcomp = tree.get(branch_indices[leaf_number]).base_comp;
-					pars_active[leaf_number] = 
-							subcomp instanceof AlignSeriesBase
-							&& (!hasDivider() || ((AlignSeriesBase)subcomp).hasDivider())			
-							&& ((AlignSeriesBase)subcomp).getOrientation()
-									== getOrientation();
-				} else comps.get(i).subBranchShouldUsePars(tree, branch_indices, pars_active);
-			}
+	// Manage Parentheses
+	protected boolean decideSingleParentheses(int cflag, int ctype_last) {
+		switch(cflag) {
+		case ClosureFlags.BOUNDED:
+		case ClosureFlags.SCRIPT:
+		case ClosureFlags.TEXT_ALPHABETIC:
+			return false;
+		case ClosureFlags.SERIES_HORIZ:
+		case ClosureFlags.SERIES_HORIZ | ClosureFlags.DIVIDER:
+			return orient.getOrientation() == HORIZONTAL;
+		case ClosureFlags.SERIES_VERT:
+		case ClosureFlags.SERIES_VERT | ClosureFlags.DIVIDER:
+			return orient.getOrientation() == VERTICAL;
+		case ClosureFlags.TEXT_NUMERIC:
+			return !(comps.get(INDEX_DIVIDER)!=null) &&
+					(orient.getOrientation() == HORIZONTAL) &&
+					ctype_last!=ClosureFlags.NONE && ClosureFlags.typeIsText(ctype_last);
+		case ClosureFlags.TEXT_NUMERIC | ClosureFlags.NEGATIVE:
+			return ctype_last!=ClosureFlags.NONE && (orient.getOrientation() == HORIZONTAL)
+					&& (!(comps.get(INDEX_DIVIDER)!=null) || stretch_divider==STRETCH_NONE);
+		default:
+			return true;
 		}
-		else for (int i=INDEX_FIRST; i<length; ++i) {
-			// Horizontal series comps need parentheses:
-			//	- (same cases for vertical)
-			//	- when numbers are adjacent
-			//	- when a negative number is preceded by an operator
-			if (comps.get(i) instanceof AlignLeaf) {
-				leaf_number = ((AlignLeaf)comps.get(i)).leaf_number;
-				subcomp = tree.get(branch_indices[leaf_number]).base_comp;
-				
-				if (subcomp instanceof AlignSeriesBase) {
-					pars_active[leaf_number] = (!hasDivider()
-							|| ((AlignSeriesBase)subcomp).hasDivider() )
-							&& ((AlignSeriesBase)subcomp).getOrientation()
-							== getOrientation();
-				} else if (i != INDEX_FIRST) {
-					final AlignForm comp_prev = comps.get(hasDivider() ? INDEX_DIVIDER:i-1)
-							.getLastInSeries(
-									getOrientation(),
-									tree.new Navigator(branch_indices[0]).toRoot()
-							);
-					if (!(comp_prev instanceof DrawText)) continue;
-					final AlignForm comp = subcomp
-							.getFirstInSeries(
-									getOrientation(),
-									tree.new Navigator(branch_indices[0]).toRoot()
-							);
-					if (!(comp instanceof DrawText)) continue;
-					final char
-					c1 = ((DrawText)comp_prev).text.charAt(((DrawText)comp_prev).text.length()-1),
-					c2 = ((DrawText)comp).text.charAt(0);
-					pars_active[leaf_number] = 
-							(AlignDrawBuilder.mathOperators.indexOf(c1) != -1
-									&& AlignDrawBuilder.mathOperators.indexOf(c2) != -1)
-							|| (Character.isDigit(c1) && (Character.isDigit(c2)
-									|| AlignDrawBuilder.mathOperators.indexOf(c2) != -1));
-				}
-			} else comps.get(i).subBranchShouldUsePars(tree, branch_indices, pars_active);
-		}	
+		
 	}
 	
-	@Override
-	public <T extends DrawAligned> AlignForm getFirstInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {
-		if (orientation != getOrientation()) return this;
-		return comps.get(INDEX_FIRST).getFirstInSeries(orientation,nav);
-	}
-	@Override
-	public <T extends DrawAligned> AlignForm getLastInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {
-		if (orientation != getOrientation()) return this;
-		return comps.get(comps.size()-1).getLastInSeries(orientation,nav);
-	}
 }

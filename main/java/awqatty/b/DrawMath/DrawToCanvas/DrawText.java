@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.SparseArray;
+import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
 import awqatty.b.DrawMath.DrawSubTree.AlignForm;
 import awqatty.b.DrawMath.DrawSubTree.DrawAligned;
 import awqatty.b.ListTree.ListTree;
@@ -27,7 +28,7 @@ public class DrawText implements DrawForm, AlignForm {
 	}
 	
 	//--- Local Private Members ---
-	public final String text;
+	public String text;
 	
 	protected Paint paint=null;
 	protected Rect valid_area=null;
@@ -38,14 +39,16 @@ public class DrawText implements DrawForm, AlignForm {
 	public DrawText(String text) {
 		this.text = text;
 	}
+	public DrawText(String text, float size_reduction) {
+		this.text = text;
+
+	}
 	
 	//--- Get Methods ---
 	@Override
 	public void getSize(RectF dst) {
 		loadDrawTools();
 		dst.set(valid_area);
-		dst.offsetTo(0,-dst.height()/2);
-			// used for EDGE_ORIGIN alignment
 	}
 		
 	//--- Overrides ---
@@ -90,9 +93,8 @@ public class DrawText implements DrawForm, AlignForm {
 		// Creates paint object
 		loadPaint();
 		// Initializes size
-		if (valid_area == null) {
+		if (valid_area == null)
 			valid_area = new Rect();
-		}
 		paint.getTextBounds(text, 0, text.length(), valid_area);
 	}
 	private void loadPaint() {
@@ -122,26 +124,17 @@ public class DrawText implements DrawForm, AlignForm {
 	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs) {}
 	@Override
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {
-		return RawDrawBase.contains(dst, px,py, RawDrawBase.TOUCH_PADDING);
-	}
-	@Override
-	public boolean intersectsTouchRegion(RectF dst,
-			float p1_x, float p1_y,
-			float p2_x, float p2_y) {
-		return RawDrawBase.containsLineSegment(dst, p1_x,p1_y, p2_x,p2_y,
-				RawDrawBase.TOUCH_PADDING);
+		// TODO change touch region type
+		return dst.contains(px, py);
 	}
 	
 	//--- Manage Parentheses ---
 	@Override
+	public void assignParentheses(int[] ctypes, boolean[] pars_active) {}
+	@Override
+	public int getClosureFlags() {return ClosureFlags.TEXT_ALPHABETIC;}
+	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(
-			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {}
-
-	@Override
-	public <T extends DrawAligned> AlignForm getFirstInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {return this;}
-	@Override
-	public <T extends DrawAligned> AlignForm getLastInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {return this;}
+			ListTree<T>.Navigator nav, boolean[] pars_active) {}
 
 }
