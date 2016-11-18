@@ -152,12 +152,16 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 							== getOrientation();
 				} else if (i != INDEX_FIRST) {
 					final AlignForm comp_prev = comps.get(hasDivider() ? INDEX_DIVIDER:i-1)
-							.getLastInSeries(getOrientation(),
-							tree.new Navigator(branch_indices[0]).toRoot());
+							.getLastInSeries(
+									getOrientation(),
+									tree.new Navigator(branch_indices[0]).toRoot()
+							);
 					if (!(comp_prev instanceof DrawText)) continue;
 					final AlignForm comp = subcomp
-							.getFirstInSeries(getOrientation(),
-							tree.new Navigator(branch_indices[0]).toRoot());
+							.getFirstInSeries(
+									getOrientation(),
+									tree.new Navigator(branch_indices[0]).toRoot()
+							);
 					if (!(comp instanceof DrawText)) continue;
 					final char
 					c1 = ((DrawText)comp_prev).text.charAt(((DrawText)comp_prev).text.length()-1),
