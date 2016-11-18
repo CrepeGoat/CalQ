@@ -14,7 +14,7 @@ abstract public class DataLoopLeafUp<E, T>{
 	}
 	
 	// TODO add "skip parent branch" functionality
-	public List<T> runLoop(ListTree<E> tree) {
+	public List<T> runLoop(ListTree<? extends E> tree) {
 		stack.clear();
 		final int count = tree.size();
 		int branch_count;

@@ -14,7 +14,7 @@ public final class SwipePaletteManager extends PaletteManager {
 			OnClickListener swap, OnClickListener del ) {
 		super(activity, palettebox_layout_id);
 		
-		PaletteSwipeListener.setDpi(activity);
+		OnSwipeListener.setDpi(activity);
 		swipe_listener = new PaletteSwipeListener(activity);
 		if (palettebox_layout_id == 
 				R.layout.palettebox_swipe_swapleftright) {

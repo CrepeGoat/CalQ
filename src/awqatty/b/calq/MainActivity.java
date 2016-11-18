@@ -18,7 +18,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -32,14 +31,13 @@ import awqatty.b.CustomEventListeners.SwitchOnChangeListener;
 import awqatty.b.CustomEventListeners.SwitchedEventListenerBase;
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.FunctionDictionary.FunctionForms.CalculationException;
+import awqatty.b.GUI.TouchMathView;
 import awqatty.b.GUI.NumberKeyboardListener;
 import awqatty.b.GUI.PaletteManager;
 import awqatty.b.GUI.PaletteboxAnimator;
 import awqatty.b.GUI.SideButtonPaletteManager;
 import awqatty.b.GUI.SwipePaletteManager;
 import awqatty.b.GenericTextPresentation.NumberStringConverter;
-import awqatty.b.JSInterface.MathmlLinksViewClient;
-import awqatty.b.MathmlPresentation.MathmlTextPresBuilder;
 import awqatty.b.CustomEventListeners.ObservedOpTree;
 import awqatty.b.OpButtons.OperationButton;
 import awqatty.b.ViewUtilities.ViewFinder;
@@ -56,16 +54,11 @@ import awqatty.b.ViewUtilities.ViewReplacer;
  * 
  * TODO
  * 
- * Fix highlighting, or shift to pure html display
- * 
  * Fix number-to-text conversion
  * 
  * Add _ftype values to buttons (to avoid switch table for OnPressOperator & addFunction)
  * 
  * GUI Scheme (colors, custom buttons, TextView borders)
- * 
- * Add code to allow for a "blank-click" on-screen, & allow for SVG output
- * 		(i.e. at each link, add "stopPropogation" functionality)
  * 
  * Add larger device support
  * (also change drawables to be API specific)
@@ -73,21 +66,26 @@ import awqatty.b.ViewUtilities.ViewReplacer;
  * Shift textNum TextView to be constantly in view,
  * 		remove equals button
  * 
- * improve parentheses
+ * add parentheses support
  * 
  * make sure numText contains result in one line
  * 
  * convert single-palette view to be swipe up/down (not scroll) stack
  * 
- * divide panels into fragments
+ * divide panels into fragments (?)
+ * 
+ * change numkeys to normal buttons
+ * 	- more uniform appearance
+ * 
+ * make adding calculated result to equation screen a swipe action
  * 
  * TODO Bugs
  * 
  *****************************************************************************************/
 
 
-public final class MainActivity extends Activity  implements
-	SharedPreferences.OnSharedPreferenceChangeListener {
+public final class MainActivity extends Activity
+		implements SharedPreferences.OnSharedPreferenceChangeListener {
 	
 	/*********************************************************
 	 * Private Fields
@@ -119,7 +117,6 @@ public final class MainActivity extends Activity  implements
 	private RetainDataFragment<ObservedOpTree> fragment_retainOpTree;
 	
 	// Local References (used for faster access of commonly-accessed views)
-	private WebView webview;
 	private TextView number_text;
 	
 	//---------------------------------------------------
@@ -131,7 +128,7 @@ public final class MainActivity extends Activity  implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		webview = (WebView) findViewById(R.id.webview);
+		final TouchMathView mathview = (TouchMathView) findViewById(R.id.mathview);
 		number_text = (TextView) findViewById(R.id.textNum);
 
 		/*********************************************************
@@ -151,7 +148,7 @@ public final class MainActivity extends Activity  implements
 					.commit();
 		}
 		if (fragment_retainOpTree.getData() == null) {
-			expression = new ObservedOpTree(new MathmlTextPresBuilder());
+			expression = new ObservedOpTree(this);
 			fragment_retainOpTree.setData(expression);
 		}
 		else
@@ -167,25 +164,21 @@ public final class MainActivity extends Activity  implements
 		// Make new onChangeListeners
 		//		Collect listeners into one composite listener
 		final CompositeOnChangeListener change_listener = 
-				new CompositeOnChangeListener(2);
+				new CompositeOnChangeListener(4);
 		//		Set change listener
 		expression.setOnChangeListener(change_listener);
-
+		
 		//		Observer to refresh MathML screen
-		change_listener.setOnChangeListener(new OnChangeListener() {
-			@Override
-			public void onChange(ChangeEvent event) {
-				refreshMathmlScreen();
-			}
-		});
+		change_listener.setOnChangeListener(mathview);
+		
 		//		Observer to Unset Shuffle Button
 		final SwitchOnChangeListener listener_unsetShuffleButton = 
 				new SwitchOnChangeListener(new OnChangeListener() {
 					@Override
 					public void onChange(ChangeEvent event) {
-						if (event.getSourceObject() instanceof ObservedOpTree &&
-								event.getTimingCode() == ObservedOpTree.POST_EVENT &&
-								event.getTypeCode() != ObservedOpTree.EVENT_SHUFFLE) {
+						if (event.source_obj instanceof ObservedOpTree &&
+								event.timing_code == ObservedOpTree.POST_EVENT &&
+								event.changetype_code != ObservedOpTree.EVENT_SHUFFLE) {
 							unsetShuffleButton();
 						}
 					}
@@ -194,7 +187,7 @@ public final class MainActivity extends Activity  implements
 		switch_unsetShuffleButton.disableListener();
 		change_listener.setOnChangeListener(listener_unsetShuffleButton);
 		
-		//		Observer to Set Text To Equal
+		//		Observer to SetTextToEqual
 		final SwitchOnChangeListener listener_setTextToEqual = 
 			new SwitchOnChangeListener(new OnChangeListener() {
 				@Override
@@ -253,8 +246,9 @@ public final class MainActivity extends Activity  implements
 		};
 		
 				
-		// Accommodates large screens that do not hide the number keyboard
+		// Platform-dependent logic
 		final View button_num = findViewById(R.id.buttonNum);
+		// For smaller screens which hide the number keyboard
 		if (button_num != null) {
 			// Set listeners to _number-keyboard button
 			final CompositeOnClickListener
@@ -285,13 +279,14 @@ public final class MainActivity extends Activity  implements
 						public void onChange(ChangeEvent event) {
 							hideNumKeys();
 						}
-			});
+					});
 			switch_hideNumKeys = keys2_listener.getSwitch();
 			switch_hideNumKeys.disableListener();
 			change_listener.setOnChangeListener(keys2_listener);
 			
 			trigger_showNumKeys.enableListener();
 		}
+		// For larger screens which leave the number keyboard on-screen
 		else {
 			keys1_listener.addSwitchListener(trigger_setEqualToText);
 			switch_hideNumKeys = null;
@@ -309,7 +304,7 @@ public final class MainActivity extends Activity  implements
 						
 		// Get palette action mode preferences		
 		pltmanager = initPaletteManager(pref.getString(
-				this.getString(R.string.prefKey_paletteActionMode), null ));
+				getString(R.string.prefKey_paletteActionMode), null ));
 		
 		// Get old palette id's from preferences
 		final String keybase = getString(R.string.prefKey_paletteIds_baseStr);
@@ -346,59 +341,7 @@ public final class MainActivity extends Activity  implements
 		/*********************************************************
 		 * Set local WebView object
 		 *********************************************************/
-		// Enable Javascript in Webview (warning suppressed)
-		webview.getSettings().setJavaScriptEnabled(true);
-
-		// Reroute "html-links" to MainActivity
-		//*
-		webview.setWebViewClient(new MathmlLinksViewClient());
-		//*/
-
-		// vvv Used for Javascript onclick methods vvv
-		/*
-		JSBinder binder = new JSBinder(webview);
-		binder.setOnClickListener(web_listener);
-		webview.addJavascriptInterface(binder, "Android");
-		//*/
-		
-		// Loads initial MathJax configuration
-		//	(https://github.com/leathrum/android-apps/blob/master
-		//		/MathJaxApp/mml-full/MainActivity.java)
-		String data = "<script type='text/x-mathjax-config'>"
-				+"MathJax.Hub.Config({ "
-					+"showMathMenu: false, "
-					+"jax: ['input/MathML','output/'], "
-					+"extensions: ['mml2jax.js'], "
-					+"TeX: { extensions: ['noErrors.js','noUndefined.js'] }, "
-					+"OUTPUT: { scale: 175 }, "
-					+"});</script>"
-				+"<script type='text/javascript' "
-					+"src='file:///android_asset/MathJax-2.3-trim/MathJax.js'>"
-					+"</script>"
-				/* Used for JavaScript binding
-				+"<script>function JSOnClickMathml(id_tag){"
-					+"Android.onClickMathml(id_tag);"
-					+"return false;"
-					+"}</script>"
-				//*/
-				+"<span id='math'></span>";
-		// Chooses HTML-CSS vs. SVG, based on android version
-		//		(disabled SVG, causes links to nest improperly)
-		/*
-		if (android.os.Build.VERSION.SDK_INT
-				>= android.os.Build.VERSION_CODES.HONEYCOMB ) {
-			base_url = base_url
-					.replaceFirst("output/", "output/SVG")
-					.replaceFirst("OUTPUT", "SVG");
-			Log.d(this.toString(), "SVG used!");
-		}
-		else //*/
-			data = data
-					.replaceFirst("output/", "output/HTML-CSS")
-					.replaceFirst("OUTPUT", "\"HTML-CSS\"");
-		
-		webview.loadDataWithBaseURL(
-				"http://bar", data, "text/html","utf-8",null );
+		mathview.setOpTree(expression);
 
 		/*********************************************************
 		 * Set Number Keyboard
@@ -542,30 +485,6 @@ public final class MainActivity extends Activity  implements
 	//////////////////////////////////////////////////////////////////////
 	// INTERNAL FUNCTIONS
 	//////////////////////////////////////////////////////////////////////
-	private void loadMathmlToScreen(String mathml_exp) {
-		// Load a MathML example on-screen
-		//	(https://github.com/leathrum/android-apps/blob/master
-		//		/MathJaxApp/mml-full/MainActivity.java)
-		/* 								  vv green
-		 * TODO add color ( mathcolor='#000000')
-		 * 							red	^^	^^ blue
-		 */
-		webview.loadUrl("javascript:document.getElementById('math').innerHTML='"
-				+"<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\">"
-				+"<mstyle displaystyle=\"true\""
-				//+" mathcolor='#000000'"
-				//+ " mathsize=1.2em"
-				+">"
-				// Insert MathML code here
-				+ mathml_exp
-				//
-				+"</mstyle></math>';"
-				+"\njavascript:MathJax.Hub.Queue(['Typeset',MathJax.Hub]);"
-				);
-	}
-	public void refreshMathmlScreen() {
-		loadMathmlToScreen(expression.getTextPres());
-	}
 
 	/*
 	private void refreshNumberText() {
@@ -637,28 +556,26 @@ public final class MainActivity extends Activity  implements
 				getApplicationContext(), str, Toast.LENGTH_SHORT );
 		// Sets toast position to bottom of WebView
 		t.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0,
-				webview.getBottom() - 10 );
+				findViewById(R.id.mathview).getBottom() - 10 );
 		t.show();
 	}
 	
 	private PaletteManager initPaletteManager(String plt_actionmode) {
-		if (plt_actionmode.equals(getString(
-				R.string.prefValue_paletteActionMode_sidebutton ))) {
+		if (plt_actionmode != null && plt_actionmode.equals(getString(
+				R.string.prefValue_paletteActionMode_sidebutton )))
 			return new SideButtonPaletteManager(this,
 					(getResources().getBoolean(R.bool.canDeletePalette)
 							? R.layout.palettebox_button_swapdelright
 							: R.layout.palettebox_button_swapright ),
 					swapplt_listener, delplt_listener);
-		}
-		else if (plt_actionmode.equals(getString(
-				R.string.prefValue_paletteActionMode_swipe ))) {
+		else
+			//if (plt_actionmode.equals(getString(
+			//	R.string.prefValue_paletteActionMode_swipe )))
 			return new SwipePaletteManager(this,
 					(getResources().getBoolean(R.bool.canDeletePalette)
 							? R.layout.palettebox_swipe_swapleft_delright
 							: R.layout.palettebox_swipe_swapleftright ),
 					swapplt_listener, delplt_listener);
-		}
-		else return null;
 	}
 	
 //	private static FunctionType getFtypeFromViewId(int id) {}
@@ -668,10 +585,10 @@ public final class MainActivity extends Activity  implements
 	//////////////////////////////////////////////////////////////////////
 	
 	// Called when a MathML element is clicked in the WebView
-	public void onClickMathml(int index) {
+	public void onClickMathView(int index) {
 		// TODO (?) if clicked element is a child element of the current selection,
 		//		set selector to the index of its parent
-		expression.setSelection(index);
+		expression.addToSelection(index);
 		//refreshNumberText();
 	}
 	
@@ -680,7 +597,7 @@ public final class MainActivity extends Activity  implements
 			// Calculate result (throws CalcEx)
 			result = expression.getCalculation();
 
-			expression.setSelection(0);
+			expression.selectNone();
 
 			// Set text representation of result to view
 			((TextView) findViewById(R.id.textNum))
@@ -692,14 +609,14 @@ public final class MainActivity extends Activity  implements
 					.setHint(getString(R.string.textNum_blank));
 
 			// set failed index
-			blank_index = (Integer)ce.getCauseObject();
+			blank_index = (Integer) ce.getCauseObject();
 		}
 	}
 	// Called when the result text box is clicked
 	public void onClickNumberText(View v) {		
 		if (number_text.getHint() == getString(R.string.textNum_blank)) {
 			switch_setTextToEqual.disableListener();
-			expression.setSelection(blank_index);
+			expression.addToSelection(blank_index);
 			switch_setTextToEqual.enableListener();
 			number_text.setText(getString(R.string.textNum_default));
 		}
@@ -752,12 +669,24 @@ public final class MainActivity extends Activity  implements
 		if (number_text.getText() == "")
 			number_text.setText(getString(R.string.textNum_default));
 	}
-	public void onNumKeyboardResult(double d) {
-		expression.addNumber(d);
+	public void onNumKeyboardResult() {
+		String str = number_text.getText().toString();
+		if (!str.isEmpty()) {
+			try {expression.addNumber(Double.valueOf(str));}
+			catch (NumberFormatException e) {
+				// Raise toast to alert user that expression is incomplete
+				raiseToast("Error: Invalid Number Format");
+			}
+			number_text.setText("");
+		}
+		// Set state components
 		//refreshNumberText();
 	}
 	public void onNumKeyboardCancel() {
-		expression.setSelection(0);
+		number_text.setText("");
+		onNumKeyboardResult();
+		// TODO make numkeys hide in some other way (this is kinda dumb)
+		expression.addToSelection(expression.getSelectionIndex());
 	}
 	
 	public void onClickDeletePalette(View v) {
@@ -787,7 +716,7 @@ public final class MainActivity extends Activity  implements
 				//+ temp_count.toString() + "</mn>";
 		
 		// Load a MathML example on-screen
-		loadMathmlToScreen(temp_out);
+		//loadMathmlToScreen(temp_out);
 	}
 	//*/
 	/*

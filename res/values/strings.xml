@@ -17,7 +17,7 @@
 	<string name="shuffleDesc">Shift operation order</string>
 	<string name="example">Example MathML</string>
 	<string name="numkeyboard_hint">0.0</string>
-	<string name="textNum_blank">(incomplete)</string>
+	<string name="textNum_blank">[?]</string>
 	<string name="textNum_default">0</string>
 	<string name="arrowUp">↑</string>
 	<string name="circle">&#9675;</string>

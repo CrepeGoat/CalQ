@@ -2,20 +2,18 @@ package awqatty.b.CustomEventListeners;
 
 public class ChangeEvent {
 
-	private final Object source;
-	private final byte code_type, code_time;
+	public final Object source_obj;
+	public final byte changetype_code;
+	public final byte timing_code;
+	/*
 	public ChangeEvent(Object obj) {
-		source = obj;
-		code_type = 0;
-		code_time = 0;
+		source_obj = obj;
+		changetype_code = -1;
+		timing_code = -1;
+	}//*/
+	public ChangeEvent(Object change_obj, byte changetype, byte timing) {
+		source_obj = change_obj;
+		changetype_code = changetype;
+		timing_code = timing;
 	}
-	public ChangeEvent(Object change_obj, byte change_code, byte timing_code) {
-		source = change_obj;
-		code_type = change_code;
-		code_time = timing_code;
-	}
-
-	public Object getSourceObject() {return source;}
-	public byte getTypeCode() {return code_type;}
-	public byte getTimingCode() {return code_time;}
 }

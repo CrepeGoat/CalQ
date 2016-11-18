@@ -2,6 +2,9 @@ package awqatty.b.OpTree;
 
 import java.util.List;
 
+import android.content.Context;
+import awqatty.b.DrawMath.AlignDrawBuilder;
+import awqatty.b.DrawMath.DrawSubTree.AlignForm;
 import awqatty.b.FunctionDictionary.*;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionConstant;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionException;
@@ -12,29 +15,22 @@ import awqatty.b.FunctionDictionary.FunctionForms.FunctionLCM;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionNCK;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionNPK;
 import awqatty.b.ListTree.ListTree;
-import awqatty.b.TextPresentation.TextPresBuilderForm;
-import awqatty.b.TextPresentation.TextPresForm;
 
 public final class OperationBuilder {
 
 	double _number;
-	TextPresBuilderForm textbuilder;
+	AlignDrawBuilder align_builder;
 	
-	public OperationBuilder(TextPresBuilderForm tpb) {
-		textbuilder = tpb;
+	public OperationBuilder(Context context) {
+		align_builder = new AlignDrawBuilder(context);
 	}
-	
-	public void setTextPresBuilder(TextPresBuilderForm tpb) {
-		textbuilder = tpb;
-		tpb.number(_number);
-	}
-	
+		
 	/**************************************************************
 	 *** BUILDER METHODS ***
 	 **************************************************************/
 	public OperationBuilder number(double n) {
 		_number = n;
-		textbuilder.number(n);
+		align_builder.number(n);
 		return this;
 	}
 	
@@ -248,8 +244,8 @@ public final class OperationBuilder {
 		}
 	}
 	
-	private TextPresForm buildTextPres(FunctionType ftype) {
-		return textbuilder.build(ftype);
+	private AlignForm buildDisplay(FunctionType ftype) {
+		return align_builder.build(ftype);
 	}
 	
 	private static int getMinLeaves(FunctionType ftype) {
@@ -346,31 +342,15 @@ public final class OperationBuilder {
 		}
 	}
 	
-	// Used to ensure functions have appropriate ftypes
-	//	i.e. SQUARE differs from POWER only by default values,
-	//		should be treated as POWER function (esp. when args change from defaults)
-	private static FunctionType getImplementingType(FunctionType ftype) {
-		switch(ftype){
-		case SQUARE:
-		case EXP_E:
-		case EXP_10:
-		case MULT_INVERSE:
-			return FunctionType.POWER;
-		default:
-			return ftype;
-		}
-	}
-
 	public Operation build(FunctionType ftype) {
 		if (ftype != FunctionType.SOURCE) {
-			return new Operation(
-					getImplementingType(ftype),
+			return new Operation(ftype,
 					buildFunction(ftype),
-					buildTextPres(ftype) );
+					buildDisplay(ftype) );
 		}
 		// Unexpected case
 		else
-			throw new RuntimeException("Cannot create source node instance");
+			throw new RuntimeException("Cannot create source_obj node instance");
 	}
 	
 	// Returns whether the args can be shuffled or not
@@ -427,44 +407,46 @@ public final class OperationBuilder {
 			return false;
 		// 2-arg w/ default value
 		case SQUARE:
+			subtree.addRoot(0, build(FunctionType.POWER),
+					getMinLeaves(FunctionType.POWER),
+					getMaxLeaves(FunctionType.POWER) );
 			number(2);
-			subtree.addRoot(0, build(ftype),
-					getMinLeaves(ftype), getMaxLeaves(ftype) );
 			subtree.addBranch(0, 1, build(FunctionType.NUMBER),
 					getMinLeaves(FunctionType.NUMBER),
 					getMaxLeaves(FunctionType.NUMBER) );
 			number(tmp);
 			return false;
 		case MULT_INVERSE:
+			subtree.addRoot(0, build(FunctionType.POWER),
+					getMinLeaves(FunctionType.POWER),
+					getMaxLeaves(FunctionType.POWER) );
 			number(-1);
-			subtree.addRoot(0, build(ftype),
-					getMinLeaves(ftype),
-					getMaxLeaves(ftype) );
 			subtree.addBranch(0, 1, build(FunctionType.NUMBER),
 					getMinLeaves(FunctionType.NUMBER),
 					getMaxLeaves(FunctionType.NUMBER) );
 			number(tmp);
 			return false;
 		case EXP_E:
-			subtree.addRoot(0, build(ftype),
-					getMinLeaves(ftype),
-					getMaxLeaves(ftype) );
+			subtree.addRoot(0, build(FunctionType.POWER),
+					getMinLeaves(FunctionType.POWER),
+					getMaxLeaves(FunctionType.POWER) );
 			subtree.addBranch(0, 0, build(FunctionType.CONST_E),
 					getMinLeaves(FunctionType.CONST_E),
 					getMaxLeaves(FunctionType.CONST_E) );
 			return false;
 		case EXP_10:
+			subtree.addRoot(0, build(FunctionType.POWER),
+					getMinLeaves(FunctionType.POWER),
+					getMaxLeaves(FunctionType.POWER) );
 			number(10);
-			subtree.addRoot(0, build(ftype),
-					getMinLeaves(ftype),
-					getMaxLeaves(ftype) );
 			subtree.addBranch(0, 0, build(FunctionType.NUMBER),
 					getMinLeaves(FunctionType.NUMBER),
 					getMaxLeaves(FunctionType.NUMBER) );
 			number(tmp);
 			return false;
-		default:
-			throw new RuntimeException("Invalid function-type code");
+			
+			default:
+				throw new RuntimeException("Invalid function-type code");
 		}
 	}
 

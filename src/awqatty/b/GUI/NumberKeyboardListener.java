@@ -31,37 +31,28 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 
 	@Override
 	public void onRelease(int arg0) {
-		final String text = display.getText().toString();
+		String text=null;
+		if (arg0 != -3 && arg0 != -2) {
+			text = display.getText().toString();
+			if (text.isEmpty()) text = "0";
+		}
 		
 		switch (arg0) {
 		case -5:	// Delete Key Logic
 			if (text.length() == 1)
 				display.setText("0");
-			else if (text.length() == 2 && text.startsWith("-")) {
-				if (text.charAt(1) != '0')
-					display.setText("-0");
-				else
-					display.setText("0");
-			}
-			else if (text.length() > 0)
+			else if (text.length() == 2 && text.startsWith("-"))
+				display.setText( text.charAt(1)!='0' ? "-0" : "0" );
+			else if (text.length() > 1)
 				display.setText(text.subSequence(0, text.length()-1));
 			break;
 			
 		case -3:	// Cancel Key Logic
-			display.setText("");
 			((MainActivity) display.getContext()).onNumKeyboardCancel();
 			break;
 		
 		case -2:	// Enter Key Logic
-			try {
-				((MainActivity) display.getContext())
-						.onNumKeyboardResult(Double.valueOf(text));
-				display.setText("");
-			} catch (NumberFormatException e) {
-				// Raise toast to alert user that expression is incomplete
-				((MainActivity) display.getContext())
-						.raiseToast("Error: Invalid Number Format");
-			}
+			((MainActivity) display.getContext()).onNumKeyboardResult();
 			break;
 		
 		case 45:	// Negative Key Logic
