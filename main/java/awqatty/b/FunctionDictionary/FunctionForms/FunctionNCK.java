@@ -3,7 +3,7 @@ package awqatty.b.FunctionDictionary.FunctionForms;
 import java.util.List;
 
 
-public class FunctionNCK extends FunctionFactorial implements FunctionForm {
+public class FunctionNCK implements FunctionForm {
 	//*
 
 	long holdVarAsTemp(long var, long setVarToNewValue) {

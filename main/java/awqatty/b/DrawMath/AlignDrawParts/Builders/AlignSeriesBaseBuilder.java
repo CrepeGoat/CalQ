@@ -1,7 +1,7 @@
-package awqatty.b.DrawMath.DrawSubTree.Builders;
+package awqatty.b.DrawMath.AlignDrawParts.Builders;
 
-import awqatty.b.DrawMath.DrawSubTree.AlignAxisBase;
-import awqatty.b.DrawMath.DrawSubTree.AlignForm;
+import awqatty.b.DrawMath.AlignDrawParts.AlignAxisBase;
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
 
 public abstract class AlignSeriesBaseBuilder extends AlignAxisBuilder {
 

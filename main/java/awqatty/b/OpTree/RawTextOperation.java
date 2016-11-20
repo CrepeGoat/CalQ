@@ -1,6 +1,6 @@
 package awqatty.b.OpTree;
 
-import awqatty.b.DrawMath.DrawSubTree.AlignForm;
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
 import awqatty.b.DrawMath.DrawToCanvas.DrawText;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionForm;
 import awqatty.b.FunctionDictionary.FunctionType;

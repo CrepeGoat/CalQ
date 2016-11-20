@@ -6,7 +6,7 @@ import android.content.Context;
 import awqatty.b.DrawMath.AlignDrawBuilder;
 import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
 import awqatty.b.DrawMath.AssignParentheses.ClosureType;
-import awqatty.b.DrawMath.DrawSubTree.AlignForm;
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
 import awqatty.b.FunctionDictionary.*;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionConstant;
 import awqatty.b.FunctionDictionary.FunctionForms.FunctionException;
@@ -462,49 +462,58 @@ public final class OperationBuilder {
 			case ARHYPTANGENT:
 			case FACTORIAL:
 				subtree.addRoot(0, build(ftype),
-						getMinLeaves(ftype), getMaxLeaves(ftype) );
+						getMinLeaves(ftype), getMaxLeaves(ftype)
+				);
 				return;
 				//return false;
 			// 2-arg w/ default value
 			case SQUARE:
 				subtree.addRoot(0, build(FunctionType.POWER),
 						getMinLeaves(FunctionType.POWER),
-						getMaxLeaves(FunctionType.POWER) );
+						getMaxLeaves(FunctionType.POWER)
+				);
 				number(2);
 				subtree.addBranch(0, 1, build(FunctionType.NUMBER),
 						getMinLeaves(FunctionType.NUMBER),
-						getMaxLeaves(FunctionType.NUMBER) );
+						getMaxLeaves(FunctionType.NUMBER)
+				);
 				number(tmp);
 				return;
 				//return false;
 			case MULT_INVERSE:
 				subtree.addRoot(0, build(FunctionType.POWER),
 						getMinLeaves(FunctionType.POWER),
-						getMaxLeaves(FunctionType.POWER) );
+						getMaxLeaves(FunctionType.POWER)
+				);
 				number(-1);
 				subtree.addBranch(0, 1, build(FunctionType.NUMBER),
 						getMinLeaves(FunctionType.NUMBER),
-						getMaxLeaves(FunctionType.NUMBER) );
+						getMaxLeaves(FunctionType.NUMBER)
+				);
 				number(tmp);
 				return;
 				//return false;
 			case EXP_E:
 				subtree.addRoot(0, build(FunctionType.POWER),
 						getMinLeaves(FunctionType.POWER),
-						getMaxLeaves(FunctionType.POWER) );
+						getMaxLeaves(FunctionType.POWER)
+				);
 				subtree.addBranch(0, 0, build(FunctionType.CONST_E),
 						getMinLeaves(FunctionType.CONST_E),
-						getMaxLeaves(FunctionType.CONST_E) );
+						getMaxLeaves(FunctionType.CONST_E)
+				);
 				return;
 				//return false;
 			case EXP_10:
 				subtree.addRoot(0, build(FunctionType.POWER),
 						getMinLeaves(FunctionType.POWER),
-						getMaxLeaves(FunctionType.POWER) );
+						getMaxLeaves(FunctionType.POWER)
+				);
 				number(10);
 				subtree.addBranch(0, 0, build(FunctionType.NUMBER),
 						getMinLeaves(FunctionType.NUMBER),
-						getMaxLeaves(FunctionType.NUMBER) );
+						getMaxLeaves(FunctionType.NUMBER)
+				);
 				number(tmp);
 				return;
 				//return false;

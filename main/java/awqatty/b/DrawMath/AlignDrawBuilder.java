@@ -8,13 +8,13 @@ import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import awqatty.b.DrawMath.DrawSubTree.AlignAxisBase;
-import awqatty.b.DrawMath.DrawSubTree.AlignSuperscript;
-import awqatty.b.DrawMath.DrawSubTree.AlignLeaf;
-import awqatty.b.DrawMath.DrawSubTree.AlignForm;
-import awqatty.b.DrawMath.DrawSubTree.Builders.AlignBorderBuilder;
-import awqatty.b.DrawMath.DrawSubTree.Builders.AlignLeafSeriesBuilder;
-import awqatty.b.DrawMath.DrawSubTree.Builders.AlignSeriesBuilder;
+import awqatty.b.DrawMath.AlignDrawParts.AlignAxisBase;
+import awqatty.b.DrawMath.AlignDrawParts.AlignSuperscript;
+import awqatty.b.DrawMath.AlignDrawParts.AlignLeaf;
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
+import awqatty.b.DrawMath.AlignDrawParts.Builders.AlignBorderBuilder;
+import awqatty.b.DrawMath.AlignDrawParts.Builders.AlignLeafSeriesBuilder;
+import awqatty.b.DrawMath.AlignDrawParts.Builders.AlignSeriesBuilder;
 import awqatty.b.DrawMath.DrawToCanvas.DrawBlank;
 import awqatty.b.DrawMath.DrawToCanvas.DrawPath;
 import awqatty.b.DrawMath.DrawToCanvas.DrawText;
@@ -24,6 +24,7 @@ import awqatty.b.GUI.NumberStringConverter;
 import awqatty.b.calq.R;
 
 public final class AlignDrawBuilder {
+
 
  	public static final String bracketsOpen = "([{|";
  	public static final String bracketsClose = ")]}|";
@@ -300,27 +301,27 @@ public final class AlignDrawBuilder {
 						new AlignLeaf(0), new AlignLeaf(1));
 			case SQRT:
 				path = new Path();
-				path.addRect(new RectF(0,0,LINE_THICKNESS,LINE_THICKNESS),
-						Path.Direction.CCW );
-				DrawText draw = new DrawText("\u221A");	//sqrt
-				draw.setScale(2);
+				path.addRect(
+						new RectF(0,0,LINE_THICKNESS,LINE_THICKNESS),
+						Path.Direction.CCW
+				);
+				final DrawText draw_sqrt = new DrawText("\u221A");	//sqrt symbol
+				draw_sqrt.setScale(2);
 				return new AlignBorderBuilder(
 						new AlignBorderBuilder(new AlignLeaf(0))
-								.start_bound(new DrawPath(path,
-										new Paint(Paint.ANTI_ALIAS_FLAG) ))
+								.start_bound(new DrawPath(path, new Paint(Paint.ANTI_ALIAS_FLAG)))
 								//.end_bound(new DrawBlank())
 								.bound_stretch(AlignAxisBase.STRETCH_GIRTH)
 								.orientation(AlignAxisBase.VERTICAL)
 								.aligned_edge(AlignAxisBase.EDGE_CENTER)
 								.whitespace(GROUP_SPACING)
 								.build())
-						.start_bound(draw)
+						.start_bound(draw_sqrt)
 						.bound_stretch(AlignAxisBase.STRETCH_GIRTH)
 						.orientation(AlignAxisBase.HORIZONTAL)
 						.aligned_edge(AlignAxisBase.EDGE_CENTER)
-						//.whitespace(-letter_spacing)
+						//.whitespace(-LETTER_SPACING)
 						.build();
-
 
 			// Text-Represented Functions
 			// Log Functions

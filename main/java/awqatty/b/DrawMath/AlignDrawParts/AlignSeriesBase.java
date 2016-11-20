@@ -1,4 +1,4 @@
-package awqatty.b.DrawMath.DrawSubTree;
+package awqatty.b.DrawMath.AlignDrawParts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
 
 abstract public class AlignSeriesBase extends AlignAxisBase {
 
-	protected final List<AlignForm> comps = new ArrayList<AlignForm>();
+	protected final List<AlignForm> comps = new ArrayList<>();
 	protected final int INDEX_DIVIDER = 0;
 
 	protected final byte stretch_divider;
@@ -35,7 +35,7 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 	protected void loadAlignTools() {
 		super.loadAlignTools();
 		if (comps_ordered == null)
-			comps_ordered = new ArrayList<AlignForm>();
+			comps_ordered = new ArrayList<>();
 		else comps_ordered.clear();
 	}
 	@Override
@@ -45,33 +45,30 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 	}
 	
 	@Override
-	protected void addCompsToSeries() {		
-		max_girth = 0;
+	protected void addCompsToSeries() {
 		// Gets max girth of components
+		max_girth = 0;
 		for (AlignForm draw : comps.subList(1,comps.size())) {
 			if (draw != null) {
 				draw.getSize(rectf);
-				max_girth = Math.max(max_girth,
-						orient.getGirth(rectf) );
+				max_girth = Math.max(max_girth, orient.getGirth(rectf));
 			}
 		}
-		
 		// Proceed based on whether or not bounds are used
 		if (comps.get(INDEX_DIVIDER) == null) {
 			// Arrange components in series
 			for (AlignForm comp : comps.subList(1,comps.size()))
 				addCompToSeries(comp, STRETCH_NONE);
 		}
-		
 		else {
 			// Sets max_girth based on bound components
 			if (stretch_divider == STRETCH_NONE) {
-					comps.get(INDEX_DIVIDER).getSize(rectf);
-					max_girth = Math.max(max_girth, orient.getGirth(rectf));
-				}
-			else /*if (stretch_divider == STRETCH_FULL
+				comps.get(INDEX_DIVIDER).getSize(rectf);
+				max_girth = Math.max(max_girth, orient.getGirth(rectf));
+			}
+			//else max_girth += 3*whtspc;
+				/*if (stretch_divider == STRETCH_FULL
 				|| stretch_divider == STRETCH_GIRTH) */
-				max_girth += 3*whtspc;
 			
 			// Arrange components in series
 			if (comps.size() > 1)
@@ -92,25 +89,25 @@ abstract public class AlignSeriesBase extends AlignAxisBase {
 	// Manage Parentheses
 	protected boolean decideSingleParentheses(int cflag, int ctype_last) {
 		switch(cflag) {
-		case ClosureFlags.BOUNDED:
-		case ClosureFlags.SCRIPT:
-		case ClosureFlags.TEXT_ALPHABETIC:
-			return false;
-		case ClosureFlags.SERIES_HORIZ:
-		case ClosureFlags.SERIES_HORIZ | ClosureFlags.DIVIDER:
-			return orient.getOrientation() == HORIZONTAL;
-		case ClosureFlags.SERIES_VERT:
-		case ClosureFlags.SERIES_VERT | ClosureFlags.DIVIDER:
-			return orient.getOrientation() == VERTICAL;
-		case ClosureFlags.TEXT_NUMERIC:
-			return !(comps.get(INDEX_DIVIDER)!=null) &&
-					(orient.getOrientation() == HORIZONTAL) &&
-					ctype_last!=ClosureFlags.NONE && ClosureFlags.typeIsText(ctype_last);
-		case ClosureFlags.TEXT_NUMERIC | ClosureFlags.NEGATIVE:
-			return ctype_last!=ClosureFlags.NONE && (orient.getOrientation() == HORIZONTAL)
-					&& (!(comps.get(INDEX_DIVIDER)!=null) || stretch_divider==STRETCH_NONE);
-		default:
-			return true;
+			case ClosureFlags.BOUNDED:
+			case ClosureFlags.SCRIPT:
+			case ClosureFlags.TEXT_ALPHABETIC:
+				return false;
+			case ClosureFlags.SERIES_HORIZ:
+			case ClosureFlags.SERIES_HORIZ | ClosureFlags.DIVIDER:
+				return orient.getOrientation() == HORIZONTAL;
+			case ClosureFlags.SERIES_VERT:
+			case ClosureFlags.SERIES_VERT | ClosureFlags.DIVIDER:
+				return orient.getOrientation() == VERTICAL;
+			case ClosureFlags.TEXT_NUMERIC:
+				return !(comps.get(INDEX_DIVIDER)!=null) &&
+						(orient.getOrientation() == HORIZONTAL) &&
+						ctype_last!=ClosureFlags.NONE && ClosureFlags.typeIsText(ctype_last);
+			case ClosureFlags.TEXT_NUMERIC | ClosureFlags.NEGATIVE:
+				return ctype_last!=ClosureFlags.NONE && (orient.getOrientation() == HORIZONTAL)
+						&& (!(comps.get(INDEX_DIVIDER)!=null) || stretch_divider==STRETCH_NONE);
+			default:
+				return true;
 		}
 		
 	}

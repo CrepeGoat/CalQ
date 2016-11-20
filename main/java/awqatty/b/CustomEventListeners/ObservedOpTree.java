@@ -32,16 +32,39 @@ public class ObservedOpTree extends OpTree {
 	public void setOnChangeListener(OnChangeListener on_change) {
 		listener = on_change;
 	}
-		
+
 	@Override
-	public void setSelection(int i) {
+	public void selectNone() {
 		if (listener != null) listener.onChange(
 				new ChangeEvent(this, EVENT_SELECTION, PRE_EVENT) );
-		super.setSelection(i);
+		super.selectNone();
 		if (listener != null) listener.onChange(
 				new ChangeEvent(this, EVENT_SELECTION, POST_EVENT) );
 	}
-	
+	@Override
+	public void setNewSelection(int... indices) {
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, PRE_EVENT) );
+		super.setNewSelection(indices);
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, POST_EVENT) );
+	}
+	@Override
+	public void addToSelection(int... indices) {
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, PRE_EVENT) );
+		super.addToSelection(indices);
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, POST_EVENT) );
+	}
+	@Override
+	public void finalizeSelection() {
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, PRE_EVENT) );
+		super.finalizeSelection();
+		if (listener != null) listener.onChange(
+				new ChangeEvent(this, EVENT_SELECTION, POST_EVENT) );
+	}
 	@Override
 	public void addFunction(FunctionType ftype) {
 		if (listener != null) listener.onChange(

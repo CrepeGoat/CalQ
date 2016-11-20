@@ -3,17 +3,21 @@ package awqatty.b.ListTree;
 import java.util.ArrayList;
 import java.util.List;
 
+import static awqatty.b.ListTree.DataLoopRootDown.LoopControl.BREAK_BRANCH;
+import static awqatty.b.ListTree.DataLoopRootDown.LoopControl.BREAK_LOOP;
+
 abstract public class DataLoopRootDown<E, T> {
 
 	private final List<T> stack = new ArrayList<T>();
 	// Allows inherited loop methods access to node indices
 	protected int index;
-	
-	protected static final byte CONTINUE = 0;
-	protected static final byte BREAK_BRANCH = 1;
-	protected static final byte BREAK_LOOP = 2;
+
+	protected static enum LoopControl {
+		CONTINUE,
+		BREAK_BRANCH,
+		BREAK_LOOP
+	};
 		
-	// TODO add "skip branch" functionality
 	public void runLoop(ListTree<E> tree) {
 		runLoop(tree, null);
 	}
@@ -31,7 +35,7 @@ abstract public class DataLoopRootDown<E, T> {
 		}
 		// TODO change to make insertions/deletions at end
 		T data;
-		byte break_type;
+		LoopControl break_type;
 		for (index=0; index<length;) {
 			// Needs to remove element before subList is created
 			data = (stack.size() > 0 ? stack.remove(0) : null);
@@ -47,6 +51,6 @@ abstract public class DataLoopRootDown<E, T> {
 		}
 	}
 	// Return true to skip all elements in the current branch
-	abstract protected byte loopAtNode(E node, T data, List<T> sublist);
+	abstract protected LoopControl loopAtNode(E node, T data, List<T> sublist);
 
 }

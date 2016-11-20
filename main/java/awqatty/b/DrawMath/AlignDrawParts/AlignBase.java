@@ -1,4 +1,4 @@
-package awqatty.b.DrawMath.DrawSubTree;
+package awqatty.b.DrawMath.AlignDrawParts;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,8 +35,7 @@ abstract public class AlignBase implements AlignForm {
 			if (comp != null)
 				comp.assignParentheses(cflags, pars_active);
 	}
-	abstract protected void decideParentheses(
-			int[] cflags, boolean[] pars_active);
+	abstract protected void decideParentheses(int[] cflags, boolean[] pars_active);
 	///////////////////////////////// ^ REMOVE? ^ /////////////////////////////////////
 
 	//--- Set Methods ---
@@ -70,8 +69,7 @@ abstract public class AlignBase implements AlignForm {
 		
 		if (dst == null || dst.equals(valid_area)) {
 			while (iter_comp.hasNext() && iter_loc.hasNext()) {
-				iter_comp.next().drawToCanvas(canvas,
-						iter_loc.next());
+				iter_comp.next().drawToCanvas(canvas, iter_loc.next());
 			}
 		}
 		else if (!dst.isEmpty()) {

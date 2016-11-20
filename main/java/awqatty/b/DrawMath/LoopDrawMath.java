@@ -17,9 +17,11 @@ public class LoopDrawMath
 	
 	private final RectF tmp = new RectF();
 	@Override
-	protected byte loopAtNode(DrawForm node, RectF data,
-			List<RectF> sublist) {
-		
+	protected LoopControl loopAtNode(
+			DrawForm node,
+			RectF data,
+			List<RectF> sublist
+	) {
 		/* TODO Test code. Remove
 		Log.d("TestDrawMath",
 				"Loop 2"
@@ -31,8 +33,6 @@ public class LoopDrawMath
 		tmp.set(data);
 		node.drawToCanvas(canvas, tmp);
 		node.getLeafLocations(sublist);
-		return CONTINUE;
+		return LoopControl.CONTINUE;
 	}
-
-
 }

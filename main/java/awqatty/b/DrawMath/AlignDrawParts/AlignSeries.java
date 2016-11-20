@@ -1,4 +1,4 @@
-package awqatty.b.DrawMath.DrawSubTree;
+package awqatty.b.DrawMath.AlignDrawParts;
 
 import java.util.List;
 
@@ -17,12 +17,12 @@ public final class AlignSeries extends AlignSeriesBase {
 		comps.addAll(components);
 	}
 	
-	public void addComponent(AlignForm draw) {
-		comps.add(draw);
-	}
-	public void clearComponents() {
-		comps.subList(1,comps.size()).clear();
-	}
+	//public void addComponent(AlignForm draw) {
+	//	comps.add(draw);
+	//}
+	//public void clearComponents() {
+	//	comps.subList(1,comps.size()).clear();
+	//}
 	
 	@Override
 	protected void decideParentheses(int[] cflags, boolean[] pars_active) {

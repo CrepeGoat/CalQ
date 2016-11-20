@@ -1,4 +1,4 @@
-package awqatty.b.DrawMath.DrawSubTree;
+package awqatty.b.DrawMath.AlignDrawParts;
 
 import java.util.List;
 
@@ -23,6 +23,8 @@ public interface AlignForm extends DrawFormBase {
 	//--- Assign Parentheses ---
 	public void assignParentheses(int[] branch_ctypes, boolean[] pars_active);
 	public <T extends DrawAligned> void subBranchShouldUsePars(
-			ListTree<T>.Navigator nav, boolean[] pars_active);
+			ListTree<T>.Navigator nav,
+			boolean[] pars_active
+	);
 	public int getClosureFlags();
 }

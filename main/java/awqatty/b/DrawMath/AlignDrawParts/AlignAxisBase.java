@@ -1,4 +1,4 @@
-package awqatty.b.DrawMath.DrawSubTree;
+package awqatty.b.DrawMath.AlignDrawParts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,19 +76,22 @@ public abstract class AlignAxisBase extends AlignBase {
 		locs.clear();
 		// Arrange Components
 		addCompsToSeries();
-		
+		// (removes buffer whitespace from last comp
+		// added to space individual comps)
+		last_edge -= whtspc;
+
 		// Set bounds
 		valid_area.left = 0;
 		valid_area.top = 0;
 		orient.setGirthEnd(valid_area, max_girth);
-		orient.setLengthEnd(valid_area, last_edge-whtspc);
+		orient.setLengthEnd(valid_area, last_edge);
 	}
 	
 	protected void loadAlignTools() {
 		if (valid_area == null)
 			valid_area = new RectF();
 		if (locs == null)
-			locs = new ArrayList<RectF>();
+			locs = new ArrayList<>();
 		else locs.clear();
 		if (rectf == null)
 			rectf = new RectF();
@@ -117,8 +120,7 @@ public abstract class AlignAxisBase extends AlignBase {
 			break;
 		}
 		orient.offsetTo(rectf, last_edge,
-				(max_girth-orient.getGirth(rectf)) * align/2f
-				);
+				(max_girth-orient.getGirth(rectf)) * align/2f);
 		last_edge = orient.getLengthEnd(rectf) + whtspc;
 		rectf = null;
 	}

@@ -22,13 +22,13 @@ import android.widget.Toast;
 import awqatty.b.CustomEventListeners.CompositeOnChangeListener;
 import awqatty.b.CustomEventListeners.CompositeOnClickListener;
 import awqatty.b.FunctionDictionary.FunctionType;
-import awqatty.b.GUI.MathView;
 import awqatty.b.GUI.NumberKeyboardListener;
 import awqatty.b.GUI.PaletteManager;
 import awqatty.b.GUI.PaletteboxAnimator;
 import awqatty.b.GUI.SideButtonPaletteManager;
 import awqatty.b.GUI.SwipePaletteManager;
 import awqatty.b.CustomEventListeners.ObservedOpTree;
+import awqatty.b.GUI.TouchableMathView;
 import awqatty.b.OpButtons.OperationButton;
 import awqatty.b.ViewUtilities.ViewFinder;
 import awqatty.b.ViewUtilities.ViewParentFinder;
@@ -114,7 +114,7 @@ public final class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		final MathView mathview = (MathView) findViewById(R.id.mathview);
+		final TouchableMathView mathview = (TouchableMathView) findViewById(R.id.mathview);
 		//number_text = (TextView) findViewById(R.id.textNum);
 
 		/*********************************************************
@@ -328,9 +328,9 @@ public final class MainActivity extends Activity
 
 		
 		/*********************************************************
-		 * Set local WebView object
+		 * Set local MathView object
 		 *********************************************************/
-		expression.setMathViewToTree(mathview);
+		mathview.setOpTree(expression);
 
 		/*********************************************************
 		 * Set Number Keyboard
@@ -576,12 +576,12 @@ public final class MainActivity extends Activity
 	//////////////////////////////////////////////////////////////////////
 	
 	// Called when a MathML element is clicked in the WebView
-	public void onClickMathml(int index) {
-		// TODO (?) if clicked element is a child element of the current selection,
-		//		set selector to the index of its parent
-		expression.setSelection(index);
-		//refreshNumberText();
-	}
+	//public void onClickMathml(int index) {
+	//	// TODO (?) if clicked element is a child element of the current selection,
+	//	//		set selector to the index of its parent
+	//	expression.setSelection(index);
+	//	//refreshNumberText();
+	//}
 	
 	/*
 	public void onClickEquals(View v) {
@@ -682,7 +682,7 @@ public final class MainActivity extends Activity
 	public void onNumKeyboardCancel() {
 		number_text.setText("");
 		onNumKeyboardResult();
-		// TODO make numkeys hide in some other way (this is kinda dumb)
+		// TO/DO make numkeys hide in some other way (this is kinda dumb)
 		expression.setSelection(expression.selection);
 	}
 	//*/
@@ -694,7 +694,7 @@ public final class MainActivity extends Activity
 	// TEST FUNCTIONS
 	//////////////////////////////////////////////////////////////////////
 
-	//*
+	/*
 	// Testing elements
 	Integer temp_count = 0;
 	String temp_out;

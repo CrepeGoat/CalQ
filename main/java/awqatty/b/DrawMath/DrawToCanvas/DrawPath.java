@@ -8,8 +8,8 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.SparseArray;
 import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
-import awqatty.b.DrawMath.DrawSubTree.AlignForm;
-import awqatty.b.DrawMath.DrawSubTree.DrawAligned;
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
+import awqatty.b.DrawMath.AlignDrawParts.DrawAligned;
 import awqatty.b.ListTree.ListTree;
 
 public class DrawPath extends RawDrawBase implements AlignForm {

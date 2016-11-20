@@ -1,4 +1,4 @@
-package awqatty.b.DrawMath.DrawSubTree;
+package awqatty.b.DrawMath.AlignDrawParts;
 
 import java.util.List;
 
@@ -96,7 +96,8 @@ public class DrawAligned implements DrawForm {
 			branches[i].setParentheses(pars_active[i]);
 	}
 	public <T extends DrawAligned> void assignBranchParentheses(
-			ListTree<T>.Navigator nav) {
+			ListTree<T>.Navigator nav
+	) {
 		// decisions for each branch
 		boolean[] pars_active = new boolean[nav.getNumberOfBranches()];
 		// moves nav to first branch
@@ -107,6 +108,7 @@ public class DrawAligned implements DrawForm {
 		// sets decisions
 		for (int i=0; i<pars_active.length; ++i) {
 			nav2.getObject().setParentheses(pars_active[i]);
+			nav2.toEnd();
 		}
 	}
 	
@@ -151,7 +153,15 @@ public class DrawAligned implements DrawForm {
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {
 		return comp.intersectsTouchRegion(dst, px, py);
 	}
-	
+	@Override
+	public boolean intersectsTouchRegion(
+			RectF dst,
+			float p1_x, float p1_y,
+			float p2_x, float p2_y
+	) {
+		return comp.intersectsTouchRegion(dst, p1_x, p1_y, p2_x, p2_y);
+	}
+
 	// Other Methods
 	@Override
 	public void clearCache() {
