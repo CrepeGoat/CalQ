@@ -35,7 +35,7 @@ public final class AlignLeaf implements AlignForm {
 	
 	//--- Loop 1 ---
 	@Override
-	public void setSuperLeafSizes(List<RectF> leaf_sizes) {
+	public void setSubLeafSizes(List<RectF> leaf_sizes) {
 		if (dim == null)
 			dim = new RectF(leaf_sizes.get(leaf_number));
 		else dim.set(leaf_sizes.get(leaf_number));
@@ -55,7 +55,7 @@ public final class AlignLeaf implements AlignForm {
 		dim.set(dst);
 	}
 	@Override
-	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs) {
+	public void getSubLeafLocations(SparseArray<RectF> leaf_locs) {
 		leaf_locs.put(leaf_number, dim);
 	}
 	@Override
@@ -75,10 +75,10 @@ public final class AlignLeaf implements AlignForm {
 		return false;
 	}
 	//--- Manage Parentheses ---
-	@Override
-	public void assignParentheses(int[] ctypes, boolean[] pars_active) {}
-	@Override
-	public int getClosureFlags() {return ClosureFlags.NONE;}
+	//@Override
+	//public void assignParentheses(int[] ctypes, boolean[] pars_active) {}
+	//@Override
+	//public int getClosureFlags() {return ClosureFlags.NONE;}
 	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(
 			ListTree<T>.Navigator nav, boolean[] pars_active) {}

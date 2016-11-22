@@ -1,4 +1,4 @@
-package awqatty.b.DrawMath.OrientationObjects;
+package awqatty.b.DrawMath.AlignDrawParts.Utilities;
 
 import android.graphics.RectF;
 
@@ -6,7 +6,7 @@ public interface OrientForm {
 
 	public static final OrientHorizontal horiz = new OrientHorizontal();
 	public static final OrientVertical vert = new OrientVertical();	
-	
+
 	public boolean getOrientation();
 	public static final boolean HORIZONTAL=false;
 	public static final boolean VERTICAL=true;

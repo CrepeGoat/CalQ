@@ -78,23 +78,21 @@ public class ListTree<E> implements Collection<E> {
 	
 	public final class Navigator {
 		private int index;
-		
+
+		public Navigator() {}
 		public Navigator(int start) {
 			index = start;
 		}
 		public Navigator(E element) {
-			final int size = list.size();
-			for (int i=0;i<size;++i) {
-				if (element == list.get(index).getObject()) {
-					index = i;
-					break;
-				}
-			}
+			moveToNode(element);
 		}
-		public Navigator new_copy() {
+		public Navigator newCopy() {
 			return new Navigator(index);
 		}
 
+		public boolean isValid() {
+			return index>=0 && index<list.size();
+		}
 		public int getIndex() {
 			return index;
 		}
@@ -104,16 +102,21 @@ public class ListTree<E> implements Collection<E> {
 		public E getObject() {
 			return get(index);
 		}
-		
-		public Navigator toRoot() {
+
+		public Navigator moveToNode(E element) {
+			final int size = list.size();
+			for (index=0; index<size && element!=list.get(index).getObject(); ++index) {}
+			return this;
+		}
+		public Navigator moveToRoot() {
 			index = getRootIndex(index);
 			return this;
 		}
-		public Navigator toNthBranch(int branch_order) {
+		public Navigator moveToNthBranch(int branch_order) {
 			index = getNthBranchIndex(index, branch_order);
 			return this;
 		}
-		public Navigator toEnd() {
+		public Navigator moveToEnd() {
 			index = getEndOfBranchIndex(index);
 			return this;
 		}

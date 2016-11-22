@@ -66,7 +66,7 @@ public class OpTree {
 			}
 			tree.get(root_index).assignBranchParentheses(ops);
 			*/
-			tree.get(root_index).assignBranchParentheses(tree.new Navigator(root_index));
+			tree.get(root_index).assignBranchParentheses(tree.new Navigator());
 
 			//final int[] branch_indices = tree.getBranchIndices(root_index);
 			//final boolean[] pars_active = tree.get(root_index)

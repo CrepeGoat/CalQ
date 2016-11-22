@@ -2,28 +2,38 @@ package awqatty.b.DrawMath.AlignDrawParts;
 
 import java.util.List;
 
+import awqatty.b.DrawMath.AlignDrawParts.Utilities.AlignmentEdge;
+import awqatty.b.DrawMath.AlignDrawParts.Utilities.StretchType;
 import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
 import awqatty.b.DrawMath.DrawToCanvas.DrawText;
 import awqatty.b.ListTree.ListTree;
 
-public final class AlignSeries extends AlignSeriesBase {
+public final class AlignSeries extends AlignAxisBase {
 	
 	// New Methods
 	public AlignSeries(
 			List<? extends AlignForm> components,
-			AlignForm divider, byte stretch_type,
-			boolean orientation, float whitespace, byte aligned_edges) {
-		super(divider, stretch_type, orientation, whitespace, aligned_edges);
+			List<StretchType> componentStretches,
+			boolean orientation,
+			float whitespace_series,
+			float whitespace_stretch,
+			AlignmentEdge aligned_edges
+	) {
+		super(orientation, whitespace_series, whitespace_stretch, aligned_edges);
 		comps.addAll(components);
+		stretches.addAll(componentStretches);
 	}
-	
-	//public void addComponent(AlignForm draw) {
-	//	comps.add(draw);
-	//}
-	//public void clearComponents() {
-	//	comps.subList(1,comps.size()).clear();
-	//}
-	
+
+	@Override
+	protected int getCompIndex(int index) {
+		return index;
+	}
+	@Override
+	protected boolean hasNthEntry(int index) {
+		return index < comps.size();
+	}
+
+	/*
 	@Override
 	protected void decideParentheses(int[] cflags, boolean[] pars_active) {
 		int cflag_last=ClosureFlags.NONE;
@@ -38,7 +48,7 @@ public final class AlignSeries extends AlignSeriesBase {
 		}
 		
 	}
-
+	//*/
 	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(
 			ListTree<T>.Navigator nav, boolean[] pars_active) {

@@ -4,46 +4,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.graphics.RectF;
+
+import awqatty.b.DrawMath.AlignDrawParts.Utilities.AlignmentEdge;
+import awqatty.b.DrawMath.AlignDrawParts.Utilities.StretchType;
 import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
-import awqatty.b.DrawMath.OrientationObjects.OrientForm;
+import awqatty.b.DrawMath.AlignDrawParts.Utilities.OrientForm;
 
 public abstract class AlignAxisBase extends AlignBase {
 
 	// Local Members
-	protected List<RectF> locs=null;
+	protected List<RectF> locs_ordered = null;
+	protected final List<AlignForm> comps = new ArrayList<>();
+	protected final List<StretchType> stretches = new ArrayList<>();
 	@Override
 	public void clearCache() {
 		super.clearCache();
-		locs = null;
+		locs_ordered = null;
 	}
-	
-	// Stretch types (for bounds/divider)
-		public static final byte STRETCH_NONE	=0;
-		public static final byte STRETCH_GIRTH	=1;
-		public static final byte STRETCH_FULL	=2;
 
 	protected final OrientForm orient;
-		public static final boolean HORIZONTAL	=OrientForm.HORIZONTAL;
-		public static final boolean VERTICAL	=OrientForm.VERTICAL;
-	
-	protected final float whtspc;	// separates each component, including divider
-	
-	protected final byte align;	// how to align components in opposing axis
-		public static final byte EDGE_LEFT	=0;
-		public static final byte EDGE_TOP	=0;
-		public static final byte EDGE_START	=0;
-		public static final byte EDGE_CENTER=1;
-		public static final byte EDGE_RIGHT	=2;
-		public static final byte EDGE_BOTTOM=2;
-		public static final byte EDGE_END	=2;
+	protected final float whtspc_seriesSeparation;	// separates each component, including divider
+	protected final float whtspc_stretchPadding; // girth added to ends of stretched components
+	protected final AlignmentEdge align;	// how to align components in opposing axis
 
 	public AlignAxisBase(
 			boolean orientation,
-			float whitespace,
-			byte aligned_edges) {
-		orient = (orientation == HORIZONTAL
+			float whitespace_series,
+			float whitespace_stretch,
+			AlignmentEdge aligned_edges
+	) {
+		orient = (orientation == OrientForm.HORIZONTAL
 				? OrientForm.horiz : OrientForm.vert);
-		whtspc = whitespace;
+		whtspc_seriesSeparation = whitespace_series;
+		whtspc_stretchPadding = whitespace_stretch;
 		align = aligned_edges;
 	}
 	
@@ -51,34 +44,45 @@ public abstract class AlignAxisBase extends AlignBase {
 	public boolean getOrientation() {
 		return orient.getOrientation();
 	}
-	
-	@Override
-	public int getClosureFlags() {
-		return orient.getOrientation() == HORIZONTAL
-				? ClosureFlags.SERIES_HORIZ : ClosureFlags.SERIES_VERT;
-	}
-	
+
+	//@Override
+	//public int getClosureFlags() {
+	//	return orient.getOrientation() == OrientForm.HORIZONTAL
+	//			? ClosureFlags.SERIES_HORIZ : ClosureFlags.SERIES_VERT;
+	//}
+
+	// Abstract Methods
+	abstract protected int getCompIndex(int index);
+
 	//--- AlignBase Overrides ---
 	@Override
-	public Iterable<RectF> iterLocs() {return locs;}
-	
+	public Iterable<AlignForm> iterComps() {return comps;}
+	@Override
+	protected AlignForm getNthComp(int index) {
+		return comps.get(getCompIndex(index));
+	}
+	@Override
+	protected RectF getNthLoc(int index) {
+		return locs_ordered.get(index);
+	}
+
+
 	protected RectF rectf = null;
 	protected float max_girth;
 	// Use in loop
 	private float last_edge;
 	@Override
 	protected void arrange() {
-		// TODO Auto-generated method stub
 		loadAlignTools();
 		last_edge=0;
 				
 		// Clear previous lists
-		locs.clear();
+		locs_ordered.clear();
 		// Arrange Components
 		addCompsToSeries();
-		// (removes buffer whitespace from last comp
+		// (removes buffer whitespaceBetweenSeries from last comp
 		// added to space individual comps)
-		last_edge -= whtspc;
+		last_edge -= whtspc_seriesSeparation;
 
 		// Set bounds
 		valid_area.left = 0;
@@ -90,40 +94,64 @@ public abstract class AlignAxisBase extends AlignBase {
 	protected void loadAlignTools() {
 		if (valid_area == null)
 			valid_area = new RectF();
-		if (locs == null)
-			locs = new ArrayList<>();
-		else locs.clear();
+		if (locs_ordered == null)
+			locs_ordered = new ArrayList<>();
+		else locs_ordered.clear();
 		if (rectf == null)
 			rectf = new RectF();
 	}
 	
-	protected void addCompToSeries(AlignForm comp, byte stretch_type) {
+	private void addCompToSeries(AlignForm comp, StretchType stretch_type) {
 		if (comp == null) return;
-		
+
 		if (rectf == null)
 			rectf = new RectF();
-		locs.add(rectf);
+		locs_ordered.add(rectf);
 		
 		comp.getSize(rectf);
 		rectf.offsetTo(0,0);
 				
 		switch (stretch_type) {
-		case STRETCH_NONE:
+		case NONE:
 			break;
-		case STRETCH_FULL:
+		case FULL:
 			orient.setLengthEnd(rectf,
 					orient.getLength(rectf)*max_girth/orient.getGirth(rectf) );
-		case STRETCH_GIRTH:
+		case GIRTH:
 			orient.setGirthEnd(rectf, max_girth);
 			break;
 		default:
 			break;
 		}
 		orient.offsetTo(rectf, last_edge,
-				(max_girth-orient.getGirth(rectf)) * align/2f);
-		last_edge = orient.getLengthEnd(rectf) + whtspc;
+				(align==AlignmentEdge.TOP_LEFT) ? 0 :
+				(max_girth-orient.getGirth(rectf))*(align==AlignmentEdge.CENTER ? 0.5f:1)
+		);
+		last_edge = orient.getLengthEnd(rectf) + whtspc_seriesSeparation;
 		rectf = null;
 	}
-	abstract protected void addCompsToSeries();
+	private void addCompsToSeries() {
+		// Gets max girth of components
+		max_girth = 0;
+		boolean hasStretchComp = false;
+		for (int i=0;i<comps.size();++i) {
+			if (comps.get(i)!=null){
+				if (stretches.get(i)==StretchType.NONE) {
+					comps.get(i).getSize(rectf);
+					max_girth = Math.max(max_girth, orient.getGirth(rectf));
+				} else {
+					hasStretchComp = true;
+				}
+			}
+		}
+		if (hasStretchComp) max_girth += 2*whtspc_stretchPadding;
 
+		// Add each component in order
+		for (int i=0; hasNthEntry(i); ++i) {
+			addCompToSeries(
+					comps.get(getCompIndex(i)),
+					stretches.get(getCompIndex(i))
+			);
+		}
+	}
 }

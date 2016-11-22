@@ -8,7 +8,7 @@ public class AlignLeafSeriesBuilder extends AlignSeriesBaseBuilder {
 	@Override
 	public AlignAxisBase build() {
 		return new AlignLeafSeries(div, stretch_div,
-				orient, whtspc, edge );
+				orient, whtspc_seriesSeparation, whtspc_stretchPadding, edge );
 	}
 
 }

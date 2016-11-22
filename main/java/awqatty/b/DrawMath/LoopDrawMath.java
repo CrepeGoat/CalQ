@@ -4,23 +4,27 @@ import java.util.List;
 
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.util.SparseArray;
+
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
 import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
 import awqatty.b.ListTree.DataLoopRootDown;
 
 public class LoopDrawMath
-		extends DataLoopRootDown<DrawForm, RectF> {
+		extends DataLoopRootDown<AlignForm, RectF> {
 
 	private Canvas canvas;
 	public void setCanvas(Canvas canvas) {
 		this.canvas = canvas;
 	}
-	
+	private SparseArray<RectF> leafLocHolder=new SparseArray<>();
+
 	private final RectF tmp = new RectF();
 	@Override
 	protected LoopControl loopAtNode(
-			DrawForm node,
+			AlignForm node,
 			RectF data,
-			List<RectF> sublist
+			List<RectF> subList
 	) {
 		/* TODO Test code. Remove
 		Log.d("TestDrawMath",
@@ -32,7 +36,14 @@ public class LoopDrawMath
 		//*/
 		tmp.set(data);
 		node.drawToCanvas(canvas, tmp);
-		node.getLeafLocations(sublist);
+
+		node.getSubLeafLocations(leafLocHolder);
+		final int length = leafLocHolder.size();
+		for (int i=0; i<length; ++i) {
+			subList.add(leafLocHolder.get(i));
+		}
+		leafLocHolder.clear();
+
 		return LoopControl.CONTINUE;
 	}
 }

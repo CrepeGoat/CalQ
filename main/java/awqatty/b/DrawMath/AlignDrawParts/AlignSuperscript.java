@@ -26,11 +26,20 @@ public final class AlignSuperscript extends AlignBase {
 	}
 
 	@Override
+	protected boolean hasNthEntry(int index) {
+		return index<2;
+	}
+	@Override
+	protected AlignForm getNthComp(int index) {
+		return comps.get(index);
+	}
+	@Override
+	protected RectF getNthLoc(int index) {
+		return locs.get(index);
+	}
+
+	@Override
 	protected Iterable<AlignForm> iterComps() {return comps;}
-	@Override
-	protected Iterable<AlignForm> iterCompsWithLoc() {return comps;}
-	@Override
-	protected Iterable<RectF> iterLocs() {return locs;}
 
 	@Override
 	protected void arrange() {
@@ -58,10 +67,11 @@ public final class AlignSuperscript extends AlignBase {
 	}
 	
 	//--- Manage Parentheses ---
-	@Override
-	public int getClosureFlags() {
-		return ClosureFlags.SCRIPT;
-	}
+	//@Override
+	//public int getClosureFlags() {
+	//	return ClosureFlags.SCRIPT;
+	//}
+	/*
 	@Override
 	protected void decideParentheses(int[] ctypes, boolean[] pars_active) {
 		if (comps.get(INDEX_BASE) instanceof AlignLeaf) {
@@ -75,12 +85,12 @@ public final class AlignSuperscript extends AlignBase {
 			pars_active[((AlignLeaf)comps.get(INDEX_EXP)).leaf_number] = false;
 		}
 	}
-
+	//*/
 	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(
 			ListTree<T>.Navigator nav, boolean[] pars_active) {
-		pars_active[INDEX_BASE] = (nav.getObject().base_comp instanceof AlignSeriesBase);
-		nav.toEnd();
+		pars_active[INDEX_BASE] = (nav.getObject().base_comp instanceof AlignAxisBase);
+		nav.moveToEnd();
 		pars_active[INDEX_EXP] = (nav.getObject().base_comp instanceof AlignSuperscript);
 	}
 

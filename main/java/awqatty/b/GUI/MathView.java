@@ -1,33 +1,24 @@
 package awqatty.b.GUI;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.GestureDetector.OnGestureListener;
-import android.view.MotionEvent;
 import android.view.View;
-import awqatty.b.CustomEventListeners.ChangeEvent;
-import awqatty.b.CustomEventListeners.ObservedOpTree;
-import awqatty.b.CustomEventListeners.OnChangeListener;
-import awqatty.b.DrawMath.LoopSizingMath;
-import awqatty.b.DrawMath.LoopClickMath;
+
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
+import awqatty.b.DrawMath.LoopPreSizingMath;
 import awqatty.b.DrawMath.LoopDrawMath;
 import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
 import awqatty.b.ListTree.ListTree;
-import awqatty.b.OpTree.OpTree;
-import awqatty.b.calq.MainActivity;
 
 public class MathView
 		extends View
 		//implements OnGestureListener, OnChangeListener
 {
-	protected ListTree<? extends DrawForm> tree;
+	protected ListTree<? extends AlignForm> tree;
 	
-	private final LoopSizingMath loop_sizing = new LoopSizingMath();
+	private final LoopPreSizingMath loop_sizing = new LoopPreSizingMath();
 	private final LoopDrawMath loop_draw = new LoopDrawMath();
 	private float minScaleForFit = (float)Math.sqrt(0.5); // -> area = 1/2 of original
 
@@ -51,7 +42,7 @@ public class MathView
 	}
 	
 	// ListTree Interface Methods
-	public void setListTree(ListTree<? extends DrawForm> list_tree) {
+	public void setListTree(ListTree<? extends AlignForm> list_tree) {
 		tree = list_tree;
 		refresh();
 	}

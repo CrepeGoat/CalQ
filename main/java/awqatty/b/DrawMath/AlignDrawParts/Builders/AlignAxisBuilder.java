@@ -1,12 +1,17 @@
 package awqatty.b.DrawMath.AlignDrawParts.Builders;
 
 import awqatty.b.DrawMath.AlignDrawParts.AlignAxisBase;
+import awqatty.b.DrawMath.AlignDrawParts.Utilities.AlignmentEdge;
+import awqatty.b.DrawMath.AlignDrawParts.Utilities.OrientForm;
+
+import static awqatty.b.DrawMath.AlignDrawParts.Utilities.AlignmentEdge.CENTER;
 
 abstract public class AlignAxisBuilder {
 
-	protected boolean orient = AlignAxisBase.HORIZONTAL;
-	protected float whtspc = 0;
-	protected byte edge = AlignAxisBase.EDGE_START;
+	protected boolean orient = OrientForm.HORIZONTAL;
+	protected float whtspc_seriesSeparation=0;
+	protected float whtspc_stretchPadding=0;
+	protected AlignmentEdge edge = CENTER;
 	
 	// Constructor
 	public AlignAxisBuilder() {}
@@ -16,11 +21,15 @@ abstract public class AlignAxisBuilder {
 		orient = orientation;
 		return this;
 	}
-	public AlignAxisBuilder whitespace(float whitespace) {
-		whtspc = whitespace;
+	public AlignAxisBuilder whitespaceBetweenSeries(float whitespace) {
+		whtspc_seriesSeparation = whitespace;
 		return this;
 	}
-	public AlignAxisBuilder aligned_edge(byte aligned_edge) {
+	public AlignAxisBuilder whitespacePaddingStretch(float whitespace) {
+		whtspc_stretchPadding = whitespace;
+		return this;
+	}
+	public AlignAxisBuilder aligned_edge(AlignmentEdge aligned_edge) {
 		edge = aligned_edge;
 		return this;
 	}

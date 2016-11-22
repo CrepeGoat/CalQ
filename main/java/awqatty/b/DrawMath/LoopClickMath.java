@@ -5,13 +5,16 @@ import java.util.List;
 
 import android.graphics.RectF;
 import android.util.Log;
+import android.util.SparseArray;
+
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
 import awqatty.b.DrawMath.DrawToCanvas.DrawForm;
 import awqatty.b.DrawMath.DrawToCanvas.RawDrawBase;
 import awqatty.b.ListTree.DataLoopRootDown;
 import awqatty.b.ListTree.ListTree;
 
 public class LoopClickMath
-		extends DataLoopRootDown<DrawForm, RectF> {
+		extends DataLoopRootDown<AlignForm, RectF> {
 
 	// Input - Click coordinates
 	private float x1,y1, x2,y2;
@@ -46,15 +49,16 @@ public class LoopClickMath
 	
 	// Loop Function
 	@Override
-	public void runLoop(ListTree<? extends DrawForm> tree, RectF init_data) {
+	public void runLoop(ListTree<? extends AlignForm> tree, RectF init_data) {
 		indices.clear();
 		//touchedAreas.clear();
 		super.runLoop(tree, init_data);
 	}
 	
 	private final RectF rectf_tmp = new RectF();
+	private final SparseArray<RectF> leafLocHolder = new SparseArray<>();
 	@Override
-	protected LoopControl loopAtNode(DrawForm node, RectF data, List<RectF> sublist) {
+	protected LoopControl loopAtNode(AlignForm node, RectF data, List<RectF> sublist) {
 		// If the clicked region does not intersect this node's area,
 		//	skip the rest of its branch
 		if (!RawDrawBase.containsLineSegment(data, x1,y1, x2,y2)) {
@@ -71,7 +75,12 @@ public class LoopClickMath
 			//touchedAreas.add(new RectF(rectf_tmp));
 		}
 		
-		node.getLeafLocations(sublist);
+		node.getSubLeafLocations(leafLocHolder);
+		for (int i=0;i<leafLocHolder.size();++i) {
+			sublist.add(leafLocHolder.get(i));
+		}
+		leafLocHolder.clear();
+
 		return LoopControl.CONTINUE;
 	}
 

@@ -12,8 +12,8 @@ public interface DrawForm extends DrawFormBase{
 	// Set
 	public void setScale(float scale_factor);
 	// Loop 1
-	public void arrange(List<RectF> branch_sizes);
+	//public void arrange(List<RectF> branch_sizes);
 	// Loop 2
-	public void getLeafLocations(List<RectF> leaf_locs);
+	//public void getLeafLocations(List<RectF> leaf_locs);
 
 }

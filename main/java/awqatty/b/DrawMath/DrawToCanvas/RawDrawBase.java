@@ -88,8 +88,8 @@ public abstract class RawDrawBase implements DrawForm {
 	}
 	
 	//--- Arrange Loop Methods ---
-	@Override
-	public void arrange(List<RectF> branch_sizes) {}
+	//@Override
+	//public void arrange(List<RectF> branch_sizes) {}
 	@Override
 	public void getSize(RectF dst) {
 		getRawBounds(dst);
@@ -133,15 +133,21 @@ public abstract class RawDrawBase implements DrawForm {
 		canvas.restore();
 	}	
 	
-	@Override
-	public void getLeafLocations(List<RectF> leaf_locs) {}
+	//@Override
+	//public void getLeafLocations(List<RectF> leaf_locs) {}
 
 	@Override
-	public boolean intersectsTouchRegion(RectF dst,
-										 float p1_x, float p1_y,
-										 float p2_x, float p2_y) {
-		return containsLineSegment(dst, p1_x, p1_y, p2_x, p2_y,
-				TOUCH_PADDING);
+	public boolean intersectsTouchRegion(
+			RectF dst,
+			float p1_x, float p1_y,
+			float p2_x, float p2_y
+	) {
+		return containsLineSegment(
+				dst,
+				p1_x, p1_y,
+				p2_x, p2_y,
+				TOUCH_PADDING
+		);
 	}
 	@Override
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {

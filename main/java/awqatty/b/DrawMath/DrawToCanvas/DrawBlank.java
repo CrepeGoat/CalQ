@@ -10,7 +10,7 @@ import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
 import awqatty.b.DrawMath.AlignDrawParts.DrawAligned;
 import awqatty.b.ListTree.ListTree;
 
-public final class DrawBlank implements AlignForm, DrawForm {
+public final class DrawBlank implements DrawForm {
 
 	private float w,h;
 	private float scale=1;
@@ -50,16 +50,12 @@ public final class DrawBlank implements AlignForm, DrawForm {
 	public void clearCache() {}
 	@Override
 	public void setColor(int color) {}
-	@Override
-	public void setSuperLeafSizes(List<RectF> leaf_sizes) {}
-	@Override
-	public void arrange(List<RectF> branch_sizes) {}
+	//@Override
+	//public void arrange(List<RectF> branch_sizes) {}
 	@Override
 	public void drawToCanvas(Canvas canvas, RectF dst) {}
-	@Override
-	public void getLeafLocations(List<RectF> leaf_locs) {}
-	@Override
-	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs) {}
+	//@Override
+	//public void getLeafLocations(List<RectF> leaf_locs) {}
 	@Override
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {return false;}
 	@Override
@@ -70,12 +66,9 @@ public final class DrawBlank implements AlignForm, DrawForm {
 	}
 
 	//--- Manage Parentheses ---
-	@Override
-	public void assignParentheses(int[] ctypes, boolean[] pars_active) {}
-	@Override
-	public int getClosureFlags() {return ClosureFlags.NONE;}
-	@Override
-	public <T extends DrawAligned> void subBranchShouldUsePars(
-			ListTree<T>.Navigator nav, boolean[] pars_active) {}
+	//@Override
+	//public void assignParentheses(int[] ctypes, boolean[] pars_active) {}
+	//@Override
+	//public int getClosureFlags() {return ClosureFlags.NONE;}
 
 }
