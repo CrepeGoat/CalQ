@@ -41,10 +41,7 @@ import awqatty.b.ViewUtilities.ViewParentFinder;
  * MathJax in Android Sample Code (https://github.com/leathrum/android-apps/blob/master
  * 		/MathJaxApp/mml-full/MainActivity.java)
  * 
- * TODO
- *
- * Shift textNum TextView to be constantly in view,
- * 		remove equals button
+ * TODO new features
  *
  * Add _ftype values to buttons (to avoid switch table for OnPressOperator & addFunction)
  * 
@@ -53,10 +50,6 @@ import awqatty.b.ViewUtilities.ViewParentFinder;
  * Add larger device support
  * (also change drawables to be API specific)
  *
- * add parentheses support
- * 
- * make sure numText contains result in one line
- * 
  * convert single-palette view to be swipe up/down (not scroll) stack
  * 
  * divide panels into fragments (?)
@@ -64,10 +57,13 @@ import awqatty.b.ViewUtilities.ViewParentFinder;
  * change numkeys to normal buttons
  * 	-> makes a more uniform appearance
  * 
- * TODO Bugs
- * change keyboard listener functionality
+ * TODO working features
  * parentheses assignment inside neg function (f(x)=-x)
+ *
  * on mathview reload: shift view to focus on selection
+ *
+ * get SVG images to render
+ *
  *****************************************************************************************/
 
 

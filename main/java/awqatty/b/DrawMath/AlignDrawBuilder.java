@@ -123,6 +123,7 @@ public final class AlignDrawBuilder {
 		}
 		getDrawSeriesFromNumTextSeries(series_mag, list);
 	}
+	// TODO change to parse based on regional separators (e.g., ',' '.' ' ' etc.)
 	private static void groupWholeNum(String str, List<String> list) {
 		final int length = str.length();
 		
@@ -290,7 +291,8 @@ public final class AlignDrawBuilder {
 			case ABS:
 				path = new Path();
 				path.addRect(new RectF(0,0,LINE_THICKNESS,LINE_THICKNESS),
-						Path.Direction.CCW );
+						Path.Direction.CCW
+				);
 				nested_comp = new AlignDraw(new DrawPath(path, new Paint(Paint.ANTI_ALIAS_FLAG)));
 				return new AlignSeriesBuilder(Arrays.asList(
 						nested_comp,
