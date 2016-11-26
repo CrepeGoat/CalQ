@@ -5,6 +5,7 @@ import android.graphics.Color;
 
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.FunctionDictionary.FunctionForms.CalculationException;
+import awqatty.b.GUI.NumberStringConverter;
 import awqatty.b.GUI.TouchableMathView;
 import awqatty.b.ListTree.BranchCountException;
 import awqatty.b.ListTree.ListTree;
@@ -372,9 +373,19 @@ public class OpTree {
 
 	// Allows for text insertion of numbers
 	public String getText() {
-		if ((tree.get(index_selection).ftype != FunctionType.RAW_TEXT)) {
+		if (tree.get(index_selection).ftype != FunctionType.RAW_TEXT) {
+			String str_tmp = "";
+			if (tree.get(index_selection).ftype == FunctionType.NUMBER) {
+				// -> then set temporary text as number's current text
+				str_tmp = NumberStringConverter.toReducedString(
+						tree.get(index_selection).func.calculate(null)
+				);
+			}
 			node_builder.buildFuncOverSubtree(tree.subTree(index_selection), FunctionType.RAW_TEXT);
 			tree.get(index_selection).setColor(color_highlightEdit);
+			if (str_tmp != "") {
+				((RawTextOperation)tree.get(index_selection)).setText(str_tmp);
+			}
 		}
 		return ((RawTextOperation)tree.get(index_selection)).getText();
 	}

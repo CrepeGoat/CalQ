@@ -42,7 +42,6 @@ import awqatty.b.ViewUtilities.ViewParentFinder;
  * 		/MathJaxApp/mml-full/MainActivity.java)
  * 
  * TODO new features
- *
  * Add _ftype values to buttons (to avoid switch table for OnPressOperator & addFunction)
  * 
  * GUI Scheme (colors, custom buttons, TextView borders)
@@ -56,13 +55,19 @@ import awqatty.b.ViewUtilities.ViewParentFinder;
  * 
  * change numkeys to normal buttons
  * 	-> makes a more uniform appearance
- * 
+ *
+ * 	implement 'undo' button (i.e., keep running log of actions)
+ *
+ * 	align objects to origin (will fix alignment of, e.g., exponential expressions)
+ *
  * TODO working features
  * parentheses assignment inside neg function (f(x)=-x)
  *
  * on mathview reload: shift view to focus on selection
  *
  * get SVG images to render
+ *
+ * minimum shrink scale for elements (i.e. fix nested exponent functions)
  *
  *****************************************************************************************/
 
