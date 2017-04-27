@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 744.09448819 1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="deleteParent_a+b_wBorder.svg">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Lstart"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path4430"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt"
+         transform="scale(0.8) translate(12.5,0)" />
+    </marker>
+    <linearGradient
+       id="linearGradient4192"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4194" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="16"
+     inkscape:cx="1.055606"
+     inkscape:cy="9.5417563"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="711"
+     inkscape:window-x="0"
+     inkscape:window-y="1"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Region"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="opacity:0.25">
+    <path
+       style="opacity:1;fill:#000000;fill-opacity:0.50196081;fill-rule:nonzero;stroke:none;stroke-width:150;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 0 1028.3613 L 0 1052.3613 L 24 1052.3613 L 24 1028.3613 L 0 1028.3613 z M 2 1030.3633 L 22 1030.3633 L 22 1050.3613 L 2 1050.3613 L 2 1030.3633 z "
+       id="rect3336" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Content">
+    <path
+       style="font-style:normal;font-weight:normal;font-size:9.12249374px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 2.875 1035.3613 C 2.39025 1035.3613 2 1035.7516 2 1036.2363 L 2 1044.4863 C 2 1044.9711 2.39025 1045.3613 2.875 1045.3613 L 7.625 1045.3613 C 8.10975 1045.3613 8.5 1044.9711 8.5 1044.4863 L 8.5 1036.2363 C 8.5 1035.7516 8.10975 1035.3613 7.625 1035.3613 L 2.875 1035.3613 z M 9.0039062 1036.6113 L 8.5039062 1037.4785 L 11.511719 1039.2148 L 11.511719 1040.4941 L 9.03125 1040.4941 L 9.03125 1041.252 L 11.511719 1041.252 L 11.511719 1043.7324 L 12.259766 1043.7324 L 12.259766 1041.252 L 14.742188 1041.252 L 14.742188 1041.0801 L 16.537109 1042.1152 L 16.537109 1043.7324 L 17.361328 1043.7324 L 17.361328 1042.9844 C 17.533563 1043.2813 17.750397 1043.5029 18.011719 1043.6484 C 18.27601 1043.791 18.589822 1043.8613 18.955078 1043.8613 C 19.129223 1043.8613 19.29033 1043.8352 19.445312 1043.7949 L 21.496094 1044.9785 L 21.996094 1044.1113 L 20.388672 1043.1836 L 19.677734 1042.7734 L 17.373047 1041.4434 L 17.373047 1041.4414 L 16.537109 1040.9609 L 12.259766 1038.4902 L 11.511719 1038.0586 L 9.0039062 1036.6113 z M 16.537109 1036.8027 L 16.537109 1039.8066 L 17.482422 1040.3516 C 17.543001 1040.1535 17.623234 1039.9748 17.730469 1039.8262 C 17.979912 1039.4817 18.322303 1039.3105 18.755859 1039.3105 C 19.189415 1039.3105 19.528917 1039.4817 19.775391 1039.8262 C 20.024834 1040.1677 20.148438 1040.6394 20.148438 1041.2422 C 20.148438 1041.4667 20.126388 1041.6688 20.091797 1041.8574 L 20.857422 1042.3008 C 20.951742 1041.9854 21 1041.6327 21 1041.2422 C 21 1040.4582 20.809791 1039.8268 20.429688 1039.3457 C 20.052553 1038.8646 19.560869 1038.623 18.955078 1038.623 C 18.589822 1038.623 18.27601 1038.6963 18.011719 1038.8418 C 17.750397 1038.9843 17.533563 1039.205 17.361328 1039.502 L 17.361328 1036.8027 L 16.537109 1036.8027 z M 5.0625 1038.623 C 5.7841035 1038.623 6.3233401 1038.8114 6.6796875 1039.1855 C 7.0360349 1039.5597 7.2128906 1040.1265 7.2128906 1040.8867 L 7.2128906 1043.7324 L 6.3945312 1043.7324 L 6.3945312 1042.9766 C 6.2074489 1043.2795 5.9744513 1043.5029 5.6953125 1043.6484 C 5.4161737 1043.791 5.0737823 1043.8613 4.6699219 1043.8613 C 4.1591573 1043.8613 3.752114 1043.7206 3.4492188 1043.4355 C 3.1492929 1043.1475 3 1042.7625 3 1042.2812 C 3 1041.7202 3.1863821 1041.2968 3.5605469 1041.0117 C 3.9376812 1040.7266 4.4987806 1040.584 5.2441406 1040.584 L 6.3945312 1040.584 L 6.3945312 1040.5039 C 6.3945312 1040.1268 6.2689744 1039.8358 6.0195312 1039.6309 C 5.7730576 1039.423 5.4269195 1039.3184 4.9785156 1039.3184 C 4.6934377 1039.3184 4.4147614 1039.3536 4.1445312 1039.4219 C 3.8743011 1039.4902 3.6146776 1039.5919 3.3652344 1039.7285 L 3.3652344 1038.9707 C 3.6651601 1038.8549 3.9561729 1038.7693 4.2382812 1038.7129 C 4.5203896 1038.6535 4.7952394 1038.623 5.0625 1038.623 z M 12.259766 1039.6465 L 13.728516 1040.4941 L 12.259766 1040.4941 L 12.259766 1039.6465 z M 5.578125 1041.2246 C 4.9159127 1041.2246 4.4585073 1041.3017 4.203125 1041.4531 C 3.9477427 1041.6046 3.8203125 1041.8613 3.8203125 1042.2266 C 3.8203125 1042.5176 3.9154168 1042.7496 4.1054688 1042.9219 C 4.2984903 1043.0911 4.5590505 1043.1758 4.8886719 1043.1758 C 5.3430148 1043.1758 5.7072691 1043.016 5.9804688 1042.6953 C 6.256638 1042.3716 6.3945312 1041.9427 6.3945312 1041.4082 L 6.3945312 1041.2246 L 5.578125 1041.2246 z "
+       id="text3349" />
+  </g>
+</svg>
