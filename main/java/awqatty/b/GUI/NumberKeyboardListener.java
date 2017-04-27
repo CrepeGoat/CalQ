@@ -2,8 +2,8 @@ package awqatty.b.GUI;
 
 import android.inputmethodservice.KeyboardView.OnKeyboardActionListener;
 import android.view.View.OnClickListener;
-import android.widget.TextView;
-import awqatty.b.calq.MainActivity;
+
+import awqatty.b.OpTree.OpTree;
 
 public final class NumberKeyboardListener implements OnKeyboardActionListener {
 
@@ -11,12 +11,12 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 	public static final int LISTENER_COUNT = 1;
 	public static final int KEYS_EDIT = 0;
 	
-	private final TextView display;
+	private final OpTree text_source;
 	private final OnClickListener[] listeners;
 	
-	public NumberKeyboardListener(TextView view) {
+	public NumberKeyboardListener(OpTree optree) {
 		listeners = new OnClickListener[LISTENER_COUNT];
-		display = view;
+		text_source = optree;
 	}
 	
 	public void setOnClickListener(int listener_number, OnClickListener l) {
@@ -33,49 +33,49 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 	public void onRelease(int arg0) {
 		String text=null;
 		if (arg0 != -3 && arg0 != -2) {
-			text = display.getText().toString();
+			text = text_source.getText();
 			if (text.isEmpty()) text = "0";
 		}
 		
 		switch (arg0) {
 		case -5:	// Delete Key Logic
 			if (text.length() == 1)
-				display.setText("0");
+				text_source.setText("0");
 			else if (text.length() == 2 && text.startsWith("-"))
-				display.setText( text.charAt(1)!='0' ? "-0" : "0" );
+				text_source.setText(text.charAt(1)!='0' ? "-0":"0");
 			else if (text.length() > 1)
-				display.setText(text.subSequence(0, text.length()-1));
+				text_source.setText(text.subSequence(0, text.length()-1).toString());
 			break;
 			
 		case -3:	// Cancel Key Logic
-			((MainActivity) display.getContext()).onNumKeyboardCancel();
+			//((MainActivity) text_source.getContext()).onNumKeyboardCancel();
 			break;
 		
 		case -2:	// Enter Key Logic
-			((MainActivity) display.getContext()).onNumKeyboardResult();
+			text_source.setTextAsNumber();
 			break;
 		
 		case 45:	// Negative Key Logic
 			final int index = text.lastIndexOf("E") + 1;
 			if (index < text.length() && text.charAt(index) == '-')
-				display.setText(text.substring(0, index) + text.substring(index+1));
+				text_source.setText(text.substring(0, index) + text.substring(index+1));
 			else
-				display.setText(text.substring(0,index) + '-' + text.substring(index));
+				text_source.setText(text.substring(0,index) + '-' + text.substring(index));
 			break;
 		
 		case 46:	// Decimal Key Logic
 			if (text.length() == 0)
-				display.setText("0.");
+				text_source.setText("0.");
 			else if (!text.contains("E") && !text.contains("."))
-				display.setText(text.toString() + '.');
+				text_source.setText(text.toString() + '.');
 			break;
 		
 		case 69:	// Exponent Key Logic
 			if (text.length() > 0) {
 				if (!text.contains("E"))
-					display.setText(text.toString() + 'E');
+					text_source.setText(text.toString() + 'E');
 				else if (text.endsWith("E"))
-					display.setText(text.substring(0,text.length()-1));	
+					text_source.setText(text.substring(0,text.length()-1));
 			}
 			break;
 		
@@ -87,13 +87,13 @@ public final class NumberKeyboardListener implements OnKeyboardActionListener {
 				prefix = "-";
 			else
 				prefix = text;
-			display.setText(prefix + (char)arg0);
+			text_source.setText(prefix + (char)arg0);
 			break;
 		}
 		
 		if (arg0 == -3 || arg0 == -2) {}
 		else {
-			listeners[KEYS_EDIT].onClick(display);
+			//listeners[KEYS_EDIT].onClick(display);
 		}
 	}
 

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class FunctionGCD implements FunctionForm {
 
-	protected Double getGCD(List<Double> vlist) {
+	static protected Double getGCD(List<Double> vlist) {
 		// Avoids "0" corner case
 		for (Double d : vlist)
 			if (d == 0)

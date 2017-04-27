@@ -25,14 +25,14 @@ public class ListTree<E> implements Collection<E> {
 		// Local Members
 		private final E obj;
 		
-		private int branch_count;
+		private int branchCount;
 		public final int minBranchCount;
 		public final int maxBranchCount;
 
 		// Constructors
 		public Node(E object, int min, int max) {
 			obj = object;
-			branch_count = 0;
+			branchCount = 0;
 			minBranchCount = min;
 			maxBranchCount = max;
 		}
@@ -46,43 +46,53 @@ public class ListTree<E> implements Collection<E> {
 		}
 		
 		public int getBranchCount() {
-			return branch_count;
+			return branchCount;
 		}
 		// Increment/Decrement Operations
 		//		throws Exception on illegal child counts
 		public void incrementCount() throws BranchCountException {
-			if (branch_count >= maxBranchCount)
+			if (branchCount >= maxBranchCount)
 				throw new BranchCountException();
-			++branch_count;
+			++branchCount;
 		}
 		public void decrementCount() throws BranchCountException {
-			if (branch_count <= minBranchCount)
+			if (branchCount <= minBranchCount)
 				throw new BranchCountException();
-			--branch_count;
+			--branchCount;
 		}
 		public void incrementCountBy(int diff) {
-			if (minBranchCount > branch_count+diff
-					|| maxBranchCount < branch_count+diff)
+			if (minBranchCount > branchCount +diff
+					|| maxBranchCount < branchCount +diff)
 				throw new BranchCountException();
-			branch_count += diff;
+			branchCount += diff;
 		}
 		// Checks count for validity
 		//		(When building a branch, no exception will be thrown
 		//		 while incrementing. Use this at end of build process
 		//		 to ensure end count complies with bounds.)
 		public void checkCount() throws BranchCountException {
-			if (branch_count <= minBranchCount || branch_count >= maxBranchCount)
+			if (branchCount <= minBranchCount || branchCount >= maxBranchCount)
 				throw new BranchCountException();
 		}
 	}
 	
 	public final class Navigator {
 		private int index;
-		
+
+		public Navigator() {}
 		public Navigator(int start) {
 			index = start;
 		}
-		
+		public Navigator(E element) {
+			moveToNode(element);
+		}
+		public Navigator newCopy() {
+			return new Navigator(index);
+		}
+
+		public boolean isValid() {
+			return index>=0 && index<list.size();
+		}
 		public int getIndex() {
 			return index;
 		}
@@ -92,16 +102,21 @@ public class ListTree<E> implements Collection<E> {
 		public E getObject() {
 			return get(index);
 		}
-		
-		public Navigator toRoot() {
+
+		public Navigator moveToNode(E element) {
+			final int size = list.size();
+			for (index=0; index<size && element!=list.get(index).getObject(); ++index) {}
+			return this;
+		}
+		public Navigator moveToRoot() {
 			index = getRootIndex(index);
 			return this;
 		}
-		public Navigator toNthBranch(int branch_order) {
+		public Navigator moveToNthBranch(int branch_order) {
 			index = getNthBranchIndex(index, branch_order);
 			return this;
 		}
-		public Navigator toEnd() {
+		public Navigator moveToEnd() {
 			index = getEndOfBranchIndex(index);
 			return this;
 		}
@@ -154,12 +169,12 @@ public class ListTree<E> implements Collection<E> {
 		return list.get(index).getBranchCount();		
 	}
 	public int getMinBranchCount(int index) {
-		return list.get(index).minBranchCount;		
+		return list.get(index).minBranchCount;
 	}
 	public int getMaxBranchCount(int index) {
-		return list.get(index).maxBranchCount;		
+		return list.get(index).maxBranchCount;
 	}
-	
+
 	/**
 	 * METHOD - subTree
 	 * Returns a new tree object, with subList as base stack
@@ -196,9 +211,9 @@ public class ListTree<E> implements Collection<E> {
 	 */
 	public int getEndOfBranchIndex(int index) {
 		if (index < list.size()) {
-			int tmp = list.get(index++).getBranchCount();
+			int tmp=list.get(index++).getBranchCount();
 			while (tmp > 0) {
-				tmp += list.get(index++).getBranchCount()-1;
+				tmp += list.get(index++).getBranchCount() - 1;
 			}
 		}
 		return index;
@@ -246,7 +261,7 @@ public class ListTree<E> implements Collection<E> {
 		final int[] indices = new int[list.get(parent_loc).getBranchCount()];
 		if (indices.length > 0) {
 			indices[0] = parent_loc+1;
-			for (int i=1; i<indices.length; ++i) {
+			for (int i=1; i < indices.length; ++i) {
 				indices[i] = getEndOfBranchIndex(indices[i-1]);
 			}
 		}
@@ -267,10 +282,10 @@ public class ListTree<E> implements Collection<E> {
 		}
 		return depth;
 	}
-	
+
 	/**
 	 * METHOD - getDeepestCommonRoot
-	 * 
+	 *
 	 */
 	public int getDeepestCommonRoot(int... indices) {
 		// Sets potential return index to lowest provided index
@@ -278,7 +293,7 @@ public class ListTree<E> implements Collection<E> {
 		for (int index : indices)
 			return_index = Math.min(return_index, index);
 		int end_index = getEndOfBranchIndex(return_index);
-		
+
 		int index_count = 0;
 		// Check return index for containment of other nodes
 		// (Pre-check can avoid instantiation of FPAlg)
@@ -286,7 +301,7 @@ public class ListTree<E> implements Collection<E> {
 			if (++index_count >= indices.length)
 				return return_index;
 		}
-		
+
 		FindParentAlgorithm fp_alg = new FindParentAlgorithm();
 		int loop_end;
 		while (true) {
@@ -305,7 +320,7 @@ public class ListTree<E> implements Collection<E> {
 			}
 		}
 	}
-	
+
 	/**********************************************************
 	 * Basic Insertion Methods
 	 * 
@@ -449,11 +464,11 @@ public class ListTree<E> implements Collection<E> {
 	 * 
 	 */
 	public void deleteSubTree(int branch_loc) throws BranchCountException {
-		if (getRootIndex(branch_loc) != -1) {
+		if (getRootIndex(branch_loc) != -1)
 			list.get(getRootIndex(branch_loc)).decrementCount();
-		}
 		list.subList(branch_loc, getEndOfBranchIndex(branch_loc)).clear();
 	}
+
 	/**
 	 * FUNCTION - deleteBranches
 	 */
@@ -464,7 +479,7 @@ public class ListTree<E> implements Collection<E> {
 		if (range <= 0) throw new RuntimeException();
 		// Last Validity Check (after check, method makes changes)
 		list.get(root_loc).incrementCountBy(-range);
-		
+
 		// Rest of operation
 		final int index_first = getNthBranchIndex(root_loc, order_first);
 		int index_last = index_first;
@@ -473,7 +488,7 @@ public class ListTree<E> implements Collection<E> {
 		}
 		list.subList(index_first, index_last).clear();
 	}
-	
+
 	/**
 	 * FUNCTION - deleteRoot
 	 * 

@@ -96,7 +96,6 @@ public class OperationButton extends Button {
 		}
 	}
 
-	
 	private FunctionType ftype;
 	public FunctionType getFtype() {return ftype;}
 	public void setFtype(FunctionType ft) {ftype = ft;}

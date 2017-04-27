@@ -1,0 +1,48 @@
+<!-- NOTE: other old layout versions are on GitHub -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/context"
+	android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".MainActivity" >
+
+	<include layout="@layout/mathview"
+		android:layout_width="match_parent"
+		android:layout_height="0dp"
+		android:layout_weight="1"
+		android:layout_gravity="center_horizontal" />
+
+	<LinearLayout
+		android:id="@+id/panelOps"
+		android:orientation="vertical"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" >
+
+		<LinearLayout
+			android:orientation="horizontal"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:paddingBottom="5dp"
+			style="?android:attr/buttonBarStyle"
+			android:divider="?android:attr/dividerVertical"
+			android:showDividers="middle" >
+
+			<include layout="@layout/buttons_edits"/>
+
+		</LinearLayout>
+
+		<include layout="@layout/panelpalette"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" />
+
+		<android.inputmethodservice.KeyboardView
+			android:id="@+id/keyboardNum"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_horizontal|bottom"
+			android:focusable="true"
+			android:focusableInTouchMode="true" />
+
+	</LinearLayout>
+</LinearLayout>

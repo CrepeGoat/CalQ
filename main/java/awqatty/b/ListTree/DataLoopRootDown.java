@@ -3,18 +3,21 @@ package awqatty.b.ListTree;
 import java.util.ArrayList;
 import java.util.List;
 
+import static awqatty.b.ListTree.DataLoopRootDown.LoopControl.BREAK_BRANCH;
+import static awqatty.b.ListTree.DataLoopRootDown.LoopControl.BREAK_LOOP;
+
 abstract public class DataLoopRootDown<E, T> {
 
 	private final List<T> stack = new ArrayList<T>();
 	// Allows inherited loop methods access to node indices
 	protected int index;
-	
+
 	protected static enum LoopControl {
 		CONTINUE,
 		BREAK_BRANCH,
 		BREAK_LOOP
-	}
-	
+	};
+		
 	public void runLoop(ListTree<E> tree) {
 		runLoop(tree, null);
 	}
@@ -40,9 +43,9 @@ abstract public class DataLoopRootDown<E, T> {
 			break_type = loopAtNode(tree.get(index), data, stack.subList(0, 0));
 			
 			// Check loop breaks
-			if (break_type == LoopControl.BREAK_BRANCH)
+			if (break_type == BREAK_BRANCH)
 				index = tree.getEndOfBranchIndex(index);
-			else if (break_type == LoopControl.BREAK_LOOP)
+			else if (break_type == BREAK_LOOP)
 				break;
 			else ++index;
 		}

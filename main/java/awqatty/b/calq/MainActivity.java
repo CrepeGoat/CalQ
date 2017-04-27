@@ -18,31 +18,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
-import awqatty.b.CustomEventListeners.ChangeEvent;
 import awqatty.b.CustomEventListeners.CompositeOnChangeListener;
 import awqatty.b.CustomEventListeners.CompositeOnClickListener;
-import awqatty.b.CustomEventListeners.OnViewEventListener;
-import awqatty.b.CustomEventListeners.CompositeSwitchEventListenerBase.ListenerBoxSwitch;
-import awqatty.b.CustomEventListeners.OnChangeListener;
-import awqatty.b.CustomEventListeners.SwitchOnChangeListener;
-import awqatty.b.CustomEventListeners.SwitchedEventListenerBase;
 import awqatty.b.FunctionDictionary.FunctionType;
-import awqatty.b.FunctionDictionary.FunctionForms.CalculationException;
-import awqatty.b.GUI.TouchMathView;
 import awqatty.b.GUI.NumberKeyboardListener;
 import awqatty.b.GUI.PaletteManager;
 import awqatty.b.GUI.PaletteboxAnimator;
 import awqatty.b.GUI.SideButtonPaletteManager;
 import awqatty.b.GUI.SwipePaletteManager;
-import awqatty.b.GenericTextPresentation.NumberStringConverter;
 import awqatty.b.CustomEventListeners.ObservedOpTree;
+import awqatty.b.GUI.TouchableMathView;
 import awqatty.b.OpButtons.OperationButton;
 import awqatty.b.ViewUtilities.ViewFinder;
 import awqatty.b.ViewUtilities.ViewParentFinder;
-import awqatty.b.ViewUtilities.ViewReplacer;
 
 /***************************************************************************************
  * Author - Becker Awqatty
@@ -52,35 +41,34 @@ import awqatty.b.ViewUtilities.ViewReplacer;
  * MathJax in Android Sample Code (https://github.com/leathrum/android-apps/blob/master
  * 		/MathJaxApp/mml-full/MainActivity.java)
  * 
- * TODO
- * 
- * Fix number-to-text conversion
- * 
+ * TODO new features
  * Add _ftype values to buttons (to avoid switch table for OnPressOperator & addFunction)
  * 
  * GUI Scheme (colors, custom buttons, TextView borders)
  * 
  * Add larger device support
  * (also change drawables to be API specific)
- * 
- * Shift textNum TextView to be constantly in view,
- * 		remove equals button
- * 
- * add parentheses support
- * 
- * make sure numText contains result in one line
- * 
+ *
  * convert single-palette view to be swipe up/down (not scroll) stack
  * 
  * divide panels into fragments (?)
  * 
  * change numkeys to normal buttons
- * 	- more uniform appearance
- * 
- * make adding calculated result to equation screen a swipe action
- * 
- * TODO Bugs
- * 
+ * 	-> makes a more uniform appearance
+ *
+ * 	implement 'undo' button (i.e., keep running log of actions)
+ *
+ * 	align objects to origin (will fix alignment of, e.g., exponential expressions)
+ *
+ * TODO working features
+ * parentheses assignment inside neg function (f(x)=-x)
+ *
+ * on mathview reload: shift view to focus on selection
+ *
+ * get SVG images to render
+ *
+ * minimum shrink scale for elements (i.e. fix nested exponent functions)
+ *
  *****************************************************************************************/
 
 
@@ -91,34 +79,33 @@ public final class MainActivity extends Activity
 	 * Private Fields
 	 *********************************************************/
 	private ObservedOpTree expression = null;
-	private double result;
-	private int blank_index;	// stores node loc. from calc.exception
+	//private int blank_index;	// stores node loc. from calc.exception
 	
 	// Click Listeners stored for inflation of new palettes
 	private PaletteManager pltmanager;
 	private View.OnClickListener swapplt_listener, delplt_listener;
-	
+
 	// Listener-Box Switches to (de)activate on-view-event listeners
-	private ListenerBoxSwitch
-			trigger_setEqualToText,	// on click equal, or click num
-			trigger_showNumKeys;	// on Num click, or textNum click
-	private SwitchedEventListenerBase.ListenerSwitch
-			switch_unsetShuffleButton,
-			switch_setTextToEqual,
-			switch_hideNumKeys;
+	//private ListenerBoxSwitch
+	//		trigger_setEqualToText,	// on click equal, or click num
+	//		trigger_showNumKeys;	// on Num click, or textNum click
+	//private SwitchedEventListenerBase.ListenerSwitch
+	//		switch_unsetShuffleButton,
+	//		switch_setTextToEqual,
+	//		switch_hideNumKeys;
 
 	// used to swap operators with shuffle button
-	private View button_shuffle;
-	private View button_temp;
-	
+	//private View button_shuffle;
+	//private View button_temp;
+
 	private View view_newpalette;	// local storage for context-menu operation
 	
 	// trigger for storage function in onDestroy()
 	private RetainDataFragment<ObservedOpTree> fragment_retainOpTree;
-	
+
 	// Local References (used for faster access of commonly-accessed views)
-	private TextView number_text;
-	
+	//private TextView number_text;
+
 	//---------------------------------------------------
 	// Init Functions
 	@Override
@@ -128,8 +115,8 @@ public final class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		final TouchMathView mathview = (TouchMathView) findViewById(R.id.mathview);
-		number_text = (TextView) findViewById(R.id.textNum);
+		final TouchableMathView mathview = (TouchableMathView) findViewById(R.id.mathview);
+		//number_text = (TextView) findViewById(R.id.textNum);
 
 		/*********************************************************
 		 * Fragment Management
@@ -141,7 +128,7 @@ public final class MainActivity extends Activity
 				getString(R.string.fragtag_retainOpTree) );
 		
 		if (fragment_retainOpTree == null) {
-			fragment_retainOpTree = new RetainDataFragment<ObservedOpTree>();
+			fragment_retainOpTree = new RetainDataFragment<>();
 			getFragmentManager().beginTransaction()
 					.add(fragment_retainOpTree,
 							getString(R.string.fragtag_retainOpTree) )
@@ -170,8 +157,9 @@ public final class MainActivity extends Activity
 		
 		//		Observer to refresh MathML screen
 		change_listener.setOnChangeListener(mathview);
-		
+
 		//		Observer to Unset Shuffle Button
+		/*
 		final SwitchOnChangeListener listener_unsetShuffleButton = 
 				new SwitchOnChangeListener(new OnChangeListener() {
 					@Override
@@ -186,7 +174,6 @@ public final class MainActivity extends Activity
 		switch_unsetShuffleButton = listener_unsetShuffleButton.getSwitch();
 		switch_unsetShuffleButton.disableListener();
 		change_listener.setOnChangeListener(listener_unsetShuffleButton);
-		
 		//		Observer to SetTextToEqual
 		final SwitchOnChangeListener listener_setTextToEqual = 
 			new SwitchOnChangeListener(new OnChangeListener() {
@@ -198,13 +185,15 @@ public final class MainActivity extends Activity
 		switch_setTextToEqual = listener_setTextToEqual.getSwitch();
 		switch_setTextToEqual.disableListener();		
 		change_listener.setOnChangeListener(listener_setTextToEqual);
-		
+		//*/
+
 		// Create OnClickListeners
 		final CompositeOnClickListener
-				eql_listener = new CompositeOnClickListener(1),
-				txt_listener = new CompositeOnClickListener(1),
+		//		eql_listener = new CompositeOnClickListener(1),
+		//		txt_listener = new CompositeOnClickListener(1),
 				keys1_listener = new CompositeOnClickListener(1);
-		
+
+		/*
 		eql_listener.addListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -227,7 +216,7 @@ public final class MainActivity extends Activity
 					}
 				);
 		trigger_setEqualToText.enableListener();
-				
+		//*/
 		swapplt_listener = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -247,14 +236,14 @@ public final class MainActivity extends Activity
 		
 				
 		// Platform-dependent logic
-		final View button_num = findViewById(R.id.buttonNum);
+		//final View button_num = findViewById(R.id.buttonNum);
 		// For smaller screens which hide the number keyboard
-		if (button_num != null) {
+		//if (button_num != null) {
 			// Set listeners to _number-keyboard button
-			final CompositeOnClickListener
-					num_listener = new CompositeOnClickListener(2);
-			num_listener.addSwitchListener(trigger_setEqualToText);
-			num_listener.addListener(new View.OnClickListener() {
+			//final CompositeOnClickListener
+			//		num_listener = new CompositeOnClickListener(2);
+			//num_listener.addSwitchListener(trigger_setEqualToText);
+			/*num_listener.addListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					onClickNumbersButton(v);
@@ -285,19 +274,20 @@ public final class MainActivity extends Activity
 			change_listener.setOnChangeListener(keys2_listener);
 			
 			trigger_showNumKeys.enableListener();
-		}
+			//*/
+		//}
 		// For larger screens which leave the number keyboard on-screen
-		else {
-			keys1_listener.addSwitchListener(trigger_setEqualToText);
-			switch_hideNumKeys = null;
-			trigger_showNumKeys = null;
-		}
-		
+		//else {
+			//keys1_listener.addSwitchListener(trigger_setEqualToText);
+			//switch_hideNumKeys = null;
+			//trigger_showNumKeys = null;
+		//}
+
 		/********************************************************
 		 * Fill Incomplete Views
 		 ********************************************************/
 		// Inflate Shuffle Button (substituted in dynamically for op buttons)
-		button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
+		//button_shuffle = View.inflate(this, R.layout.button_shuffle, null);
 		
 		final SharedPreferences pref = PreferenceManager
 				.getDefaultSharedPreferences(this);
@@ -311,7 +301,7 @@ public final class MainActivity extends Activity
 		final int max = getResources().getInteger(R.integer.maxPaletteQuantity);
 		
 		// Collect old palette ids in stack (use only basic palette if none exist)
-		final List<Integer> palette_ids = new ArrayList<Integer>(max);
+		final List<Integer> palette_ids = new ArrayList<>(max);
 		
 		for (int i=0; pref.contains(keybase+Integer.toString(i)) && i<max; ++i)
 			palette_ids.add(pref.getInt(keybase+Integer.toString(i), 0));
@@ -329,8 +319,8 @@ public final class MainActivity extends Activity
 		 * Sets listeners to respective views
 		 */
 		//		Unique Views
-		findViewById(R.id.buttonEqual).setOnClickListener(eql_listener);
-		number_text.setOnClickListener(txt_listener);
+		//findViewById(R.id.buttonEqual).setOnClickListener(eql_listener);
+		//number_text.setOnClickListener(txt_listener);
 		
 		final View button_addPalette = findViewById(R.id.buttonNewPalette);
 		if (button_addPalette !=  null) {
@@ -339,7 +329,7 @@ public final class MainActivity extends Activity
 
 		
 		/*********************************************************
-		 * Set local WebView object
+		 * Set local MathView object
 		 *********************************************************/
 		mathview.setOpTree(expression);
 
@@ -347,7 +337,7 @@ public final class MainActivity extends Activity
 		 * Set Number Keyboard
 		 *********************************************************/
 		NumberKeyboardListener num_keyslistener
-				= new NumberKeyboardListener(number_text);
+				= new NumberKeyboardListener(expression);
 		num_keyslistener.setOnClickListener
 				(NumberKeyboardListener.KEYS_EDIT, keys1_listener);
 		
@@ -376,10 +366,11 @@ public final class MainActivity extends Activity
 		final SharedPreferences.Editor pref_edit = pref.edit();
 		final String keybase = getString(R.string.prefKey_paletteIds_baseStr);
 		// Gets current ids
-		List<Integer> ids = new ArrayList<Integer>();
+		List<Integer> ids = new ArrayList<>();
 		for (View palette : (new ViewFinder()).findViewsByTag(
-				(ViewGroup)getWindow().getDecorView().getRootView(),
-				getString(R.string.tag_plt) )) {
+				getWindow().getDecorView().getRootView(),
+				getString(R.string.tag_plt)
+		)) {
 			ids.add(palette.getId());
 		}
 		
@@ -403,7 +394,7 @@ public final class MainActivity extends Activity
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
+		// Inflate the menu; this adds items to the action bar if it's present.
 		getMenuInflater().inflate(R.menu.menu_main, menu);
 		return true;
 	}
@@ -490,11 +481,11 @@ public final class MainActivity extends Activity
 	private void refreshNumberText() {
 		number_text.setText("");
 		// Sets result of selection to textNum hint
-		try {			
+		try {
 			// Calculate result (throws CalcEx)
-			result = expression.getSelectionCalculation();
+			double result = expression.getSelectionCalculation();
 			// Set text representation of result to view
-			number_text.setHint(NumberStringConverter.toCompressedString(result,13));
+			number_text.setHint(NumberStringConverter.toString(result));
 		}
 		catch (CalculationException ce) {
 			// Set failed index
@@ -502,8 +493,7 @@ public final class MainActivity extends Activity
 			number_text.setHint(getString(R.string.textNum_blank));
 		}
 	}
-	//*/
-	
+
 	// Called on button click after Equals has been clicked
 	public void setEqualToText() {
 		((ViewSwitcher) findViewById(R.id.switchEqText)).showNext();
@@ -512,7 +502,7 @@ public final class MainActivity extends Activity
 	}
 	public void setTextToEqual() {
 		((ViewSwitcher) findViewById(R.id.switchEqText)).showPrevious();
-		// TODO this shouldn't have to be here
+		// TO/DO this shouldn't have to be here
 		number_text.setText("");
 		switch_setTextToEqual.disableListener();
 		trigger_setEqualToText.enableListener();
@@ -521,11 +511,12 @@ public final class MainActivity extends Activity
 	public void hideNumKeys() {
 		// Shows button panel
 		findViewById(R.id.panelOps).setVisibility(View.VISIBLE);
-		/*** Use only if root view is a RelativeLayout ***
+		//*** Use only if root view is a RelativeLayout ***
 		// Aligns bottom of WebView back to button panel
 		((RelativeLayout.LayoutParams)number_text.getLayoutParams())
 				.addRule(RelativeLayout.ABOVE, R.id.opPanel);
-		//*/
+		//^/
+
 		// Hides Keyboard
 		KeyboardView keyboard = (KeyboardView)findViewById(R.id.keyboardNum);
 		keyboard.setVisibility(View.GONE);
@@ -539,18 +530,19 @@ public final class MainActivity extends Activity
 		KeyboardView keyboard = (KeyboardView)findViewById(R.id.keyboardNum);
 		keyboard.setVisibility(View.VISIBLE);
 		keyboard.setEnabled(true);
-		/*** Use only if root view is a RelativeLayout ***
+		//*** Use only if root view is a RelativeLayout ***
 		// Aligns bottom of WebView to top of keyboard
 		((RelativeLayout.LayoutParams)number_text.getLayoutParams())
 				.addRule(RelativeLayout.ABOVE, R.id.keyboardNum);
-		//*/
+		//^/
 		// Hides button panel
 		findViewById(R.id.panelOps).setVisibility(View.GONE);
 		// Set triggers
 		trigger_showNumKeys.disableListener();
 		switch_hideNumKeys.enableListener();
 	}
-		
+	//*/
+
 	public void raiseToast(String str) {
 		Toast t = Toast.makeText(
 				getApplicationContext(), str, Toast.LENGTH_SHORT );
@@ -585,19 +577,20 @@ public final class MainActivity extends Activity
 	//////////////////////////////////////////////////////////////////////
 	
 	// Called when a MathML element is clicked in the WebView
-	public void onClickMathView(int index) {
-		// TODO (?) if clicked element is a child element of the current selection,
-		//		set selector to the index of its parent
-		expression.addToSelection(index);
-		//refreshNumberText();
-	}
+	//public void onClickMathml(int index) {
+	//	// TODO (?) if clicked element is a child element of the current selection,
+	//	//		set selector to the index of its parent
+	//	expression.setSelection(index);
+	//	//refreshNumberText();
+	//}
 	
+	/*
 	public void onClickEquals(View v) {
 		try {			
 			// Calculate result (throws CalcEx)
-			result = expression.getCalculation();
+			double result = expression.getCalculation();
 
-			expression.selectNone();
+			expression.setSelection(OpTree.null_index);
 
 			// Set text representation of result to view
 			((TextView) findViewById(R.id.textNum))
@@ -613,10 +606,10 @@ public final class MainActivity extends Activity
 		}
 	}
 	// Called when the result text box is clicked
-	public void onClickNumberText(View v) {		
+	public void onClickNumberText(View v) {
 		if (number_text.getHint() == getString(R.string.textNum_blank)) {
 			switch_setTextToEqual.disableListener();
-			expression.addToSelection(blank_index);
+			expression.setSelection(blank_index);
 			switch_setTextToEqual.enableListener();
 			number_text.setText(getString(R.string.textNum_default));
 		}
@@ -624,7 +617,8 @@ public final class MainActivity extends Activity
 			number_text.setText(number_text.getHint());
 		}
 	}
-		
+	//*/
+
 	// Called when the user clicks the delete button
 	public void onClickDelete(View v) {
 		expression.delete();
@@ -642,28 +636,32 @@ public final class MainActivity extends Activity
 		// Adds function to expression
 		FunctionType ftype = ((OperationButton)v).getFtype();
 		// (sets selector in function)
-		final boolean canShuffle = expression.addFunction(ftype);
+		//final boolean canShuffle =
+		expression.addFunction(ftype);
 		//refreshNumberText();
 		
 		// Replaces op-button with shuffle button
-		if (canShuffle) {
-			(new ViewReplacer()).replaceView(v, button_shuffle);
-			button_temp = v;
-			switch_unsetShuffleButton.enableListener();
-		}
+		//if (canShuffle) {
+		//	(new ViewReplacer()).replaceView(v, button_shuffle);
+		//	button_temp = v;
+		//	switch_unsetShuffleButton.enableListener();
+		//}
 	}
 	public void onClickShuffle(View v) {
 		expression.shuffleOrder();
 		// Selection remains the same in shuffle, no refreshNumberText() necessary
 	}
+	/*
 	public void unsetShuffleButton() {
 		// Replaces shuffle button w/ op-button
 		(new ViewReplacer()).replaceView(button_shuffle, button_temp);
 		button_temp = null;
 		switch_unsetShuffleButton.disableListener();
 	}
-	
+	//*/
+
 	// Called when the user clicks the _number insertion button
+	/*
 	public void onClickNumbersButton(View v) {
 		showNumKeys();
 		if (number_text.getText() == "")
@@ -685,10 +683,10 @@ public final class MainActivity extends Activity
 	public void onNumKeyboardCancel() {
 		number_text.setText("");
 		onNumKeyboardResult();
-		// TODO make numkeys hide in some other way (this is kinda dumb)
-		expression.addToSelection(expression.getSelectionIndex());
+		// TO/DO make numkeys hide in some other way (this is kinda dumb)
+		expression.setSelection(expression.selection);
 	}
-	
+	//*/
 	public void onClickDeletePalette(View v) {
 		pltmanager.removePalette(v);
 	}
@@ -697,7 +695,7 @@ public final class MainActivity extends Activity
 	// TEST FUNCTIONS
 	//////////////////////////////////////////////////////////////////////
 
-	//*
+	/*
 	// Testing elements
 	Integer temp_count = 0;
 	String temp_out;

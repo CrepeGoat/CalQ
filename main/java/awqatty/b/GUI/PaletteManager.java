@@ -10,6 +10,7 @@ import awqatty.b.ViewUtilities.ViewFinder;
 import awqatty.b.ViewUtilities.ViewReplacer;
 import awqatty.b.calq.R;
 
+
 abstract public class PaletteManager {
 	
 	private static int getLayoutIdFromViewId(int id) {

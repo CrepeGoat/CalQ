@@ -1,30 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android" >
-	
-	<Button
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+	   xmlns:app="http://schemas.android.com/apk/res-auto">
+	<!-- TODO get vector images to work -->
+
+	<ImageButton
 		android:id="@+id/buttonDel"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:contentDescription="@string/deleteOp_desc"
-		android:drawableRight="@drawable/ic_action_remove"
-   		android:drawablePadding="-57dp"
-		android:text="@string/circle"
-		android:textSize="@dimen/button_textSize_L"
+		android:src="@drawable/ic_action_del_expr"
+		android:scaleType="fitCenter"
 		style="?android:attr/buttonBarButtonStyle"
 		android:onClick="onClickDelete" />
-	
-   	<Button
+	<!--
+   	android:drawableRight="@drawable/ic_action_remove"
+   	android:drawablePadding="-57dp"
+    android:text="@string/circle"
+    android:textSize="@dimen/button_textSize_L" -->
+
+   	<ImageButton
    		android:id="@+id/buttonDelParent"
    		android:layout_width="wrap_content"
    		android:layout_height="wrap_content"
-   		android:contentDescription="@string/deleteOp_desc"
+   		android:contentDescription="@string/deleteOpParent_desc"
+		android:src="@drawable/ic_action_del_parent_expr"
+		android:scaleType="fitCenter"
+		style="?android:attr/buttonBarButtonStyle"
+		android:onClick="onClickDeleteParent" />
+	<!--
    		android:drawablePadding="-7.5sp"
    		android:drawableRight="@drawable/ic_action_remove"
    		android:text="@string/arrowUp"
 		android:textSize="@dimen/button_textSize_M"
+	-->
+
+	<ImageButton
+		android:id="@+id/buttonCycle"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@drawable/ic_action_shuffle"
+		android:contentDescription="@string/shuffleDesc"
+		android:tint="@color/white"
 		style="?android:attr/buttonBarButtonStyle"
-		android:onClick="onClickDeleteParent" />
-   	
+		android:onClick="onClickShuffle" />
+
 	<View
    		android:layout_width="0dp"
    		android:layout_height="match_parent"

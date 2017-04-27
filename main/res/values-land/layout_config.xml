@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <item name="main" 			type="layout"	>@layout/main_land</item>
-    <item name="panelpalette" 	type="layout"	>@layout/panelpalette_single</item>
-    <item name="palettebox" 	type="layout"	>@layout/palettebox_swipe_swapleftright</item>
-    <item name="numkeys" 		type="xml"		>@xml/numkeys_4x4_right_hideable</item>
-    
-    <string name="stretchPaletteCols">-1</string>
-</resources>

@@ -5,11 +5,12 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.SparseArray;
-import awqatty.b.DrawMath.DrawSubTree.AlignForm;
-import awqatty.b.DrawMath.DrawSubTree.DrawAligned;
+import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
+import awqatty.b.DrawMath.AlignDrawParts.DrawAligned;
 import awqatty.b.ListTree.ListTree;
 
-public final class DrawBlank implements AlignForm, DrawForm {
+public final class DrawBlank implements DrawForm {
 
 	private float w,h;
 	private float scale=1;
@@ -49,31 +50,25 @@ public final class DrawBlank implements AlignForm, DrawForm {
 	public void clearCache() {}
 	@Override
 	public void setColor(int color) {}
-	@Override
-	public void setSuperLeafSizes(List<RectF> leaf_sizes) {}
-	@Override
-	public void arrange(List<RectF> branch_sizes) {}
+	//@Override
+	//public void arrange(List<RectF> branch_sizes) {}
 	@Override
 	public void drawToCanvas(Canvas canvas, RectF dst) {}
-	@Override
-	public void getLeafLocations(List<RectF> leaf_locs) {}
-	@Override
-	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs) {}
+	//@Override
+	//public void getLeafLocations(List<RectF> leaf_locs) {}
 	@Override
 	public boolean intersectsTouchRegion(RectF dst, float px, float py) {return false;}
 	@Override
-	public boolean intersectsTouchRegion(RectF dst, float p1_x, float p1_y,
-			float p2_x, float p2_y) {return false;}
-	
+	public boolean intersectsTouchRegion(
+			RectF dst, float p1_x, float p1_y, float p2_x, float p2_y
+	) {
+		return false;
+	}
+
 	//--- Manage Parentheses ---
-	@Override
-	public <T extends DrawAligned> void subBranchShouldUsePars(
-			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {}
-	@Override
-	public <T extends DrawAligned> AlignForm getFirstInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {return this;}
-	@Override
-	public <T extends DrawAligned> AlignForm getLastInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {return this;}
+	//@Override
+	//public void assignParentheses(int[] ctypes, boolean[] pars_active) {}
+	//@Override
+	//public int getClosureFlags() {return ClosureFlags.NONE;}
 
 }

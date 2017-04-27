@@ -7,11 +7,12 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.SparseArray;
-import awqatty.b.DrawMath.DrawSubTree.AlignForm;
-import awqatty.b.DrawMath.DrawSubTree.DrawAligned;
+import awqatty.b.DrawMath.AssignParentheses.ClosureFlags;
+import awqatty.b.DrawMath.AlignDrawParts.AlignForm;
+import awqatty.b.DrawMath.AlignDrawParts.DrawAligned;
 import awqatty.b.ListTree.ListTree;
 
-public class DrawPath extends RawDrawBase implements AlignForm {
+public class DrawPath extends RawDrawBase {
 
 	@Override
 	public void clearCache() {}
@@ -59,20 +60,19 @@ public class DrawPath extends RawDrawBase implements AlignForm {
 	}
 	
 	//--- Loop Methods ---
-	@Override
-	public void setSuperLeafSizes(List<RectF> leaf_sizes) {}
-	@Override
-	public void getSuperLeafLocations(SparseArray<RectF> leaf_locs) {}
-	
+	//@Override
+	//public void setSubLeafSizes(List<RectF> leaf_sizes) {}
+	//@Override
+	//public void getSubLeafLocations(SparseArray<RectF> leaf_locs) {}
+
 	//--- Manage Parentheses ---
-	@Override
-	public <T extends DrawAligned> void subBranchShouldUsePars(
-			ListTree<T> tree, int[] branch_indices, boolean[] pars_active) {}
-	@Override
-	public <T extends DrawAligned> AlignForm getFirstInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {return this;}
-	@Override
-	public <T extends DrawAligned> AlignForm getLastInSeries(
-			boolean orientation, ListTree<T>.Navigator nav) {return this;}
+	//@Override
+	//public void assignParentheses(int[] ctypes, boolean[] pars_active) {}
+	//@Override
+	//public int getClosureFlags() {return ClosureFlags.NONE;}
+	//@Override
+	//public <T extends DrawAligned> void subBranchShouldUsePars(
+	//		ListTree<T>.Navigator nav, boolean[] pars_active) {}
+
 
 }
