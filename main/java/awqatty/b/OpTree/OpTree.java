@@ -2,6 +2,7 @@ package awqatty.b.OpTree;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 
 import awqatty.b.FunctionDictionary.FunctionType;
 import awqatty.b.FunctionDictionary.FunctionForms.CalculationException;
@@ -31,8 +32,8 @@ public class OpTree {
 	public OpTree(Context context) {
 		synchronized(OpTree.class) {
 			// TODO
-			color_highlightSelect = context.getResources().getColor(R.color.sky_blue);
-			color_highlightEdit = context.getResources().getColor(R.color.orange_);
+			color_highlightSelect = ContextCompat.getColor(context, R.color.sky_blue);
+			color_highlightEdit = ContextCompat.getColor(context, R.color.orange_);
 		}
 		node_builder = new OperationBuilder(context);
 		tree.addBranch(-1, 0, node_builder.build(FunctionType.BLANK));

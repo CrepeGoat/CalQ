@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.util.SparseArray;
 
+import awqatty.b.ListTree.ListTree;
+
 abstract public class AlignBase implements AlignForm {
 
 	protected RectF valid_area=null;
@@ -170,4 +172,13 @@ abstract public class AlignBase implements AlignForm {
  		}
  		return false;
  	}
+
+	//TODO stubbed to always add parentheses to expressions; needs actual logic
+	public <T extends DrawAligned> void subBranchShouldUsePars(
+			ListTree<T>.Navigator nav,
+			boolean[] pars_active
+	) {
+		for (int i=0; i<pars_active.length; ++i)
+			pars_active[i] = true;
+	}
 }

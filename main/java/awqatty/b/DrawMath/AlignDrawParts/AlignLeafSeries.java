@@ -82,6 +82,7 @@ public final class AlignLeafSeries extends AlignAxisBase {
 	//	}
 	//}
 
+	/*
 	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(
 			ListTree<T>.Navigator nav, boolean[] pars_active) {
@@ -108,4 +109,5 @@ public final class AlignLeafSeries extends AlignAxisBase {
 			}
 		}
 	}
+	//*/
 }

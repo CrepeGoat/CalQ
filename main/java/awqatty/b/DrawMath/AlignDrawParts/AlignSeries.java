@@ -49,10 +49,10 @@ public final class AlignSeries extends AlignAxisBase {
 		
 	}
 	//*/
+	/*
 	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(
 			ListTree<T>.Navigator nav, boolean[] pars_active) {
-		// TODO Auto-generated method stub
 		if (comps.size() > 2
 				&& comps.get(1) instanceof DrawText
 				&& ((DrawText)comps.get(1)).text == "-"
@@ -66,7 +66,7 @@ public final class AlignSeries extends AlignAxisBase {
 				pars_active[0]=true;
 		}
 		// else all = false
-		
 	}
+	//*/
 
 }

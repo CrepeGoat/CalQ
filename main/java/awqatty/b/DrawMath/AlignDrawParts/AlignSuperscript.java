@@ -86,6 +86,7 @@ public final class AlignSuperscript extends AlignBase {
 		}
 	}
 	//*/
+	/*
 	@Override
 	public <T extends DrawAligned> void subBranchShouldUsePars(
 			ListTree<T>.Navigator nav, boolean[] pars_active) {
@@ -93,5 +94,5 @@ public final class AlignSuperscript extends AlignBase {
 		nav.moveToEnd();
 		pars_active[INDEX_EXP] = (nav.getObject().base_comp instanceof AlignSuperscript);
 	}
-
+	//*/
 }
